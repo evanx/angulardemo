@@ -38,10 +38,13 @@ import vellum.httpserver.VellumHttpServer;
  * @author evanx
  */
 public class GitteryApp implements HttpHandler {
-    Logger logger = LoggerFactory.getLogger(GitteryApp.class);
+    static Logger logger = LoggerFactory.getLogger(GitteryApp.class);
+
     VellumHttpServer httpServer = new VellumHttpServer();
+
     String repo = "https://raw.github.com/evanx/angulardemo/master";
     String root = "/home/evanx/NetBeansProjects/git/angulardemo";
+    String defaultPath = "/index.html";
     
     public void start() throws Exception {
         httpServer.start(new HttpServerProperties(8081), this);
@@ -51,13 +54,7 @@ public class GitteryApp implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         String path = he.getRequestURI().getPath();
         if (path.equals("/")) {
-            path = "/index.html";
-        }
-        String contentType = "text/html";
-        if (path.endsWith(".json")) {
-            contentType = "text/json";
-        } else if (path.endsWith(".js")) {
-            contentType = "text/javascript";
+            path = defaultPath;
         }
         File file = new File(root + path);
         logger.info("file {}", file);
@@ -78,12 +75,35 @@ public class GitteryApp implements HttpHandler {
             }
             logger.info("content {}", new String(content));
             he.sendResponseHeaders(200, length);
-            he.getResponseHeaders().set("Content-Type", contentType);
+            he.getResponseHeaders().set("Content-Type", getContentType(path));
             he.getResponseBody().write(content);
         } catch (Throwable e) {
             e.printStackTrace(System.err);
         } finally {
             he.close();
+        }
+    }
+    
+    public static String getContentType(String path) {
+        if (path.endsWith(".png")) {
+            return "image/png";
+        } else if (path.endsWith(".jpg")) {
+            return "image/jpeg";
+        } else if (path.endsWith(".html")) {
+            return "text/html";
+        } else if (path.endsWith(".css")) {
+            return "text/css";
+        } else if (path.endsWith(".js")) {
+            return "text/javascript";
+        } else if (path.endsWith(".txt")) {
+            return "text/plain";
+        } else if (path.endsWith(".json")) {
+            return "text/json";
+        } else if (path.endsWith(".html")) {
+            return "text/html";
+        } else {
+            logger.warn(path);
+            return "text/html";
         }
     }
     
@@ -96,5 +116,6 @@ public class GitteryApp implements HttpHandler {
             e.printStackTrace(System.err);
         }
     }
+    
     
 }
