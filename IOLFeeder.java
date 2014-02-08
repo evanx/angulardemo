@@ -30,9 +30,9 @@ public class IOLFeeder {
     List<LinkThread> threadList = new ArrayList();
 
     private void start() throws Exception {
-        feed("News", "http://iol.co.za/cmlink/1.640");
+        feed("Business", "http://www.iol.co.za/cmlink/1.730910");
         if (false) {
-            feed("Business", "http://www.iol.co.za/cmlink/1.730910");
+            feed("News", "http://iol.co.za/cmlink/1.640");
             feed("Sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
             feed("Multimedia", "http://iol.co.za/cmlink/1.738");
         }
@@ -59,10 +59,12 @@ public class IOLFeeder {
                 linkThread.map.put("image", "http://www.iol.co.za/" + linkThread.imageLink);
             }
             articleList.add(linkThread.map);
+            System.out.println(linkThread.map.toJson());
         }
         JMap map = new JMap();
         map.put("section", sectionLabel);
-
+        map.put("articles", articleList);
+        System.out.println(map.toJson());
     }
 
     private String cleanDescription(String description) {
@@ -95,6 +97,7 @@ public class IOLFeeder {
 }
 
 class LinkThread extends Thread {
+
     static Pattern pattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
     JMap map;
     Exception exception;
@@ -114,13 +117,13 @@ class LinkThread extends Thread {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
             while (true) {
-                String line = reader.readLine();                                
+                String line = reader.readLine();
                 if (line == null) {
                     break;
                 }
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    imageLink = matcher.group(1);                    
+                    imageLink = matcher.group(1);
                     return;
                 }
             }
