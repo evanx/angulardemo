@@ -22,7 +22,7 @@ app.factory("appService", ["$http", function($http) {
 
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
-        $scope.title = "Business";
+        $scope.title = "Sport";
         $scope.userEmail = null;
         $scope.login = function() {
             appService.login($scope.email, $scope.password, $scope.loggedIn);
@@ -44,7 +44,7 @@ app.controller("appController", ["$scope", "appService",
 
 app.controller("feedController", ["$scope", "$window", "appService",
     function($scope, $window, appService) {
-        appService.feed("business.json", function(data) {
+        appService.feed("sport.json", function(data) {
             $scope.articles = data;
         });
         $scope.selected = function() {
