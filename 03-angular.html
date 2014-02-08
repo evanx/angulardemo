@@ -31,8 +31,11 @@
             </div>
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
-          <span class="navbar navbar-right" ng-show="email">{{email}}</span>
-        </div>
+            <div class="navbar-collapse collapse pull-right">
+                <div class="navbar-text" ng-cloak ng-show="email">
+                    {{email}}
+                </div>
+            </div>
       </div>
     </div>
 
