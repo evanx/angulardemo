@@ -3,11 +3,11 @@ var app = angular.module("app", []);
 
 app.factory("appService", ["$http", function($http) {
         return {
-            login: function(email, password, successHandler) {
+            login: function(email, password, successHandler, errorHandler) {
                 $http.post("login.json", {
                     email: email,
                     password: password
-                }).success(successHandler);
+                }).success(successHandler).error(errorHandler);
             },
             logout: function(email, successHandler) {
                 $http.post("logout.json", {
@@ -29,6 +29,9 @@ app.controller("appController", ["$scope", "appService",
         $scope.loggedIn = function(data) {
             $scope.userEmail = data.email;
             $scope.userDisplayName = data.name;
+        };
+        $scope.loginError = function(data) {
+            console.log("loginError", data);
         };
         $scope.logout = function() {
             appService.logout($scope.email, $scope.loggedOut);

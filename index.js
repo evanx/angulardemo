@@ -16,12 +16,12 @@ app.controller("linksController", ["$scope", "$window", "appService",
             "01-bootstrap.html",
             "02-app.js",
             "03-angular.html",
-            "04-login.js",
-            "05-submit.html",
+            "04-submit.html",
+            "05-login.js",
             "06-login.js",
             "07-login.html",
-            "08-headlines.js",
-            "09-headlines.html"
+            "08-headlines.html",
+            "09-headlines.js"
         ];
         console.log("links", $scope.links);
         $scope.open = function() {

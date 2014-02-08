@@ -24,12 +24,15 @@
         </div>
         <div class="navbar-collapse collapse">
           <div class="navbar-right">
-            <form class="navbar-form navbar-right" role="form" ng-show="!userEmail" ng-cloak ng-submit="login()">
+            <form class="navbar-form navbar-right" role="form" 
+                  ng-show="!userEmail" ng-cloak ng-submit="login()">
               <div class="form-group">
-                <input type="email" placeholder="Email" class="form-control" ng-model="email" required >
+                <input type="email" placeholder="Email" class="form-control" 
+                       ng-model="email" required>
               </div>
               <div class="form-group">
-                <input type="password" required placeholder="Password" class="form-control" ng-model="password" ng-minlength="8">
+                <input type="password" placeholder="Password" class="form-control" 
+                       ng-model="password" required ng-minlength="8">
               </div>
               <button type="submit" class="btn btn-success">Sign in</button>
             </form>
