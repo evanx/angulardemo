@@ -21,7 +21,8 @@ app.controller("linksController", ["$scope", "$window", "appService",
             "06-login.js",
             "07-login.html",
             "08-feed.html",
-            "09-feed.js"
+            "09-feed.js",
+            "10-swipe.html"
         ];
         console.log("links", $scope.links);
         $scope.open = function() {

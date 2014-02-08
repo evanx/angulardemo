@@ -52,7 +52,10 @@
                   <p style="font-family: sans-serif">
                   {{article.description}}
                   </p>
-                  <img src="{{article.image}}" ng-show="article.image">
+                  <img src="{{article.image}}" ng-show="article.image" 
+                       ng-swipe-left="console.log('swipe-left')"
+                       ng-swipe-right="console.log('swipe-right')"
+                       >
                 </td>
               </tr>
             </tbody>

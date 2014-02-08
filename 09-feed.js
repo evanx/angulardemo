@@ -1,5 +1,5 @@
 
-var app = angular.module("app", []);
+var app = angular.module("app", ["ngTouch"]);
 
 app.factory("appService", ["$http", function($http) {
         return {
@@ -14,8 +14,8 @@ app.factory("appService", ["$http", function($http) {
                     email: email
                 }).success(successHandler);
             },
-            sportFeed: function(successHandler) {
-                $http.post("sport.json").success(successHandler);
+            feed: function(feed, successHandler) {
+                $http.post(feed).success(successHandler);
             }
         }
     }]);
@@ -43,8 +43,7 @@ app.controller("appController", ["$scope", "appService",
 
 app.controller("feedController", ["$scope", "$window", "appService",
     function($scope, $window, appService) {
-        appService.sportFeed(function(data) {
-            console.log("sportFeed", data);
+        appService.feed("news.json", function(data) {
             $scope.articles = data;
         });
         $scope.selected = function() {
