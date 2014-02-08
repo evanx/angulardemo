@@ -22,7 +22,7 @@
           <a class="navbar-brand" href="#">Project name</a>
         </div>
         <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
+          <form class="navbar-form navbar-right" role="form" ng-show="!email">
             <div class="form-group">
               <input type="text" placeholder="Email" class="form-control">
             </div>
@@ -31,6 +31,7 @@
             </div>
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
+          <span class="" ng-show="email">{{email}}</span>
         </div>
       </div>
     </div>
