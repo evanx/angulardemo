@@ -13,7 +13,7 @@ app.factory("appService", ["$http", function($http) {
 
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
-        $scope.email = null;        
+        $scope.email = "evan.summers@gmail.com";
         $scope.login = function() {
             appService.login($scope.email, $scope.password);
         };
