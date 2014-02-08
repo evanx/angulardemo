@@ -22,7 +22,6 @@ app.factory("appService", ["$http", function($http) {
 
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
-        console.log("appController init");
         $scope.userEmail = null;
         $scope.login = function() {
             appService.login($scope.email, $scope.password, $scope.loggedIn);
@@ -42,9 +41,14 @@ app.controller("appController", ["$scope", "appService",
         };
     }]);
 
-app.controller("headlinesController", ["$scope","appService",
-    function($scope, appService) {
+app.controller("headlinesController", ["$scope", "$window", "appService",
+    function($scope, $window, appService) {
         appService.sportFeed(function(data) {
+            console.log("sportFeed", data);
             $scope.headlines = data;
         });
+        $scope.selected = function() {
+            console.log("selected", this.headline);
+            $window.location.href = this.headline.link;
+        }
     }]);
