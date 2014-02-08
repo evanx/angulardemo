@@ -15,15 +15,14 @@ app.factory("appService", ["$http", function($http) {
                 }).success(successHandler);
             },
             sportFeed: function(successHandler) {
-                $http.post("sport.json", {
-                    email: email
-                }).success(successHandler);
+                $http.post("sport.json").success(successHandler);
             }
         }
     }]);
 
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
+        console.log("appController init");
         $scope.userEmail = null;
         $scope.login = function() {
             appService.login($scope.email, $scope.password, $scope.loggedIn);
@@ -43,10 +42,9 @@ app.controller("appController", ["$scope", "appService",
         };
     }]);
 
-app.controller("headlinesController", ["$scope", "appService",
+app.controller("headlinesController", ["$scope","appService",
     function($scope, appService) {
-        appService.sportFeed($scope.sportFeedHandler);        
-        $scope.sportFeedHandler = function(data) {
+        appService.sportFeed(function(data) {
             $scope.headlines = data;
-        };
+        });
     }]);
