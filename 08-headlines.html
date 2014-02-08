@@ -39,17 +39,17 @@
       </div>
     </div>
 
-    <div class="container" ng-controller="headlinesController" ng-cloak>
+    <div class="container" ng-controller="feedController" ng-cloak>
       <br>
-      <div class="row" ng-show="headlines.length > 0" ng-cloak>
+      <div class="row" ng-show="articles.length > 0" ng-cloak>
         <div class="col-lg-4">
           <table class="table table-condensed">
             <tbody>
-              <tr ng-repeat="headline in headlines" ng-click="selected()">
+              <tr ng-repeat="article in articles" ng-click="selected()">
                 <td>
-                  <b><a href="{{headline.link}}">{{headline.title}}</a></b><br>
-                  {{headline.description}}<br>
-                  <img src="{{headline.image}}" ng-show="headline.image">
+                  <b><a href="{{article.link}}">{{article.title}}</a></b><br>
+                  {{article.description}}<br>
+                  <img src="{{article.image}}" ng-show="article.image">
                 </td>
               </tr>
             </tbody>

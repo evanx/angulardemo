@@ -41,11 +41,11 @@ app.controller("appController", ["$scope", "appService",
         };
     }]);
 
-app.controller("headlinesController", ["$scope", "$window", "appService",
+app.controller("feedController", ["$scope", "$window", "appService",
     function($scope, $window, appService) {
         appService.sportFeed(function(data) {
             console.log("sportFeed", data);
-            $scope.headlines = data;
+            $scope.articles = data;
         });
         $scope.selected = function() {
             console.log("selected", this.headline);
