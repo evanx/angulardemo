@@ -45,9 +45,10 @@ public class GitteryApp implements HttpHandler {
     String repo = "https://raw.github.com/evanx/angulardemo/master";
     String root = "/home/evanx/NetBeansProjects/git/angulardemo";
     String defaultPath = "/index.html";
+    int port = 8088; 
     
     public void start() throws Exception {
-        httpServer.start(new HttpServerProperties(8081), this);
+        httpServer.start(new HttpServerProperties(port), this);
     }
 
     @Override
