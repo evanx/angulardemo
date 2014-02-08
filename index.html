@@ -35,10 +35,13 @@
             <tbody>
               <tr ng-repeat="link in links">
                 <td>
-                  <a target="_blank" href="{{link}}">{{link}}</a> 
+                  {{link}}
                 </td>
                 <td>
                   <a target="_blank" href="https://github.com/evanx/angulardemo/blob/master/{{link}}">source</a>
+                </td>
+                <td>
+                  <a target="_blank" href="{{link}}">load</a> 
                 </td>
               </tr>
             </tbody>
