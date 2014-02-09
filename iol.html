@@ -6,6 +6,7 @@
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://getbootstrap.com/examples/jumbotron/jumbotron.css" rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>    
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-touch.min.js"></script>    
     <title>Angular Demo</title>
   </head>
 
@@ -20,7 +21,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#" ng-cloak>{{title}}</a>
+          <a href="#" class="navbar-brand dropdown-toggle" data-toggle="dropdown" ng-cloak>
+            {{view}} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#" ng-click="setView('News')">News</a></li>
+            <li><a href="#" ng-click="setView('Sport')">Sport</a></li>
+            <li><a href="#" ng-click="setView('Business')">Business</a></li>
+          </ul>
         </div>
         <div class="navbar-collapse collapse">
           <div class="navbar-right">
@@ -46,12 +53,14 @@
           <table class="table table-striped table-condensed" style="width: 300px">
             <tbody>
               <tr ng-repeat="article in articles" ng-click="selected()">
-                <td>
+                <td ng-cloak>
                   <h5><a href="{{article.link}}">{{article.title}}</a></h5>
                   <p style="font-family: sans-serif">
                   {{article.description}}
                   </p>
-                  <img src="{{article.image}}" ng-show="article.image">
+                  <img ng-src="{{article.image}}"
+                       ng-swipe-left="console.log('swipe-left')"
+                       ng-swipe-right="console.log('swipe-right')">
                 </td>
               </tr>
             </tbody>
@@ -62,7 +71,7 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <script src="09-feed.js"></script>    
+    <script src="iol.js"></script>    
   </body>
 </html>
 

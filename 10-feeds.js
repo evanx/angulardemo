@@ -14,7 +14,8 @@ app.factory("appService", ["$http", function($http) {
                     email: email
                 }).success(successHandler);
             },
-            feed: function(feed, successHandler) {
+            loadFeed: function(feed, successHandler) {
+                console.log("loadFeed", feed);
                 $http.post(feed).success(successHandler);
             }
         }
@@ -22,8 +23,8 @@ app.factory("appService", ["$http", function($http) {
 
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
-        $scope.title = "Sport";
         $scope.userEmail = null;
+        $scope.view = "News";
         $scope.login = function() {
             appService.login($scope.email, $scope.password, $scope.loggedIn);
             $scope.email = null;
@@ -40,15 +41,35 @@ app.controller("appController", ["$scope", "appService",
             $scope.userEmail = null;
             $scope.userDisplayName = null;
         };
+        $scope.setView = function(view) {
+            if ($scope.view !== view) {
+                $scope.view = view;
+                $scope.$broadcast("setView", view);
+            }
+        };
     }]);
 
 app.controller("feedController", ["$scope", "$window", "appService",
     function($scope, $window, appService) {
-        appService.feed("sport.json", function(data) {
-            $scope.articles = data;
+        $scope.$on("setView", function(event, view) {
+            console.log("feedController setView", view);
+            if (view === "News") {
+                $scope.loadFeed("news.json");
+            } else if (view === "Sport") {
+                $scope.loadFeed("sport.json");
+            } else if (view === "Business") {
+                $scope.loadFeed("business.json");
+            }
         });
+        $scope.loadFeed = function(feed) {
+            appService.loadFeed(feed,  $scope.feedResult);
+        };
+        $scope.feedResult = function(data) {
+            $scope.articles = data;
+        };
         $scope.selected = function() {
             console.log("article", this.article);
             $window.location.href = this.article.link;
-        }
+        };
+        $scope.loadFeed("news.json");
     }]);
