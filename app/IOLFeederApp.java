@@ -1,7 +1,6 @@
 package app;
 
 
-import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.jx.JMap;
 
 /**
  *
@@ -33,7 +33,7 @@ public class IOLFeederApp implements Runnable {
             put("multimedia", "http://iol.co.za/cmlink/1.738");
         }
         if (true) {
-            elapsedExecutorService.scheduleAtFixedRate(this, 0, 3600, TimeUnit.SECONDS);
+            elapsedExecutorService.scheduleAtFixedRate(this, 1, 3600, TimeUnit.SECONDS);
         } else {
             run();
         }
@@ -49,13 +49,21 @@ public class IOLFeederApp implements Runnable {
         for (String key : feedMap.keySet()) {
             String feedUrl = feedMap.get(key);
             try {
-                List articleList = new IOLFeeder().list(10, feedUrl);
-                String json = new Gson().toJson(articleList);
+                List<JMap> articleList = new IOLFeeder().list(3, feedUrl);
+                StringBuilder json = new StringBuilder();
+                for (JMap map : articleList) {
+                    if (json.length() > 0) {
+                        json.append(",\n");
+                    }
+                    json.append("  " + map.toJson());
+                }
+                json.insert(0, "[\n");
+                json.append("\n]\n");
                 logger.info("json {}", json);
                 File file = new File(key + ".json");
                 logger.info("file {}", file.getAbsolutePath());
                 try (FileWriter writer = new FileWriter(file)) {
-                    writer.write(json);
+                    writer.write(json.toString());
                 }
             } catch (Exception e) {
                 logger.warn("run", e);

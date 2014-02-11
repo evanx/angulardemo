@@ -21,7 +21,7 @@ public class IOLFeeder {
     
     List<LinkThread> threadList = new ArrayList();
 
-    List list(int count, String feedUrl) throws Exception {
+    List<JMap> list(int count, String feedUrl) throws Exception {
         logger.info("feedUrl {}", feedUrl);
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
@@ -43,13 +43,13 @@ public class IOLFeeder {
                 break;
             }
         }        
-        List articleList = new ArrayList();
+        List<JMap> articleList = new ArrayList();
         for (LinkThread linkThread : threadList) {
             linkThread.join();
             if (linkThread.imageLink != null) {
                 linkThread.map.put("image", "http://www.iol.co.za/" + linkThread.imageLink);
                 articleList.add(linkThread.map);
-                logger.info(linkThread.map.toJson());
+                logger.info("imageLink {}", linkThread.imageLink);
             }
         }
         return articleList;
