@@ -1,3 +1,5 @@
+package app;
+
 /*
  * Source https://github.com/evanx by @evanxsummers
 
@@ -49,6 +51,7 @@ public class GitteryApp implements HttpHandler {
     
     public void start() throws Exception {
         httpServer.start(new HttpServerProperties(port), this);
+        new IOLFeederApp().start();
     }
 
     @Override
@@ -57,7 +60,12 @@ public class GitteryApp implements HttpHandler {
         if (path.equals("/")) {
             path = defaultPath;
         }
-        File file = new File(root + path);
+        File rootFile = new File(root + path);
+        File file = rootFile;
+        File currentFile = new File("." + path);
+        if (path.endsWith(".json") && currentFile.exists()) {
+            file = currentFile;
+        }
         logger.info("file {}", file);
         URL url = new URL(repo + path);
         logger.info("url {}", url);
