@@ -65,6 +65,7 @@ app.controller("feedController", ["$scope", "$window", "appService",
             appService.loadFeed(feed,  $scope.feedResult);
         };
         $scope.feedResult = function(data) {
+            console.log("feedResult", data);
             $scope.articles = data;
         };
         $scope.selected = function() {
