@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.BasicConfigurator;
@@ -23,18 +26,21 @@ import vellum.jx.JMap;
  *
  * @author evanx
  */
-public class IOLFeeder {
+public class IOLFeeder implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(GitteryApp.class);
     Map<String, String> feedMap = new HashMap();
     List<LinkThread> threadList = new ArrayList();
+    ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private void start() throws Exception {
         feed("Business", "http://www.iol.co.za/cmlink/1.730910");
+        feed("News", "http://iol.co.za/cmlink/1.640");
+        feed("Sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
+        feed("Multimedia", "http://iol.co.za/cmlink/1.738");
         if (false) {
-            feed("News", "http://iol.co.za/cmlink/1.640");
-            feed("Sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
-            feed("Multimedia", "http://iol.co.za/cmlink/1.738");
+            elapsedExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
+            
         }
     }
 
@@ -59,7 +65,9 @@ public class IOLFeeder {
                 linkThread.map.put("image", "http://www.iol.co.za/" + linkThread.imageLink);
             }
             articleList.add(linkThread.map);
-            System.out.println(linkThread.map.toJson());
+            if (false) {
+                System.out.println(linkThread.map.toJson());
+            }
         }
         JMap map = new JMap();
         map.put("section", sectionLabel);
@@ -85,6 +93,10 @@ public class IOLFeeder {
         return description;
     }
 
+    @Override
+    public void run() {
+    }
+    
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
