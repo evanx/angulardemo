@@ -33,7 +33,7 @@ public class IOLFeederApp implements Runnable {
         if (false) {
             put("multimedia", "http://iol.co.za/cmlink/1.738");
         }
-        if (false) {
+        if (true) {
             elapsedExecutorService.scheduleAtFixedRate(this, 0, 3600, TimeUnit.SECONDS);
         } else {
             run();
@@ -53,9 +53,10 @@ public class IOLFeederApp implements Runnable {
                 String json = new Gson().toJson(articleList);
                 logger.info("json {}", json);
                 File file = new File(key + ".json");
-                FileWriter writer = new FileWriter(file);
-                writer.write(json);
-                writer.close();
+                logger.info("file {}", file.getAbsolutePath());
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(json);
+                }
             } catch (Exception e) {
                 logger.warn("run", e);
             }
