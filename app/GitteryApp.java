@@ -63,8 +63,12 @@ public class GitteryApp implements HttpHandler {
         File rootFile = new File(root + path);
         File file = rootFile;
         File currentFile = new File("." + path);
-        if (path.endsWith(".json") && currentFile.exists()) {
-            file = currentFile;
+        if (path.endsWith(".json")) {
+            if (currentFile.exists()) {
+                file = currentFile;
+            } else {
+                logger.warn("file {}", currentFile);
+            }
         }
         logger.info("file {}", file);
         URL url = new URL(repo + path);

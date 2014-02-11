@@ -17,7 +17,8 @@ import vellum.jx.JMap;
  */
 public class IOLFeeder {
 
-    static Logger logger = LoggerFactory.getLogger(GitteryApp.class);
+    static Logger logger = LoggerFactory.getLogger(IOLFeeder.class);
+    
     List<LinkThread> threadList = new ArrayList();
 
     List list(int count, String feedUrl) throws Exception {
@@ -26,6 +27,7 @@ public class IOLFeeder {
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
         for (Object object : feed.getEntries()) {
             SyndEntryImpl entry = (SyndEntryImpl) object;
+            logger.info("title {}", entry.getTitle());
             JMap map = new JMap();
             map.put("title", entry.getTitle());
             map.put("description", IOLFeeds.cleanDescription(entry.getDescription().getValue()));
@@ -34,18 +36,21 @@ public class IOLFeeder {
             LinkThread linkThread = new LinkThread(map, entry.getLink());
             linkThread.start();
             threadList.add(linkThread);
-            count--;
-            if (count == 0) break;
-        }
-        
+            if (count > 0) {
+                count--;
+            }
+            if (count == 0) {
+                break;
+            }
+        }        
         List articleList = new ArrayList();
         for (LinkThread linkThread : threadList) {
             linkThread.join();
             if (linkThread.imageLink != null) {
                 linkThread.map.put("image", "http://www.iol.co.za/" + linkThread.imageLink);
+                articleList.add(linkThread.map);
+                logger.info(linkThread.map.toJson());
             }
-            articleList.add(linkThread.map);
-            logger.info(linkThread.map.toJson());
         }
         return articleList;
     }

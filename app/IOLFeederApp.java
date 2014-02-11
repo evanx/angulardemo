@@ -4,7 +4,6 @@ package app;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +20,9 @@ import org.slf4j.LoggerFactory;
  */
 public class IOLFeederApp implements Runnable {
 
-    static Logger logger = LoggerFactory.getLogger(GitteryApp.class);
+    static Logger logger = LoggerFactory.getLogger(IOLFeederApp.class);
+    
     Map<String, String> feedMap = new HashMap();
-    List<LinkThread> threadList = new ArrayList();
     ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
     
     void start() throws Exception {
@@ -46,6 +45,7 @@ public class IOLFeederApp implements Runnable {
 
     @Override
     public void run() {
+        logger.info("user.dir {}", System.getProperty("user.dir"));
         for (String key : feedMap.keySet()) {
             String feedUrl = feedMap.get(key);
             try {

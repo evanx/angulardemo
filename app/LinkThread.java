@@ -18,7 +18,7 @@ public class LinkThread extends Thread {
 
     static Pattern pattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
     JMap map;
-    Exception exception;
+    Throwable exception;
     String link;
     String imageLink;
 
@@ -45,7 +45,7 @@ public class LinkThread extends Thread {
                     return;
                 }
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             exception = e;
         }
     }
