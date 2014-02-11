@@ -55,13 +55,13 @@ public class IOLFeederApp implements Runnable {
                     if (json.length() > 0) {
                         json.append(",\n");
                     }
-                    json.append("  " + map.toJson());
+                    json.append("  ").append(map.toJson());
                 }
                 json.insert(0, "[\n");
                 json.append("\n]\n");
                 logger.info("json {}", json);
                 File file = new File(key + ".json");
-                logger.info("file {}", file.getAbsolutePath());
+                logger.info("write file {}", file.getAbsolutePath());
                 try (FileWriter writer = new FileWriter(file)) {
                     writer.write(json.toString());
                 }

@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.httpserver.HttpServerProperties;
 import vellum.httpserver.VellumHttpServer;
+import vellum.util.Streams;
 
 /**
  *
@@ -77,9 +78,8 @@ public class GitteryApp implements HttpHandler {
             int length;
             byte[] content;
             if (file.exists()) {
-                length = (int) file.length();
-                content = new byte[length];
-                new FileInputStream(file).read(content);
+                content = Streams.readBytes(file);
+                length = content.length;
             } else {
                 URLConnection connection = url.openConnection();
                 length = connection.getContentLength();
