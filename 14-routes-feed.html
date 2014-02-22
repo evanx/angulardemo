@@ -1,0 +1,17 @@
+<div class="row" ng-show="articles.length > 0">
+  <div class="col-lg-4">
+    <table class="table table-striped table-condensed" style="width: 300px">
+      <tbody>
+        <tr ng-repeat="article in articles" ng-click="selected()">
+          <td>
+            <h5><a href="{{article.link}}">{{article.title}}</a></h5>
+            <p>
+              {{article.description}}
+            </p>
+            <img ng-src="{{article.image}}">
+          </td>
+        </tr>
+      </tbody>
+    </table>    
+  </div>
+</div>
