@@ -23,7 +23,7 @@ app.controller("linksController", ["$scope", "$window", "appService",
             "10-feed.html",
             "11-feed.js",
             "12-feeds.js",
-            "13-feeds.html"
+            "13-routes.html"
         ];
         console.log("links", $scope.links);
         $scope.open = function() {

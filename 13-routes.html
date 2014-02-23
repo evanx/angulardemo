@@ -8,7 +8,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>    
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-route.min.js"></script>    
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-touch.min.js"></script>    
-    <title>Angular Demo</title>
+    <title>Routes</title>
   </head>
 
   <body ng-controller="appController">
@@ -16,33 +16,10 @@
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="#" class="navbar-brand dropdown-toggle" data-toggle="dropdown" ng-cloak>
-            {{view}} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="/news">News</a></li>
-            <li><a href="/sport">Sport</a></li>
-            <li><a href="/business">Business</a></li>
-          </ul>
-        </div>
-        <div class="navbar-collapse collapse">
-          <div class="navbar-right">
-            <form class="navbar-form navbar-right" role="form" ng-show="!userEmail" ng-cloak ng-submit="login()">
-              <div class="form-group">
-                <input type="email" ng-model="email" placeholder="Email" required class="form-control">
-              </div>
-              <div class="form-group">
-                <input type="password" ng-model="password" ng-minlength="1" required placeholder="Password" class="form-control">
-              </div>
-              <button type="submit" class="btn btn-success">Sign in</button>
-            </form>
-            <a href="#" class="navbar-text" ng-cloak ng-click="logout()" ng-show="userDisplayName">{{userDisplayName}}</a>
-          </div>
+          <a href="#/sections" class="navbar-brand dropdown-toggle" data-toggle="dropdown"
+             ng-cloak ng-show="state.title">
+            {{state.title}}
+          </a>
         </div>
       </div>
     </div>
@@ -52,7 +29,7 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <script src="16-routes.js"></script>    
+    <script src="14-routes.js"></script>    
   </body>
 </html>
 

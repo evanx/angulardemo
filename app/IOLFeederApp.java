@@ -49,7 +49,7 @@ public class IOLFeederApp implements Runnable {
         for (String key : feedMap.keySet()) {
             String feedUrl = feedMap.get(key);
             try {
-                List<JMap> articleList = new IOLFeeder().list(3, feedUrl);
+                List<JMap> articleList = new IOLFeeder().list(8, feedUrl);
                 StringBuilder json = new StringBuilder();
                 for (JMap map : articleList) {
                     if (json.length() > 0) {
