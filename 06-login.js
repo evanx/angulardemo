@@ -33,7 +33,7 @@ app.controller("appController", ["$scope", "appService",
             console.log("loginError", data);
         };
         $scope.logout = function() {
-            appService.logout($scope.email, $scope.loggedOut);
+            appService.logout($scope.userEmail, $scope.loggedOut);
         };
         $scope.loggedOut = function() {
             $scope.userEmail = null;
