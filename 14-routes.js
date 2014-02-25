@@ -17,8 +17,8 @@ app.controller("appController", ["$scope", "appService",
 
 app.config(['$routeProvider', function($routeProvider) {
         $routeProvider.
-                when("/sections", {templateUrl: "15-sections.html", controller: "sectionsController"}).
-                when("/section/:section", {templateUrl: "16-section.html", controller: "sectionController"}).
+                when("/sections", {templateUrl: "13-sections.html", controller: "sectionsController"}).
+                when("/section/:section", {templateUrl: "12-section.html", controller: "sectionController"}).
                 otherwise({redirectTo: "/sections"});
     }]);
 
