@@ -20,6 +20,17 @@ app.factory("appService", ["$http", function($http) {
         }
     }]);
 
+app.controller("feedController", ["$scope", "$window", "appService",
+    function($scope, $window, appService) {
+        appService.loadFeed("sport.json", function(data) {
+            $scope.articles = data;
+        });
+        $scope.selected = function() {
+            console.log("article", this.article);
+            $window.location.href = this.article.link;
+        }
+    }]);
+
 app.controller("appController", ["$scope", "appService",
     function($scope, appService) {
         $scope.title = "Sport";
@@ -42,13 +53,3 @@ app.controller("appController", ["$scope", "appService",
         };
     }]);
 
-app.controller("feedController", ["$scope", "$window", "appService",
-    function($scope, $window, appService) {
-        appService.loadFeed("sport.json", function(data) {
-            $scope.articles = data;
-        });
-        $scope.selected = function() {
-            console.log("article", this.article);
-            $window.location.href = this.article.link;
-        }
-    }]);
