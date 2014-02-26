@@ -7,7 +7,7 @@
     <link href="http://getbootstrap.com/examples/jumbotron/jumbotron.css" rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>    
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-touch.min.js"></script>    
-    <title>Angular Demo</title>
+    <title>Feeds</title>
   </head>
 
   <body ng-controller="appController">
@@ -40,7 +40,8 @@
               </div>
               <button type="submit" class="btn btn-success">Sign in</button>
             </form>
-            <a href="#" class="navbar-text" ng-cloak ng-click="logout()" ng-show="userDisplayName">{{userDisplayName}}</a>
+            <a href="#" class="navbar-text" ng-cloak ng-click="logout()" 
+               ng-show="userDisplayName">{{userDisplayName}}</a>
           </div>
         </div>
       </div>
