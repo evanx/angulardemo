@@ -72,9 +72,7 @@ public class GitteryServer implements HttpHandler {
                 logger.warn("file {}", currentFile);
             }
         }
-        logger.info("file {}", file);
         URL url = new URL(repo + path);
-        logger.info("url {}", url);
         try {
             int length;
             byte[] content;
@@ -91,7 +89,7 @@ public class GitteryServer implements HttpHandler {
                     connection.getInputStream().read(content);
                 }
             }
-            logger.info("content {}", new String(content));
+            logger.info("response {} {}", length, url);
             he.sendResponseHeaders(200, length);
             he.getResponseHeaders().set("Content-Type", getContentType(path));
             he.getResponseBody().write(content);
@@ -119,6 +117,8 @@ public class GitteryServer implements HttpHandler {
             return "text/json";
         } else if (path.endsWith(".html")) {
             return "text/html";
+        } else if (path.endsWith(".ico")) {
+            return "image/x-icon";
         } else {
             logger.warn(path);
             return "text/html";
