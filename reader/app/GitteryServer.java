@@ -52,6 +52,7 @@ public class GitteryServer implements HttpHandler {
     public void start(String repo, String root) throws Exception {
         this.repo = repo;
         this.root = root;
+        logger.debug("start {} {}", repo, root);
         httpServer.start(new HttpServerProperties(port), this);
     }
 

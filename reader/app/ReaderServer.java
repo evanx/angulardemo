@@ -34,7 +34,7 @@ public class ReaderServer {
         try {
             BasicConfigurator.configure();
             GitteryServer server = new GitteryServer();
-            server.start("https://raw.github.com/evanx/angulardemo/master/reader/web",
+            server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/reader/web",
                 "/home/evanx/NetBeansProjects/git/angulardemo/reader/web"
             );
         } catch (Exception e) {
