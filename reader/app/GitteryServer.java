@@ -84,8 +84,12 @@ public class GitteryServer implements HttpHandler {
             } else {
                 URLConnection connection = url.openConnection();
                 length = connection.getContentLength();
-                content = new byte[length];
-                connection.getInputStream().read(content);
+                if (length < 0) {
+                    content = Streams.readBytes(connection.getInputStream());
+                } else {
+                    content = new byte[length];
+                    connection.getInputStream().read(content);
+                }
             }
             logger.info("content {}", new String(content));
             he.sendResponseHeaders(200, length);
