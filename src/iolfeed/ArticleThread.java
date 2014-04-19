@@ -58,7 +58,7 @@ public class ArticleThread extends Thread {
 
     private void fetchImage() {
         try {
-            imageUrl = "http://www.iol.co.za/" + imageUrl;
+            imageUrl = "http://www.iol.co.za" + imageUrl;
             byte[] content = Streams.readContent(imageUrl);
             logger.info("content {} {}", content.length, imageUrl);
             String numDate = map.getString("numDate");
@@ -67,11 +67,12 @@ public class ArticleThread extends Thread {
             File file = new File(path);
             file.getParentFile().mkdirs();
             Streams.write(content, file);
-            logger.info("file {}", file.getCanonicalPath());
+            logger.info("file {} {}", file.length(), file.getCanonicalPath());
             context.storage.put(path, content);
-            imageUrl = "http://localhost:8088" + "/" + path;
+            imageUrl = String.format("http://%s/%s", context.contentHost, path);
             Streams.postHttp(content, new URL(imageUrl));
-            logger.info("imageUrl {}", imageUrl);
+            content = Streams.readContent(imageUrl);
+            logger.info("imageUrl {} {}", content.length, imageUrl);
         } catch (Exception e) {
             logger.warn("fetchImage " + imageUrl, e);
         }

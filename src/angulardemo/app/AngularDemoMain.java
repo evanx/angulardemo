@@ -22,7 +22,7 @@ public class AngularDemoMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            new GitteryServer().start(new GitteryContext(new ContentStorage(),
+            new GitteryServer().start(new GitteryContext(new ContentStorage(), "angulardemo/web",
                 "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
                 "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web"));
             new FeedsManager().start(new FeedsContext(new ContentStorage()));

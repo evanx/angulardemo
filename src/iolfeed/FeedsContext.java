@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class FeedsContext {
 
-    String contextName = "iol";
-    String baseUrl = "http://chronica.co:8088";
+    String contentHost = System.getProperty("reader.host", "localhost:8088");
+    String contentPath = "iol";
     String otherTimestampFormatString = "MMM d, yyyy hh:mm:ss a";
     String isoTimestampFormatString = "yyyy-MM-dd HH:mm:ss";
     String numericDateFormatString = "yyyyMMdd";

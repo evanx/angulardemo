@@ -23,6 +23,7 @@ package gittery;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -81,19 +82,18 @@ public class GitteryHandler implements HttpHandler {
             if (path.equals("/")) {
                 path = context.defaultPath;
             }
-            File file = new File(context.root + "/" + path);
-            if (path.endsWith(".json")) {
-                File jsonFile = new File(path);
-                if (jsonFile.exists()) {
-                    file = jsonFile;
-                } else {
-                    logger.warn("no file {}", jsonFile);
-                }
-            }
+            File file = new File(context.dir + "/" + path);
             if (file.exists()) {
                 content = Streams.readBytes(file);
             } else {
-                content = Streams.readContent(context.repo + "/" + path);
+                try {
+                    content = Streams.readContent(context.repo + "/" + path);
+                } catch (FileNotFoundException e) {
+                    logger.info(e.getMessage());
+                    String resourcePath = "/" + context.res + "/" + path;
+                    logger.info("resourcePath {}", resourcePath);
+                    content = Streams.readResourceBytes(getClass(), resourcePath);
+                }
             }
         }
         write(content);

@@ -17,7 +17,7 @@ public class ReaderServer {
         try {
             BasicConfigurator.configure();
             ContentStorage contentStorage = new ContentStorage();
-            new GitteryServer().start(new GitteryContext(contentStorage,
+            new GitteryServer().start(new GitteryContext(contentStorage, "reader/web",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web",
                     "/home/evanx/NetBeansProjects/git/angulardemo/src/reader/web"));
             new FeedsManager().start(new FeedsContext(contentStorage, true, 4));
