@@ -22,13 +22,13 @@ public class FeedReader {
     static Logger logger = LoggerFactory.getLogger(FeedReader.class);
 
     FeedsContext context;     
-    List<ArticleThread> threadList = new ArrayList();
+    List<ArticleTask> threadList = new ArrayList();
     
     public FeedReader(FeedsContext context) {
         this.context = context;
     }
 
-    List<JMap> list(int count, String feedUrl) throws Exception {
+    List<JMap> list(String section, int count, String feedUrl) throws Exception {
         DateFormat numericDateFormat = new SimpleDateFormat(context.numericDateFormatString);
         DateFormat isoTimestampFormat = new SimpleDateFormat(context.isoDateTimeFormatString);
         DateFormat displayTimestampFormat = new SimpleDateFormat(context.displayDateTimeFormatString);
@@ -39,13 +39,14 @@ public class FeedReader {
             SyndEntryImpl entry = (SyndEntryImpl) object;
             logger.info("title {} {}", entry.getContents().size(), entry.getTitle());
             JMap map = new JMap();
+            map.put("section", section);
             map.put("title", entry.getTitle());
-            map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
+            map.put("description", FeedsUtil.cleanText(entry.getDescription().getValue()));
             map.put("isoDate", isoTimestampFormat.format(entry.getPublishedDate()));
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));
             map.put("link", entry.getLink());
-            ArticleThread linkThread = new ArticleThread(map, entry.getLink());
+            ArticleTask linkThread = new ArticleTask(map, entry.getLink());
             linkThread.start();
             threadList.add(linkThread);
             if (count > 0) {
@@ -56,10 +57,9 @@ public class FeedReader {
             }
         }        
         List<JMap> articleList = new ArrayList();
-        for (ArticleThread linkThread : threadList) {
+        for (ArticleTask linkThread : threadList) {
             linkThread.join();
             if (linkThread.imageUrl != null) {                
-                linkThread.put();
                 articleList.add(linkThread.map);
             }
         }

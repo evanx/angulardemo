@@ -18,19 +18,20 @@ public final class FeedsContext {
     int articleCount = 4;
     Map<String, String> feedMap = new HashMap();
     ContentStorage storage;
+    TaskManager taskManager;
     
-    public FeedsContext(ContentStorage storage) {
+    public FeedsContext(TaskManager taskManager, ContentStorage storage) {
         this.storage = storage;
-        put("business", "http://www.iol.co.za/cmlink/1.730910");
         put("news", "http://iol.co.za/cmlink/1.640");
         put("sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
+        put("business", "http://www.iol.co.za/cmlink/1.730910");
         if (false) {
             put("multimedia", "http://iol.co.za/cmlink/1.738");
         }
     }
     
-    public FeedsContext(ContentStorage storage, boolean once, int articleCount) {
-        this(storage);
+    public FeedsContext(TaskManager taskManager, ContentStorage storage, boolean once, int articleCount) {
+        this(taskManager, storage);
         this.once = once;
         this.articleCount = articleCount;
     }

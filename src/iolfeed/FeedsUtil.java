@@ -6,7 +6,7 @@ package iolfeed;
  */
 public class FeedsUtil {
 
-    public static String cleanDescription(String description) {
+    public static String cleanText(String description) {
         description = description.replaceAll("\u003c", "<");
         description = description.replaceAll("\u003e", ">");
         int index = description.lastIndexOf("\u003c");

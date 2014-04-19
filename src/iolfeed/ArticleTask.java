@@ -2,6 +2,8 @@ package iolfeed;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,9 +20,9 @@ import vellum.util.Streams;
  *
  * @author evanx
  */
-public class ArticleThread extends Thread {
+public class ArticleTask extends Thread {
 
-    static Logger logger = LoggerFactory.getLogger(ArticleThread.class);
+    static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static Pattern imageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
     static Pattern imageCreditPattern = Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
     static Pattern imageCaptionPattern = Pattern.compile("<p class=\"captions\">(.*)</p>");
@@ -34,11 +36,13 @@ public class ArticleThread extends Thread {
     String imageUrl;
     String imageCredit;
     String imageCaption;
+    String section;
+    String numDate;
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
 
-    ArticleThread(JMap map, String articleLink) {
+    ArticleTask(JMap map, String articleLink) {
         this.map = map;
         this.articleLink = articleLink;
     }
@@ -55,6 +59,8 @@ public class ArticleThread extends Thread {
             }
         }
         try {
+            this.numDate = map.getString("numDate");
+            this.section = map.getString("section");
             URLConnection connection = new URL(articleLink).openConnection();
             connection.setDoOutput(false);
             BufferedReader reader = new BufferedReader(
@@ -71,6 +77,7 @@ public class ArticleThread extends Thread {
                 } else {                    
                 }
             }
+            post();
         } catch (Throwable e) {
             exception = e;
         }
@@ -108,20 +115,34 @@ public class ArticleThread extends Thread {
         if (matcher.find()) {
             String paragraph = matcher.group(1);
             if (paragraph.trim().length() > 0) {
-                paragraphs.add(paragraph);
+                paragraphs.add(FeedsUtil.cleanText(paragraph));
             }
             return true;
         }
         return false;
 
+    }    
+    
+    private void post() throws IOException {
+        map.put("imageLink", imageUrl);
+        map.put("imageCredit", imageCredit);
+        map.put("imageCaption", imageCaption);
+        map.put("articleId", articleId);
+        map.put("paragraphs", paragraphs);
+        String key = String.format("%s/%s/%s.json", numDate, section, articleId);
+        File file = new File(key);
+        file.getParentFile().mkdirs();
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(map.toJson());
+        }
+        logger.info("write file {}", file.getAbsolutePath());        
     }
-
+    
     private void fetchImage() {
         try {
             sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
             byte[] content = Streams.readContent(sourceImageUrl);
             logger.info("content {} {}", content.length, sourceImageUrl);
-            String numDate = map.getString("numDate");
             String name = Streams.parseFileName(sourceImageUrl);
             String path = numDate + "/images/" + name;
             File file = new File(path);
@@ -136,12 +157,5 @@ public class ArticleThread extends Thread {
         } catch (Exception e) {
             logger.warn("fetchImage " + sourceImageUrl, e);
         }
-    }
-
-    public void put() {
-        map.put("imageLink", imageUrl);
-        map.put("imageCredit", imageCredit);
-        map.put("imageCaption", imageCaption);
-        map.put("articleId", articleId);
     }
 }

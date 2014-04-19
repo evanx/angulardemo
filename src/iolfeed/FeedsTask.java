@@ -15,9 +15,9 @@ import vellum.provider.VellumProvider;
  *
  * @author evanx
  */
-public class FeedsManager implements Runnable {
+public class FeedsTask implements Runnable {
 
-    static Logger logger = LoggerFactory.getLogger(FeedsManager.class);
+    static Logger logger = LoggerFactory.getLogger(FeedsTask.class);
     
     ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
     FeedsContext context;
@@ -40,7 +40,7 @@ public class FeedsManager implements Runnable {
         for (String key : context.feedMap.keySet()) {
             String feedUrl = context.feedMap.get(key);
             try {
-                List<JMap> articleList = new FeedReader(context).list(context.articleCount, feedUrl);
+                List<JMap> articleList = new FeedReader(context).list(key, context.articleCount, feedUrl);
                 StringBuilder json = new StringBuilder();
                 for (JMap map : articleList) {
                     if (json.length() > 0) {
