@@ -1,4 +1,4 @@
-package src.reader.app;
+package reader.app;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
@@ -211,9 +211,9 @@ package src.reader.app;
 
 
 
-import src.iolfeed.FeedsManager;
-import src.gittery.GitteryServer;
-import src.iolfeed.FeedsContext;
+import iolfeed.FeedsManager;
+import gittery.GitteryServer;
+import iolfeed.FeedsContext;
 import org.apache.log4j.BasicConfigurator;
 
 /**

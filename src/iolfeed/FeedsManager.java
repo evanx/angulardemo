@@ -1,4 +1,4 @@
-package src.iolfeed;
+package iolfeed;
 
 import java.io.File;
 import java.io.FileWriter;

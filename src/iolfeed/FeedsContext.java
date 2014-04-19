@@ -1,4 +1,4 @@
-package src.iolfeed;
+package iolfeed;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +11,11 @@ public class FeedsContext {
 
     String contextName = "iol";
     String baseUrl = "http://chronica.co:8088";
+    String dateFormatString = "MMM d, yyyy hh:mm:ss a";
     boolean once = false;
     int articleCount = 0;
     Map<String, String> feedMap = new HashMap();
+    
 
     public FeedsContext() {
         put("business", "http://www.iol.co.za/cmlink/1.730910");

@@ -1,4 +1,4 @@
-package src.angulardemo.app;
+package angulardemo.app;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
@@ -67,8 +67,8 @@ package src.angulardemo.app;
 
 
 
-import src.iolfeed.FeedsManager;
-import src.gittery.GitteryServer;
+import iolfeed.FeedsManager;
+import gittery.GitteryServer;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
