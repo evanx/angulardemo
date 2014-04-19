@@ -1,4 +1,4 @@
-package iolfeed;
+package src.iolfeed;
 
 import java.util.HashMap;
 import java.util.Map;

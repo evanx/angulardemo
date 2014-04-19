@@ -1,7 +1,7 @@
-package iolfeed;
+package src.iolfeed;
 
 
-import static iolfeed.FeedReader.logger;
+import static src.iolfeed.FeedReader.logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package angulardemo.app;
+package src.gittery;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
@@ -22,54 +22,6 @@ package angulardemo.app;
  */
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import iolfeed.FeedsManager;
-import gittery.GitteryServer;
-import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,22 +29,31 @@ import org.slf4j.LoggerFactory;
  *
  * @author evanx
  */
-public class AngularDemoMain {
-    static Logger logger = LoggerFactory.getLogger(AngularDemoMain.class);
+public class GitteryUtil {
+    static Logger logger = LoggerFactory.getLogger(GitteryUtil.class);
 
-    public void start() throws Exception {
-    }
-    
-    public static void main(String[] args) throws Exception {
-        try {
-            BasicConfigurator.configure();
-            GitteryServer server = new GitteryServer();
-            server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
-                    "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web"
-            );
-            new FeedsManager().start();
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
+    public static String getContentType(String path) {
+        if (path.endsWith(".png")) {
+            return "image/png";
+        } else if (path.endsWith(".jpg")) {
+            return "image/jpeg";
+        } else if (path.endsWith(".html")) {
+            return "text/html";
+        } else if (path.endsWith(".css")) {
+            return "text/css";
+        } else if (path.endsWith(".js")) {
+            return "text/javascript";
+        } else if (path.endsWith(".txt")) {
+            return "text/plain";
+        } else if (path.endsWith(".json")) {
+            return "text/json";
+        } else if (path.endsWith(".html")) {
+            return "text/html";
+        } else if (path.endsWith(".ico")) {
+            return "image/x-icon";
+        } else {
+            logger.warn(path);
+            return "text/html";
         }
     }
     

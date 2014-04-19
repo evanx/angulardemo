@@ -1,4 +1,4 @@
-package gittery;
+package src.gittery;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
@@ -403,7 +403,7 @@ package gittery;
 
 
 
-import iolfeed.FeedsManager;
+import src.iolfeed.FeedsManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.File;

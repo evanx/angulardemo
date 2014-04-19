@@ -1,4 +1,4 @@
-package gittery;
+package src.gittery;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
