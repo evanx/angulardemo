@@ -7,12 +7,12 @@ import java.util.Map;
  *
  * @author evanx
  */
-public class FeedsContext {
-
+public final class FeedsContext {
+    
     String contentHost = System.getProperty("reader.host", "localhost:8088");
     String contentPath = "iol";
-    String otherTimestampFormatString = "MMM d, yyyy hh:mm:ss a";
-    String isoTimestampFormatString = "yyyy-MM-dd HH:mm:ss";
+    String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
+    String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
     boolean once = false;
     int articleCount = 4;
@@ -37,6 +37,5 @@ public class FeedsContext {
 
     void put(String name, String url) {
         feedMap.put(name, url);       
-    }
-
+    }    
 }

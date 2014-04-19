@@ -23,14 +23,15 @@ public class FeedReader {
 
     FeedsContext context;     
     List<ArticleThread> threadList = new ArrayList();
-    DateFormat numericDateFormat = new SimpleDateFormat();
     
     public FeedReader(FeedsContext context) {
         this.context = context;
-        numericDateFormat = new SimpleDateFormat(context.numericDateFormatString);
     }
 
     List<JMap> list(int count, String feedUrl) throws Exception {
+        DateFormat numericDateFormat = new SimpleDateFormat(context.numericDateFormatString);
+        DateFormat isoTimestampFormat = new SimpleDateFormat(context.isoDateTimeFormatString);
+        DateFormat displayTimestampFormat = new SimpleDateFormat(context.displayDateTimeFormatString);
         logger.info("feedUrl {}", feedUrl);
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
@@ -40,8 +41,9 @@ public class FeedReader {
             JMap map = new JMap();
             map.put("title", entry.getTitle());
             map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
-            map.put("pubDate", entry.getPublishedDate());
+            map.put("isoDate", isoTimestampFormat.format(entry.getPublishedDate()));
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
+            map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));
             map.put("link", entry.getLink());
             ArticleThread linkThread = new ArticleThread(map, entry.getLink());
             linkThread.start();
@@ -56,12 +58,11 @@ public class FeedReader {
         List<JMap> articleList = new ArrayList();
         for (ArticleThread linkThread : threadList) {
             linkThread.join();
-            if (linkThread.imageUrl != null) {
-                linkThread.map.put("imageLink", linkThread.imageUrl);
+            if (linkThread.imageUrl != null) {                
+                linkThread.put();
                 articleList.add(linkThread.map);
             }
         }
         return articleList;
     }
 }
-
