@@ -94,7 +94,7 @@ public class ArticleTask extends Thread {
 
     private boolean matchCaptionCredit(Matcher matcher) {
         if (matcher.find()) {
-            imageCredit = matcher.group(1);
+            imageCredit = FeedsUtil.cleanText(matcher.group(1));
             return true;
         }
         return false;
@@ -104,7 +104,7 @@ public class ArticleTask extends Thread {
         if (matcher.find()) {
             String paragraph = matcher.group(1);
             if (paragraph.trim().length() > 0) {
-                imageCaption = paragraph;
+                imageCaption = FeedsUtil.cleanText(paragraph);
             }
             return true;
         }
@@ -115,7 +115,7 @@ public class ArticleTask extends Thread {
         if (matcher.find()) {
             String paragraph = matcher.group(1);
             if (paragraph.trim().length() > 0) {
-                paragraphs.add(FeedsUtil.cleanText(paragraph));
+                paragraphs.add(FeedsUtil.cleanParagraph(paragraph));
             }
             return true;
         }
@@ -124,10 +124,13 @@ public class ArticleTask extends Thread {
     }    
     
     private void post() throws IOException {
+        String articleUrl = String.format("http://%s/%s/%s/%s.json", 
+                context.contentHost, numDate, section, articleId);
         map.put("imageLink", imageUrl);
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         map.put("articleId", articleId);
+        map.put("articleUrl", articleUrl);
         map.put("paragraphs", paragraphs);
         String key = String.format("%s/%s/%s.json", numDate, section, articleId);
         File file = new File(key);

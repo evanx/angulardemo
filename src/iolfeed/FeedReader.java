@@ -37,11 +37,12 @@ public class FeedReader {
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
         for (Object object : feed.getEntries()) {
             SyndEntryImpl entry = (SyndEntryImpl) object;
-            logger.info("title {} {}", entry.getContents().size(), entry.getTitle());
+            logger.info("title {}", entry.getTitle());
+            logger.info("title {}", FeedsUtil.cleanText(entry.getTitle()));
             JMap map = new JMap();
             map.put("section", section);
-            map.put("title", entry.getTitle());
-            map.put("description", FeedsUtil.cleanText(entry.getDescription().getValue()));
+            map.put("title", FeedsUtil.cleanText(entry.getTitle()));
+            map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
             map.put("isoDate", isoTimestampFormat.format(entry.getPublishedDate()));
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));

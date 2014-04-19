@@ -6,21 +6,63 @@ package iolfeed;
  */
 public class FeedsUtil {
 
-    public static String cleanText(String description) {
-        description = description.replaceAll("\u003c", "<");
-        description = description.replaceAll("\u003e", ">");
-        int index = description.lastIndexOf("\u003c");
-        if (index > 0) {
-            description = description.substring(0, index);
+    public static String cleanParagraph(String text) {
+        text = text.trim();
+        if (text.startsWith("\"")) {
+            text = text.substring(1);
         }
-        index = description.lastIndexOf("\u003e");
-        if (index > 0) {
-            description = description.substring(index + 1);
+        if (text.endsWith("\"")) {
+            text = text.substring(0, text.length() - 1);
         }
-        description = description.replaceAll("\\u0027", "'");
-        description = description.replaceAll("&#8217;", "'");
-        description = description.replaceAll("\\u0026#8220;", "\"");
-        description = description.replaceAll("\\u0026#8221;", "\"");
-        return description;
+        if (text.startsWith("<strong>")) {
+            text = text.substring(8);
+        }
+        if (text.endsWith("</strong>")) {
+            text = text.substring(0, text.length() - 9);
+        }
+        return cleanText(text);
+    }
+    
+    public static String cleanDescription(String text) {
+        int index = text.lastIndexOf("<");
+        if (index > 0) {
+            text = text.substring(0, index);
+        }
+        index = text.lastIndexOf(">");
+        if (index > 0) {
+            text = text.substring(index + 1);
+        }
+        return cleanText(text);
+    }
+        
+    public static String cleanText(String text) {
+        text = text.replaceAll("\u003c", "<");
+        text = text.replaceAll("\u003e", ">");
+        text = text.replaceAll("\u0027", "'");
+        //text = text.replaceAll("\\u0027", "'");
+        text = text.replaceAll("`", "'"); // backtick
+        text = text.replaceAll("‘", "&lsquo;"); // left single quote
+        text = text.replaceAll("’", "&rsquo;"); // right single quote
+        text = text.replaceAll("‘", "'"); // left single quote
+        text = text.replaceAll("’", "'"); // right single quote
+        text = text.replaceAll("&#8216;", "'");
+        text = text.replaceAll("&#8217;", "'");
+        text = text.replaceAll("\u8216;", "'");
+        text = text.replaceAll("\u8217;", "'");
+        //text = text.replaceAll("\\u0026#8216;", "'");
+        //text = text.replaceAll("\\u0026#8217;", "'");
+        text = text.replaceAll("\u8220;", "\"");
+        text = text.replaceAll("\u8221;", "\"");
+        text = text.replaceAll("&#8220;", "\"");
+        text = text.replaceAll("&#8221;", "\"");
+        //text = text.replaceAll("\\u0026#8220;", "\"");
+        //text = text.replaceAll("\\u0026#8221;", "\"");
+        if (false) {
+            text = text.replaceAll("\"", "&quot;");
+            text = text.replaceAll("'", "&#39;");
+            text = text.replaceAll("<", "&lt;");
+            text = text.replaceAll(">", "&gt;");
+        }
+        return text;
     }
 }
