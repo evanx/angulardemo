@@ -1,4 +1,4 @@
-package angulardemo.app;
+package iolfeed;
 
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -15,9 +15,9 @@ import vellum.jx.JMap;
  *
  * @author evanx
  */
-public class IOLFeeder {
+public class FeedReader {
 
-    static Logger logger = LoggerFactory.getLogger(IOLFeeder.class);
+    static Logger logger = LoggerFactory.getLogger(FeedReader.class);
     
     List<LinkThread> threadList = new ArrayList();
 
@@ -27,10 +27,10 @@ public class IOLFeeder {
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
         for (Object object : feed.getEntries()) {
             SyndEntryImpl entry = (SyndEntryImpl) object;
-            logger.info("title {}", entry.getTitle());
+            logger.info("title {} {}", entry.getContents().size(), entry.getTitle());
             JMap map = new JMap();
             map.put("title", entry.getTitle());
-            map.put("description", IOLFeeds.cleanDescription(entry.getDescription().getValue()));
+            map.put("description", Feeds.cleanDescription(entry.getDescription().getValue()));
             map.put("pubDate", entry.getPublishedDate());
             map.put("link", entry.getLink());
             LinkThread linkThread = new LinkThread(map, entry.getLink());

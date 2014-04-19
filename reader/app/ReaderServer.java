@@ -22,6 +22,16 @@ package reader.app;
  */
 
 
+
+
+
+
+
+
+
+
+
+import iolfeed.FeedManager;
 import gittery.GitteryServer;
 import org.apache.log4j.BasicConfigurator;
 
@@ -38,6 +48,7 @@ public class ReaderServer {
             server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/reader/web",
                 "/home/evanx/NetBeansProjects/git/angulardemo/reader/web"
             );
+            new FeedManager(true).start();
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

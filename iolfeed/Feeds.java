@@ -1,10 +1,10 @@
-package angulardemo.app;
+package iolfeed;
 
 /**
  *
  * @author evanx
  */
-public class IOLFeeds {
+public class Feeds {
 
     public static String cleanDescription(String description) {
         description = description.replaceAll("\u003c", "<");
