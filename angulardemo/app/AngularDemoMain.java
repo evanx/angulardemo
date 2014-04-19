@@ -22,7 +22,52 @@ package angulardemo.app;
  */
 
 
-import iolfeed.FeedManager;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import iolfeed.FeedsManager;
 import gittery.GitteryServer;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
@@ -45,7 +90,7 @@ public class AngularDemoMain {
             server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
                     "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web"
             );
-            new FeedManager().start();
+            new FeedsManager().start();
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

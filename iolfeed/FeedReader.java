@@ -5,6 +5,8 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -18,8 +20,13 @@ import vellum.jx.JMap;
 public class FeedReader {
 
     static Logger logger = LoggerFactory.getLogger(FeedReader.class);
-    
-    List<LinkThread> threadList = new ArrayList();
+
+    FeedsManager manager;     
+    List<ArticleThread> threadList = new ArrayList();
+    DateFormat dateFormat = new SimpleDateFormat();
+    public FeedReader(FeedsManager manager) {
+        this.manager = manager;
+    }
 
     List<JMap> list(int count, String feedUrl) throws Exception {
         logger.info("feedUrl {}", feedUrl);
@@ -30,10 +37,10 @@ public class FeedReader {
             logger.info("title {} {}", entry.getContents().size(), entry.getTitle());
             JMap map = new JMap();
             map.put("title", entry.getTitle());
-            map.put("description", Feeds.cleanDescription(entry.getDescription().getValue()));
+            map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
             map.put("pubDate", entry.getPublishedDate());
             map.put("link", entry.getLink());
-            LinkThread linkThread = new LinkThread(map, entry.getLink());
+            ArticleThread linkThread = new ArticleThread(map, entry.getLink());
             linkThread.start();
             threadList.add(linkThread);
             if (count > 0) {
@@ -44,12 +51,11 @@ public class FeedReader {
             }
         }        
         List<JMap> articleList = new ArrayList();
-        for (LinkThread linkThread : threadList) {
+        for (ArticleThread linkThread : threadList) {
             linkThread.join();
             if (linkThread.imageLink != null) {
-                linkThread.map.put("image", "http://www.iol.co.za/" + linkThread.imageLink);
+                linkThread.map.put("imageLink", linkThread.imageLink);
                 articleList.add(linkThread.map);
-                logger.info("imageLink {}", linkThread.imageLink);
             }
         }
         return articleList;

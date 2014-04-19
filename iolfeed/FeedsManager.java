@@ -16,47 +16,35 @@ import vellum.jx.JMap;
  *
  * @author evanx
  */
-public class FeedManager implements Runnable {
+public class FeedsManager implements Runnable {
 
-    static Logger logger = LoggerFactory.getLogger(FeedManager.class);
+    static Logger logger = LoggerFactory.getLogger(FeedsManager.class);
     
-    Map<String, String> feedMap = new HashMap();
     ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    boolean once = false;
+    FeedsContext context = new FeedsContext();
     
-    public FeedManager() {
+    public FeedsManager() {
     }
 
-    public FeedManager(boolean once) {
-        this.once = once;
+    public FeedsManager(FeedsContext context) {
+        this.context = context;
     }
     
     public void start() throws Exception {
-        put("business", "http://www.iol.co.za/cmlink/1.730910");
-        put("news", "http://iol.co.za/cmlink/1.640");
-        put("sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
-        if (false) {
-            put("multimedia", "http://iol.co.za/cmlink/1.738");
-        }
-        if (once) {
+        if (context.once) {
             run();
         } else {
             elapsedExecutorService.scheduleAtFixedRate(this, 1, 3600, TimeUnit.SECONDS);
         }
     }
     
-    void put(String name, String url) {
-        feedMap.put(name, url);       
-    }
-
     @Override
     public void run() {
         logger.info("user.dir {}", System.getProperty("user.dir"));
-        for (String key : feedMap.keySet()) {
-            String feedUrl = feedMap.get(key);
+        for (String key : context.feedMap.keySet()) {
+            String feedUrl = context.feedMap.get(key);
             try {
-                List<JMap> articleList = new FeedReader().list(8, feedUrl);
+                List<JMap> articleList = new FeedReader(this).list(context.articleCount, feedUrl);
                 StringBuilder json = new StringBuilder();
                 for (JMap map : articleList) {
                     if (json.length() > 0) {

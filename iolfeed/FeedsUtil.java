@@ -4,7 +4,7 @@ package iolfeed;
  *
  * @author evanx
  */
-public class Feeds {
+public class FeedsUtil {
 
     public static String cleanDescription(String description) {
         description = description.replaceAll("\u003c", "<");

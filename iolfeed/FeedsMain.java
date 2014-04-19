@@ -6,12 +6,12 @@ import org.apache.log4j.BasicConfigurator;
  *
  * @author evanx
  */
-public class FeedMain {
+public class FeedsMain {
     
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            FeedManager app = new FeedManager();
+            FeedsManager app = new FeedsManager();
             app.start();
         } catch (Exception e) {
             e.printStackTrace(System.err);

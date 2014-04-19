@@ -1,7 +1,9 @@
 package iolfeed;
 
 
+import static iolfeed.FeedReader.logger;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,7 +15,7 @@ import vellum.jx.JMap;
  *
  * @author evanx
  */
-public class LinkThread extends Thread {
+public class ArticleThread extends Thread {
 
     static Pattern pattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
     JMap map;
@@ -21,7 +23,7 @@ public class LinkThread extends Thread {
     String link;
     String imageLink;
 
-    LinkThread(JMap map, String link) {
+    ArticleThread(JMap map, String link) {
         this.map = map;
         this.link = link;
     }
@@ -41,11 +43,25 @@ public class LinkThread extends Thread {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     imageLink = matcher.group(1);
+                    imageLink = "http://www.iol.co.za/" + imageLink;
+                    fetchImage();
                     return;
                 }
             }
         } catch (Throwable e) {
             exception = e;
+        }
+    }
+
+    private void fetchImage() {
+        try {
+            String pubDate = map.getString("pubDate");
+            logger.info("imageLink {} {}", pubDate, imageLink);
+            File imageDirectory = new File(pubDate);
+            URLConnection urlConnection = new URL(imageLink).openConnection();
+            urlConnection.getInputStream();
+        } catch (Exception e) {
+            logger.warn("fetchImage " + imageLink, e);
         }
     }
 }
