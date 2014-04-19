@@ -50,6 +50,10 @@ public class GitteryHandler implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         this.he = he;
         path = he.getRequestURI().getPath();
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }        
+        logger.info("path {}", path);
         try {
             if (he.getRequestMethod().equals("POST")) {
                 post();
@@ -64,8 +68,7 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private void post() throws IOException {
-        assert path.startsWith("/") && path.contains(".");
-        File file = new File(path.substring(1));
+        File file = new File(path);
         file.getParentFile().mkdirs();
         Streams.transmit(he.getRequestBody(), file);
         logger.info("post {} {}", file.length(), file.getAbsolutePath());
@@ -73,15 +76,14 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private void get() throws Exception {
-        assert path.startsWith("/");
         byte[] content = context.storage.get(path);
         if (content == null) {
             if (path.equals("/")) {
                 path = context.defaultPath;
             }
-            File file = new File(context.root + path);
+            File file = new File(context.root + "/" + path);
             if (path.endsWith(".json")) {
-                File jsonFile = new File(path.substring(0));
+                File jsonFile = new File(path);
                 if (jsonFile.exists()) {
                     file = jsonFile;
                 } else {
@@ -91,7 +93,7 @@ public class GitteryHandler implements HttpHandler {
             if (file.exists()) {
                 content = Streams.readBytes(file);
             } else {
-                content = Streams.readContent(context.repo + path);
+                content = Streams.readContent(context.repo + "/" + path);
             }
         }
         write(content);
@@ -100,7 +102,7 @@ public class GitteryHandler implements HttpHandler {
     void write(byte[] content) throws IOException {
         logger.info("response {} {}", content.length);
         he.sendResponseHeaders(200, content.length);
-        he.getResponseHeaders().set("Content-Type", GitteryUtil.getContentType(path));
+        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
         he.getResponseBody().write(content);
     }
 }

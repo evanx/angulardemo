@@ -20,7 +20,7 @@ public class ReaderServer {
             new GitteryServer().start(new GitteryContext(contentStorage,
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web",
                     "/home/evanx/NetBeansProjects/git/angulardemo/src/reader/web"));
-            new FeedsManager().start(new FeedsContext(contentStorage, true, 99));
+            new FeedsManager().start(new FeedsContext(contentStorage, true, 4));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

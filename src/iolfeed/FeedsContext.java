@@ -15,7 +15,7 @@ public class FeedsContext {
     String isoTimestampFormatString = "yyyy-MM-dd HH:mm:ss";
     String numericDateFormatString = "yyyyMMdd";
     boolean once = false;
-    int articleCount = 0;
+    int articleCount = 4;
     Map<String, String> feedMap = new HashMap();
     ContentStorage storage;
     

@@ -5,7 +5,7 @@ import iolfeed.ContentStorage;
 public class GitteryContext {
     String repo;
     String root;
-    String defaultPath = "/index.html";
+    String defaultPath = "index.html";
     int port = 8088; 
     ContentStorage storage;
     

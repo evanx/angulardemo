@@ -58,18 +58,20 @@ public class ArticleThread extends Thread {
 
     private void fetchImage() {
         try {
-            logger.info("imageUrl {} {}", imageUrl);
             imageUrl = "http://www.iol.co.za/" + imageUrl;
+            byte[] content = Streams.readContent(imageUrl);
+            logger.info("content {} {}", content.length, imageUrl);
             String numDate = map.getString("numDate");
-            String fileName = Streams.parseFileName(imageUrl);
-            String filePath = numDate + "/images/" + fileName;
-            File imageFile = new File(filePath);
-            imageFile.getParentFile().mkdirs();
-            logger.info("imageFile {}", imageFile.getCanonicalPath());
-            URLConnection urlConnection = new URL(imageUrl).openConnection();
-            imageUrl = context.baseUrl + "/" + filePath;
+            String name = Streams.parseFileName(imageUrl);
+            String path = numDate + "/images/" + name;
+            File file = new File(path);
+            file.getParentFile().mkdirs();
+            Streams.write(content, file);
+            logger.info("file {}", file.getCanonicalPath());
+            context.storage.put(path, content);
+            imageUrl = "http://localhost:8088" + "/" + path;
+            Streams.postHttp(content, new URL(imageUrl));
             logger.info("imageUrl {}", imageUrl);
-            Streams.transmit(urlConnection.getInputStream(), imageFile);
         } catch (Exception e) {
             logger.warn("fetchImage " + imageUrl, e);
         }
