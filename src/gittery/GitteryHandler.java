@@ -25,8 +25,6 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.util.Streams;
@@ -51,17 +49,21 @@ public class GitteryHandler implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         this.he = he;
         path = he.getRequestURI().getPath();
-        if (path.startsWith("/")) {
+        logger.info("path [{}]", path);
+        if (path.equals("/")) {
+            path = context.defaultPath;
+        } else if (path.startsWith("/")) {
             path = path.substring(1);
-        }        
-        logger.info("path {}", path);
+        }
+        logger.info("path [{}]", path);
         try {
             if (he.getRequestMethod().equals("POST")) {
                 post();
-            } else {
-                get();
+            } else {                
+                write(get());
             }
         } catch (Throwable e) {
+            writeError();
             e.printStackTrace(System.err);
         } finally {
             he.close();
@@ -76,33 +78,45 @@ public class GitteryHandler implements HttpHandler {
         context.storage.put(path, Streams.readBytes(file));
     }
 
-    private void get() throws Exception {
+    private byte[] get() throws Exception {
         byte[] content = context.storage.get(path);
-        if (content == null) {
-            if (path.equals("/")) {
-                path = context.defaultPath;
-            }
-            File file = new File(context.dir + "/" + path);
-            if (file.exists()) {
-                content = Streams.readBytes(file);
-            } else {
-                try {
-                    content = Streams.readContent(context.repo + "/" + path);
-                } catch (FileNotFoundException e) {
-                    logger.info(e.getMessage());
-                    String resourcePath = "/" + context.res + "/" + path;
-                    logger.info("resourcePath {}", resourcePath);
-                    content = Streams.readResourceBytes(getClass(), resourcePath);
-                }
-            }
+        if (content != null) {
+            return content;
         }
-        write(content);
+        File file = new File(path);
+        if (file.exists()) {
+            return Streams.readBytes(file);
+        } else if (path.startsWith("2")) {
+            throw new IOException("no file: " + file.getAbsolutePath());
+        }
+        File sourceFile = new File(context.dir + "/" + path);
+        if (sourceFile.exists()) {
+            return Streams.readBytes(sourceFile);
+        }
+        logger.warn("no file: " + file.getAbsolutePath());
+        try {
+            return Streams.readContent(context.repo + "/" + path);
+        } catch (FileNotFoundException e) {
+            logger.info(e.getMessage());
+            String resourcePath = "/" + context.res + "/" + path;
+            logger.info("resourcePath {}", resourcePath);
+            return Streams.readResourceBytes(getClass(), resourcePath);
+        }
     }
 
+    void writeError() throws IOException {
+        logger.info("not found {}", path);
+        he.sendResponseHeaders(404, 0);
+    }
+    
     void write(byte[] content) throws IOException {
-        logger.info("response {} {}", content.length);
-        he.sendResponseHeaders(200, content.length);
-        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
-        he.getResponseBody().write(content);
+        if (content == null) {
+            writeError();
+        } else {
+            logger.info("response {} {}", content.length);
+            he.sendResponseHeaders(200, content.length);
+            he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+            he.getResponseBody().write(content);
+        }
     }
 }

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.httpserver.HttpServerProperties;
 import vellum.httpserver.VellumHttpServer;
-import vellum.provider.VellumProvider;
 
 /**
  *
