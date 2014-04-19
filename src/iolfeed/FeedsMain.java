@@ -11,8 +11,7 @@ public class FeedsMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            FeedsManager app = new FeedsManager();
-            app.start();
+            new FeedsManager().start(new FeedsContext(new ContentStorage()));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

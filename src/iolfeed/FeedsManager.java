@@ -2,15 +2,14 @@ package iolfeed;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.provider.VellumProvider;
 
 /**
  *
@@ -21,16 +20,13 @@ public class FeedsManager implements Runnable {
     static Logger logger = LoggerFactory.getLogger(FeedsManager.class);
     
     ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
-    FeedsContext context = new FeedsContext();
+    FeedsContext context;
+    ContentStorage storage;
     
-    public FeedsManager() {
-    }
-
-    public FeedsManager(FeedsContext context) {
+    public void start(FeedsContext context) throws Exception {
         this.context = context;
-    }
-    
-    public void start() throws Exception {
+        VellumProvider.provider.put(context);
+        VellumProvider.provider.put(context.storage);
         if (context.once) {
             run();
         } else {
@@ -44,7 +40,7 @@ public class FeedsManager implements Runnable {
         for (String key : context.feedMap.keySet()) {
             String feedUrl = context.feedMap.get(key);
             try {
-                List<JMap> articleList = new FeedReader(this).list(context.articleCount, feedUrl);
+                List<JMap> articleList = new FeedReader(context).list(context.articleCount, feedUrl);
                 StringBuilder json = new StringBuilder();
                 for (JMap map : articleList) {
                     if (json.length() > 0) {

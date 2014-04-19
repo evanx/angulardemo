@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.util.Streams;
 
 /**
  *
@@ -22,8 +23,10 @@ public class ArticleThread extends Thread {
     JMap map;
     Throwable exception;
     String link;
-    String imageLink;
-
+    String imageUrl;
+    FeedsContext context = FeedsProvider.getContext();
+    ContentStorage storage = FeedsProvider.getStorage();
+    
     ArticleThread(JMap map, String link) {
         this.map = map;
         this.link = link;
@@ -43,8 +46,7 @@ public class ArticleThread extends Thread {
                 }
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    imageLink = matcher.group(1);
-                    imageLink = "http://www.iol.co.za/" + imageLink;
+                    imageUrl = matcher.group(1);
                     fetchImage();
                     return;
                 }
@@ -56,13 +58,20 @@ public class ArticleThread extends Thread {
 
     private void fetchImage() {
         try {
-            String pubDate = map.getString("pubDate");
-            logger.info("imageLink {} {}", pubDate, imageLink);
-            File imageDirectory = new File(pubDate);
-            URLConnection urlConnection = new URL(imageLink).openConnection();
-            urlConnection.getInputStream();
+            logger.info("imageUrl {} {}", imageUrl);
+            imageUrl = "http://www.iol.co.za/" + imageUrl;
+            String numDate = map.getString("numDate");
+            String fileName = Streams.parseFileName(imageUrl);
+            String filePath = numDate + "/images/" + fileName;
+            File imageFile = new File(filePath);
+            imageFile.getParentFile().mkdirs();
+            logger.info("imageFile {}", imageFile.getCanonicalPath());
+            URLConnection urlConnection = new URL(imageUrl).openConnection();
+            imageUrl = context.baseUrl + "/" + filePath;
+            logger.info("imageUrl {}", imageUrl);
+            Streams.transmit(urlConnection.getInputStream(), imageFile);
         } catch (Exception e) {
-            logger.warn("fetchImage " + imageLink, e);
+            logger.warn("fetchImage " + imageUrl, e);
         }
     }
 }

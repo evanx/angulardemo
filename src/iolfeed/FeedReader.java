@@ -21,11 +21,13 @@ public class FeedReader {
 
     static Logger logger = LoggerFactory.getLogger(FeedReader.class);
 
-    FeedsManager manager;     
+    FeedsContext context;     
     List<ArticleThread> threadList = new ArrayList();
-    DateFormat dateFormat = new SimpleDateFormat();
-    public FeedReader(FeedsManager manager) {
-        this.manager = manager;
+    DateFormat numericDateFormat = new SimpleDateFormat();
+    
+    public FeedReader(FeedsContext context) {
+        this.context = context;
+        numericDateFormat = new SimpleDateFormat(context.numericDateFormatString);
     }
 
     List<JMap> list(int count, String feedUrl) throws Exception {
@@ -39,6 +41,7 @@ public class FeedReader {
             map.put("title", entry.getTitle());
             map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
             map.put("pubDate", entry.getPublishedDate());
+            map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("link", entry.getLink());
             ArticleThread linkThread = new ArticleThread(map, entry.getLink());
             linkThread.start();
@@ -53,8 +56,8 @@ public class FeedReader {
         List<JMap> articleList = new ArrayList();
         for (ArticleThread linkThread : threadList) {
             linkThread.join();
-            if (linkThread.imageLink != null) {
-                linkThread.map.put("imageLink", linkThread.imageLink);
+            if (linkThread.imageUrl != null) {
+                linkThread.map.put("imageLink", linkThread.imageUrl);
                 articleList.add(linkThread.map);
             }
         }

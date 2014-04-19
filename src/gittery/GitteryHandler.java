@@ -20,8 +20,6 @@ package gittery;
  specific language governing permissions and limitations
  under the License.  
  */
-
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.File;
@@ -37,14 +35,15 @@ import vellum.util.Streams;
  * @author evanx
  */
 public class GitteryHandler implements HttpHandler {
+
     static Logger logger = LoggerFactory.getLogger(GitteryHandler.class);
 
-    GitteryServer server;
+    GitteryContext context;
     HttpExchange he;
     String path;
-    
-    public GitteryHandler(GitteryServer server) {
-        this.server = server;
+
+    public GitteryHandler(GitteryContext context) {
+        this.context = context;
     }
 
     @Override
@@ -65,44 +64,42 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private void post() throws IOException {
-        File file = new File("." + path);
+        assert path.startsWith("/") && path.contains(".");
+        File file = new File(path.substring(1));
         file.getParentFile().mkdirs();
         Streams.transmit(he.getRequestBody(), file);
         logger.info("post {} {}", file.length(), file.getAbsolutePath());
+        context.storage.put(path, Streams.readBytes(file));
     }
-    
+
     private void get() throws Exception {
-        if (path.equals("/")) {
-            path = server.defaultPath;
-        }
-        File rootFile = new File(server.root + path);
-        File file = rootFile;
-        File currentFile = new File("." + path);
-        if (path.endsWith(".json")) {
-            if (currentFile.exists()) {
-                file = currentFile;
+        assert path.startsWith("/");
+        byte[] content = context.storage.get(path);
+        if (content == null) {
+            if (path.equals("/")) {
+                path = context.defaultPath;
+            }
+            File file = new File(context.root + path);
+            if (path.endsWith(".json")) {
+                File jsonFile = new File(path.substring(0));
+                if (jsonFile.exists()) {
+                    file = jsonFile;
+                } else {
+                    logger.warn("no file {}", jsonFile);
+                }
+            }
+            if (file.exists()) {
+                content = Streams.readBytes(file);
             } else {
-                logger.warn("no file {}", currentFile);
+                content = Streams.readContent(context.repo + path);
             }
         }
-        URL url = new URL(server.repo + path);
-        int length;
-        byte[] content;
-        if (file.exists()) {
-            content = Streams.readBytes(file);
-            length = content.length;
-        } else {
-            URLConnection connection = url.openConnection();
-            length = connection.getContentLength();
-            if (length < 0) {
-                content = Streams.readBytes(connection.getInputStream());
-            } else {
-                content = new byte[length];
-                connection.getInputStream().read(content);
-            }
-        }
-        logger.info("response {} {}", length, url);
-        he.sendResponseHeaders(200, length);
+        write(content);
+    }
+
+    void write(byte[] content) throws IOException {
+        logger.info("response {} {}", content.length);
+        he.sendResponseHeaders(200, content.length);
         he.getResponseHeaders().set("Content-Type", GitteryUtil.getContentType(path));
         he.getResponseBody().write(content);
     }
