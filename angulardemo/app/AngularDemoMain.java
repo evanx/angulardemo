@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author evanx
  */
-public class AngularDemoServerMain {
-    static Logger logger = LoggerFactory.getLogger(AngularDemoServerMain.class);
+public class AngularDemoMain {
+    static Logger logger = LoggerFactory.getLogger(AngularDemoMain.class);
 
     public void start() throws Exception {
     }
