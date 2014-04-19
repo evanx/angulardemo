@@ -1,4 +1,4 @@
-package reader.app;
+package angulardemo.app;
 
 /*
  * Source https://github.com/evanx by @evanxsummers
@@ -24,22 +24,31 @@ package reader.app;
 
 import gittery.GitteryServer;
 import org.apache.log4j.BasicConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author evanx
  */
-public class ReaderServer {
+public class AngularDemoServerMain {
+    static Logger logger = LoggerFactory.getLogger(AngularDemoServerMain.class);
 
+    public void start() throws Exception {
+    }
+    
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
             GitteryServer server = new GitteryServer();
-            server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/reader/web",
-                "/home/evanx/NetBeansProjects/git/angulardemo/reader/web"
+            server.start("https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
+                    "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web"
             );
+            new IOLFeederApp().start();
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
-    }    
+    }
+    
+    
 }

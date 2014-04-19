@@ -1,4 +1,4 @@
-package app;
+package angulardemo.app;
 
 
 import java.io.BufferedReader;
