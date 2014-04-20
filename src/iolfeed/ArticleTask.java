@@ -1,6 +1,5 @@
 package iolfeed;
 
-import static iolfeed.FeedTask.logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -25,6 +24,8 @@ public class ArticleTask implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static Pattern imageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
+    static Pattern galleryImageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\"");
+    
     static Pattern imageCreditPattern = Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
     static Pattern imageCaptionPattern = Pattern.compile("<p class=\"captions\">(.*)</p>");
     static Pattern paragraphPattern = Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
@@ -43,6 +44,7 @@ public class ArticleTask implements Runnable {
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
+    List<String> imageList = new ArrayList();
 
     ArticleTask(JMap map, String articleLink) {
         this.map = map;
@@ -73,7 +75,8 @@ public class ArticleTask implements Runnable {
                 if (line == null) {
                     break;
                 }
-                if (matchImageLink(imageLinkPattern.matcher(line))) {                    
+                if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {                    
+                } else if (matchImageLink(imageLinkPattern.matcher(line))) {                    
                 } else if (matchCaption(imageCaptionPattern.matcher(line))) {                    
                 } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
                 } else if (matchParagraph(paragraphPattern.matcher(line))) { 
@@ -88,13 +91,29 @@ public class ArticleTask implements Runnable {
 
     private boolean matchImageLink(Matcher matcher) {
         if (matcher.find()) {
-            sourceImageUrl = matcher.group(1);
-            fetchImage();
+            String sourceImagePath = matcher.group(1);
+            sourceImageUrl = "http://www.iol.co.za" + sourceImagePath;
+            imageUrl = loadImage(sourceImageUrl);
             return true;
         }
         return false;
     }
 
+    private boolean matchGalleryImageLink(Matcher matcher) {
+        if (matcher.find()) {
+            String galleryImagePath = matcher.group(1);
+            String galleryImageUrl = "http://www.iol.co.za" + galleryImagePath;
+            imageList.add(galleryImageUrl);
+            galleryImageUrl = loadImage(galleryImageUrl);
+            if (imageList.size() == 1) {
+                imageUrl = galleryImageUrl;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    
     private boolean matchCaptionCredit(Matcher matcher) {
         if (matcher.find()) {
             imageCredit = FeedsUtil.cleanText(matcher.group(1));
@@ -123,7 +142,6 @@ public class ArticleTask implements Runnable {
             return true;
         }
         return false;
-
     }    
     
     private void post() throws IOException {
@@ -153,9 +171,8 @@ public class ArticleTask implements Runnable {
         logger.info("write file {}", file.getAbsolutePath());        
     }
     
-    private void fetchImage() {
+    private String loadImage(String sourceImageUrl) {
         try {
-            sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
             byte[] content = Streams.readContent(sourceImageUrl);
             logger.info("content {} {}", content.length, sourceImageUrl);
             String name = Streams.parseFileName(sourceImageUrl);
@@ -165,12 +182,14 @@ public class ArticleTask implements Runnable {
             Streams.write(content, file);
             logger.info("file {} {}", file.length(), file.getCanonicalPath());
             context.storage.put(path, content);
-            imageUrl = String.format("http://%s/%s", context.contentHost, path);
-            Streams.postHttp(content, new URL(imageUrl));
-            content = Streams.readContent(imageUrl);
-            logger.info("imageUrl {} {}", content.length, imageUrl);
-        } catch (Exception e) {
+            String localImageUrl = String.format("http://%s/%s", context.contentHost, path);
+            Streams.postHttp(content, new URL(localImageUrl));
+            content = Streams.readContent(localImageUrl);
+            logger.info("imageUrl {} {}", content.length, localImageUrl);
+            return localImageUrl;
+        } catch (IOException e) {
             logger.warn("fetchImage " + sourceImageUrl, e);
+            return null;
         }
     }
 }
