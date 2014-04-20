@@ -95,9 +95,7 @@ public class ArticleTask implements Runnable {
 
     private boolean matchImageLink(Matcher matcher) {
         if (matcher.find()) {
-            String sourceImagePath = matcher.group(1);
-            sourceImageUrl = "http://www.iol.co.za" + sourceImagePath;
-            imageUrl = loadImage(sourceImageUrl);
+            sourceImageUrl = matcher.group(1);
             return true;
         }
         return false;
@@ -105,19 +103,12 @@ public class ArticleTask implements Runnable {
 
     private boolean matchGalleryImageLink(Matcher matcher) {
         if (matcher.find()) {
-            String galleryImagePath = matcher.group(1);
-            String galleryImageUrl = "http://www.iol.co.za" + galleryImagePath;
+            String galleryImageUrl = matcher.group(1);
             imageList.add(galleryImageUrl);
-            galleryImageUrl = loadImage(galleryImageUrl);
-            if (imageList.size() == 1) {
-                imageUrl = galleryImageUrl;
-                logger.info("matchGalleryImageLink {}", imageUrl);
-            }
             return true;
         }
         return false;
     }
-
     
     private boolean matchCaptionCredit(Matcher matcher) {
         if (matcher.find()) {
@@ -150,6 +141,10 @@ public class ArticleTask implements Runnable {
     }    
     
     private void post() throws IOException {
+        if (imageList.size() > 0) {
+            sourceImageUrl = imageList.get(0);
+        }
+        imageUrl = loadImage(sourceImageUrl);
         String articleUrl = String.format("http://%s/%s/articles/%s/%s.json", 
                 context.contentHost, numDate, section, articleId);
         map.put("imageLink", imageUrl);
@@ -178,6 +173,7 @@ public class ArticleTask implements Runnable {
     
     private String loadImage(String sourceImageUrl) {
         try {
+            sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
             byte[] content = Streams.readContent(sourceImageUrl);
             logger.info("content {} {}", content.length, sourceImageUrl);
             String name = Streams.parseFileName(sourceImageUrl);

@@ -1,5 +1,5 @@
 
-var app = angular.module("app", ["ngTouch", "ngRoute", "ui.bootstrap"]);
+var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
 app.factory("appService", ["$http", function($http) {
         return {

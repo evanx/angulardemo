@@ -28,11 +28,11 @@ public final class FeedsContext {
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
+        put("motoring", "http://www.iol.co.za/cmlink/1.746734");
         put("news", "http://www.iol.co.za/cmlink/1.640");
         put("sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
         put("business", "http://www.iol.co.za/cmlink/1.730910");
         put("scitech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
-        put("motoring", "http://www.iol.co.za/cmlink/1.746734");
         put("tonight", "http://www.iol.co.za/cmlink/1.891206");
         if (false) {
             put("multimedia", "http://www.iol.co.za/cmlink/1.738");
