@@ -10,10 +10,9 @@ app.factory("appService", ["$http", function($http) {
         }
     }]);
 
-app.controller("appController", ["$scope", "$locationProvider", "$location", "appService",
-    function($scope, $locationProvider, $location, appService) {
+app.controller("appController", ["$scope", "$location", "appService",
+    function($scope, $location, appService) {
         console.log("appController");
-        $locationProvider.html5Mode(true);
         $scope.state = {};
         $scope.userEmail = null;
         $scope.isActive = function(route) {
@@ -21,7 +20,8 @@ app.controller("appController", ["$scope", "$locationProvider", "$location", "ap
         };
     }]);
 
-app.config(['$routeProvider', function($routeProvider) {
+app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
+        $locationProvider.html5Mode(false);
         $routeProvider.
                 when("/sections", {
                     templateUrl: "sections.html", 
