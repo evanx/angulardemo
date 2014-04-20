@@ -87,8 +87,9 @@ public class ArticleTask implements Runnable {
                 } else {                    
                 }
             }
-            post();
+            store();
         } catch (Throwable e) {
+            logger.error("run", e);
             exception = e;
         }
     }
@@ -140,20 +141,14 @@ public class ArticleTask implements Runnable {
         return false;
     }    
     
-    private void post() throws IOException {
-        if (imageList.size() > 0) {
-            sourceImageUrl = imageList.get(0);
-        }
-        imageUrl = loadImage(sourceImageUrl);
-        String articleUrl = String.format("http://%s/%s/articles/%s/%s.json", 
-                context.contentHost, numDate, section, articleId);
-        map.put("imageLink", imageUrl);
+    private void store() throws IOException {
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         map.put("articleId", articleId);
         map.put("articlePath", articlePath);
-        map.put("articleUrl", articleUrl);
         map.put("paragraphs", paragraphs);
+        loadImage();
+        map.put("imageLink", imageUrl);        
         String path = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
         context.storage.put(path, map.toJson().getBytes());
         File file = new File(path);
@@ -170,27 +165,34 @@ public class ArticleTask implements Runnable {
         }        
         logger.info("write file {}", file.getAbsolutePath());        
     }
-    
-    private String loadImage(String sourceImageUrl) {
-        try {
-            sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
-            byte[] content = Streams.readContent(sourceImageUrl);
-            logger.info("content {} {}", content.length, sourceImageUrl);
-            String name = Streams.parseFileName(sourceImageUrl);
-            String path = numDate + "/images/" + name;
-            File file = new File(path);
-            file.getParentFile().mkdirs();
-            Streams.write(content, file);
-            logger.info("file {} {}", file.length(), file.getCanonicalPath());
-            context.storage.put(path, content);
-            String localImageUrl = String.format("http://%s/%s", context.contentHost, path);
-            Streams.postHttp(content, new URL(localImageUrl));
-            content = Streams.readContent(localImageUrl);
-            logger.info("imageUrl {} {}", content.length, localImageUrl);
-            return localImageUrl;
-        } catch (IOException e) {
-            logger.warn("fetchImage " + sourceImageUrl, e);
-            return null;
+
+    private void loadImage() throws IOException {
+        if (imageList.size() > 0) {
+            sourceImageUrl = imageList.get(0);
         }
+        if (sourceImageUrl != null) {
+            imageUrl = loadImage(sourceImageUrl);
+            String articleUrl = String.format("http://%s/%s/articles/%s/%s.json",
+                    context.contentHost, numDate, section, articleId);
+            map.put("articleUrl", articleUrl);
+        }
+    }
+    
+    private String loadImage(String sourceImageUrl) throws IOException {
+        sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
+        byte[] content = Streams.readContent(sourceImageUrl);
+        logger.info("content {} {}", content.length, sourceImageUrl);
+        String name = Streams.parseFileName(sourceImageUrl);
+        String path = numDate + "/images/" + name;
+        File file = new File(path);
+        file.getParentFile().mkdirs();
+        Streams.write(content, file);
+        logger.info("file {} {}", file.length(), file.getCanonicalPath());
+        context.storage.put(path, content);
+        String localImageUrl = String.format("http://%s/%s", context.contentHost, path);
+        Streams.postHttp(content, new URL(localImageUrl));
+        content = Streams.readContent(localImageUrl);
+        logger.info("imageUrl {} {}", content.length, localImageUrl);
+        return localImageUrl;
     }
 }
