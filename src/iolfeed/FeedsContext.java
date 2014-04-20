@@ -32,8 +32,8 @@ public final class FeedsContext {
         put("sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
         put("business", "http://www.iol.co.za/cmlink/1.730910");
         put("scitech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
-        put("motoring", "http://www.iol.co.za/cmlink/scitech-technology-telecoms-rss-1.847499");
-        put("tonight", "http://www.iol.co.za/cmlink/scitech-technology-security-rss-1.847508");
+        put("motoring", "http://www.iol.co.za/cmlink/1.746734");
+        put("tonight", "http://www.iol.co.za/cmlink/1.891206");
         if (false) {
             put("multimedia", "http://iol.co.za/cmlink/1.738");
         }

@@ -94,13 +94,21 @@ public class GitteryHandler implements HttpHandler {
             return Streams.readBytes(sourceFile);
         }
         logger.warn("no file: " + file.getAbsolutePath());
+        String contentUrl = context.repo + "/" + path;
         try {
-            return Streams.readContent(context.repo + "/" + path);
+            return Streams.readContent(contentUrl);
         } catch (FileNotFoundException e) {
             logger.info(e.getMessage());
+        } catch (IOException e) {
+            logger.warn("readContent " + contentUrl, e);
+        }
+        try {
             String resourcePath = "/" + context.res + "/" + path;
             logger.info("resourcePath {}", resourcePath);
             return Streams.readResourceBytes(getClass(), resourcePath);
+        } catch (IOException e) {
+            logger.warn(e.getMessage());
+            return null;
         }
     }
 

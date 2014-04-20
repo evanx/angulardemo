@@ -10,7 +10,6 @@ app.factory("appService", ["$http", function($http) {
         }
     }]);
 
-
 app.controller("appController", ["$scope", "$location", "appService",
     function($scope, $location, appService) {
         console.log("appController");
@@ -42,7 +41,7 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
 
 app.controller("sectionsController", ["$scope", "$window", "appService",
     function($scope, $window, appService) {
-        $scope.sections = ["News", "Sport", "Business"];
+        $scope.sections = ["News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
     }]);
 
 app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
@@ -51,13 +50,8 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         $scope.sectionResult = function(data) {
             $scope.articles = data;            
         };
-        if ($routeParams.section === "News") {
-            appService.load("news.json", $scope.sectionResult);
-        } else if ($routeParams.section === "Sport") {
-            appService.load("sport.json", $scope.sectionResult);
-        } else if ($routeParams.section === "Business") {
-            appService.load("business.json", $scope.sectionResult);
-        }
+        var jsonPath = $routeParams.section.toLowerCase() + ".json";
+        appService.load(jsonPath, $scope.sectionResult);
         $scope.selected = function(article) {
             console.log("selected", article.articleId);
             $location.path("/article/" + article.articleId);

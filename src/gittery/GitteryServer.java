@@ -47,6 +47,11 @@ public class GitteryServer implements HttpHandler {
 
     @Override
     public void handle(HttpExchange he) throws IOException {
-        new GitteryHandler(context).handle(he);
+        try {
+            new GitteryHandler(context).handle(he);
+        } catch (IOException e) {
+            logger.warn(e.getMessage());
+            throw e;
+        }
     }
 }
