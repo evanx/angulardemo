@@ -9,17 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.DateFormat;
-import java.text.ParseException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import junit.framework.Assert;
-import vellum.util.Streams;
 
 /**
  *
