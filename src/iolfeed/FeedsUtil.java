@@ -44,6 +44,11 @@ public class FeedsUtil {
             text = text.replaceAll("‘", "&lsquo;"); // left single quote
             text = text.replaceAll("’", "&rsquo;"); // right single quote
         }
+        text = text.replaceAll("&nbsp;", " ");
+        text = text.replaceAll("&ldquo;", "\"");
+        text = text.replaceAll("&rdquo;", "\"");
+        text = text.replaceAll("&lsquo;", "'");
+        text = text.replaceAll("&rsquo;", "'");
         text = text.replaceAll("&#8211;", "-");
         text = text.replaceAll("&ndash;", "-");
         text = text.replaceAll("`", "'"); // backtick

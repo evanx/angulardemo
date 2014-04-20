@@ -23,12 +23,16 @@ import vellum.util.Streams;
 public class ArticleTask implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
-    static Pattern imageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
-    static Pattern galleryImageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\"");
-    
-    static Pattern imageCreditPattern = Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
-    static Pattern imageCaptionPattern = Pattern.compile("<p class=\"captions\">(.*)</p>");
-    static Pattern paragraphPattern = Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
+    static final Pattern imageLinkPattern = 
+            Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s*");
+    static final Pattern galleryImageLinkPattern = 
+            Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\">\\s*");
+    static final Pattern imageCreditPattern = 
+            Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
+    static final Pattern imageCaptionPattern = 
+            Pattern.compile("<p class=\"captions\">(.*)</p>");
+    static final Pattern paragraphPattern = 
+            Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
 
     JMap map;
     Throwable exception;
@@ -75,7 +79,7 @@ public class ArticleTask implements Runnable {
                 if (line == null) {
                     break;
                 }
-                if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {                    
+                if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
                 } else if (matchImageLink(imageLinkPattern.matcher(line))) {                    
                 } else if (matchCaption(imageCaptionPattern.matcher(line))) {                    
                 } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
@@ -107,6 +111,7 @@ public class ArticleTask implements Runnable {
             galleryImageUrl = loadImage(galleryImageUrl);
             if (imageList.size() == 1) {
                 imageUrl = galleryImageUrl;
+                logger.info("matchGalleryImageLink {}", imageUrl);
             }
             return true;
         }
