@@ -2,9 +2,9 @@
   <div class="col-lg-8">
     <table class="table table-striped" style="width: 300px">
       <tbody>
-        <tr ng-repeat="section in sections" ng-click="selected()">
-          <td>
-            <a href="#/section/{{section}}" style="font-size: 150%">{{section}}</a>
+        <tr ng-repeat="section in sections" ng-click="selected(section)">
+          <td style="font-size: 150%">
+            {{section}}
           </td>
         </tr>
       </tbody>

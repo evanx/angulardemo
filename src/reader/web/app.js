@@ -39,9 +39,13 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
                 otherwise({redirectTo: "/section/News"});
     }]);
 
-app.controller("sectionsController", ["$scope", "$window", "appService",
-    function($scope, $window, appService) {
+app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
+    function($scope, $location, $window, appService) {
         $scope.sections = ["News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
+        $scope.selected = function(section) {
+            console.log("selected", section);
+            $location.path("/section/" + section);
+        };        
     }]);
 
 app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
