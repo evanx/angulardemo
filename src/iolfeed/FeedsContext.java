@@ -23,12 +23,17 @@ public final class FeedsContext {
     Map<String, String> feedMap = new HashMap();
     ContentStorage storage;
     TaskManager taskManager;
+    long articleTaskTimeoutSeconds = 300;
+    int articleTaskThreadPoolSize = 99;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
         put("news", "http://iol.co.za/cmlink/1.640");
         put("sport", "http://iol.co.za/cmlink/sport-category-rss-1.704");
         put("business", "http://www.iol.co.za/cmlink/1.730910");
+        put("scitech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
+        put("motoring", "http://www.iol.co.za/cmlink/scitech-technology-telecoms-rss-1.847499");
+        put("tonight", "http://www.iol.co.za/cmlink/scitech-technology-security-rss-1.847508");
         if (false) {
             put("multimedia", "http://iol.co.za/cmlink/1.738");
         }

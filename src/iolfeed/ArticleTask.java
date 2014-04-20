@@ -1,5 +1,6 @@
 package iolfeed;
 
+import static iolfeed.FeedTask.logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -20,7 +21,7 @@ import vellum.util.Streams;
  *
  * @author evanx
  */
-public class ArticleTask extends Thread {
+public class ArticleTask implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static Pattern imageLinkPattern = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s");
@@ -54,7 +55,7 @@ public class ArticleTask extends Thread {
         int index = articleId.lastIndexOf("/");
         if (index > 0) {
             articleId = articleId.substring(index + 1);
-            index = articleId.indexOf("#");
+            index = articleId.lastIndexOf("-");
             if (index > 0) {
                 articleId = articleId.substring(0, index);
             }

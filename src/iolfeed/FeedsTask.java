@@ -1,14 +1,10 @@
 package iolfeed;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vellum.jx.JMap;
 import vellum.provider.VellumProvider;
 
 /**
@@ -38,25 +34,10 @@ public class FeedsTask implements Runnable {
     @Override
     public void run() {
         logger.info("user.dir {}", System.getProperty("user.dir"));
-        for (String key : context.feedMap.keySet()) {
-            String feedUrl = context.feedMap.get(key);
+        for (String section : context.feedMap.keySet()) {
+            String feedUrl = context.feedMap.get(section);
             try {
-                List<JMap> articleList = new FeedReader(context).list(key, context.articleCount, feedUrl);
-                StringBuilder json = new StringBuilder();
-                for (JMap map : articleList) {
-                    if (json.length() > 0) {
-                        json.append(",\n");
-                    }
-                    json.append("  ").append(map.toJson());
-                }
-                json.insert(0, "[\n");
-                json.append("\n]\n");
-                logger.info("json {}", json);
-                File file = new File(key + ".json");
-                logger.info("write file {}", file.getAbsolutePath());
-                try (FileWriter writer = new FileWriter(file)) {
-                    writer.write(json.toString());
-                }
+                new FeedTask(context).start(section, feedUrl, context.articleCount);
             } catch (Exception e) {
                 logger.warn("run", e);
             }

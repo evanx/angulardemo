@@ -1,5 +1,5 @@
 
-var app = angular.module("app", ["ngTouch", "ngRoute"]);
+var app = angular.module("app", ["ngTouch", "ngRoute", "ui.bootstrap"]);
 
 app.factory("appService", ["$http", function($http) {
         return {
@@ -10,9 +10,11 @@ app.factory("appService", ["$http", function($http) {
         }
     }]);
 
+
 app.controller("appController", ["$scope", "$location", "appService",
     function($scope, $location, appService) {
         console.log("appController");
+        $scope.isCollapsed = true;
         $scope.state = {};
         $scope.userEmail = null;
         $scope.isActive = function(route) {
@@ -72,4 +74,3 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
         console.log("articleController", $routeParams.articleId, jsonPath);
         appService.load(jsonPath, $scope.articleResult);
     }]);
-

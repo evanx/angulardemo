@@ -1,7 +1,12 @@
 <div class="row">
-    <h5>{{article.title}}</h5>
-    <p>
-      {{article.description}}
-    </p>
-  <img align="right" ng-src="{{article.imageLink}}">
+  <img align="right" ng-src="{{article.imageLink}}" style="padding: 8px">
+  <h4><a href="{{article.link}}">{{article.title}}</a></h4>
+  <h6>{{article.pubDate}}</h6>
+  <hr>
+  <p ng-repeat="paragraph in article.paragraphs">
+    {{paragraph}}
+  </p>
+  <div style="font-size: 10pt">
+    <a href="{{article.link}}">Read on IOL.co.za</a>
+  </div>
 </div>
