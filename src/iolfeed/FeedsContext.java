@@ -16,10 +16,10 @@ public final class FeedsContext {
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
-    long initialDelay = Millis.fromSeconds(60);
+    long initialDelay = Millis.fromSeconds(10);
     long period = Millis.fromMinutes(30);
     boolean once = false;
-    int articleCount = 4;
+    int articleCount = 99;
     Map<String, String> feedMap = new HashMap();
     ContentStorage storage;
     TaskManager taskManager;

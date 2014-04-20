@@ -32,6 +32,7 @@ public class ArticleTask extends Thread {
     Throwable exception;
     String articleLink;
     String articleId;
+    String articlePath;
     String sourceImageUrl;
     String imageUrl;
     String imageCredit;
@@ -61,6 +62,7 @@ public class ArticleTask extends Thread {
         try {
             this.numDate = map.getString("numDate");
             this.section = map.getString("section");
+            articlePath = String.format("%s/articles/%s/%s", numDate, section, articleId);
             URLConnection connection = new URL(articleLink).openConnection();
             connection.setDoOutput(false);
             BufferedReader reader = new BufferedReader(
@@ -124,20 +126,29 @@ public class ArticleTask extends Thread {
     }    
     
     private void post() throws IOException {
-        String articleUrl = String.format("http://%s/%s/%s/%s.json", 
+        String articleUrl = String.format("http://%s/%s/articles/%s/%s.json", 
                 context.contentHost, numDate, section, articleId);
         map.put("imageLink", imageUrl);
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         map.put("articleId", articleId);
+        map.put("articlePath", articlePath);
         map.put("articleUrl", articleUrl);
         map.put("paragraphs", paragraphs);
-        String key = String.format("%s/%s/%s.json", numDate, section, articleId);
-        File file = new File(key);
+        String path = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
+        context.storage.put(path, map.toJson().getBytes());
+        File file = new File(path);
         file.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(map.toJson());
-        }
+        }        
+        path = String.format("articles/%s.json", articleId);
+        context.storage.put(path, map.toJson().getBytes());
+        file = new File(path);
+        file.getParentFile().mkdirs();
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(map.toJson());
+        }        
         logger.info("write file {}", file.getAbsolutePath());        
     }
     
