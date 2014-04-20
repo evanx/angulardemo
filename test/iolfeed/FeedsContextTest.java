@@ -3,16 +3,12 @@
 
 package iolfeed;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import junit.framework.Assert;
 
 /**
  *
@@ -20,7 +16,7 @@ import junit.framework.Assert;
  */
 public class FeedsContextTest {
 
-    FeedsContext context = new FeedsContext(new ContentStorage());
+    FeedsContext context = new FeedsContext(new TaskManager(), new ContentStorage());
 
     public FeedsContextTest() {
     }
