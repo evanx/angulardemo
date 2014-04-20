@@ -9,6 +9,7 @@ import iolfeed.TaskManager;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.jx.JMap;
 
 /**
  *
@@ -27,7 +28,8 @@ public class AngularDemoMain {
                     new ContentStorage(), "angulardemo/web",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
                 "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web"));
-            new FeedsTask().start(new FeedsContext(new TaskManager(), new ContentStorage()));
+            JMap feedsProperties = new JMap();
+            new FeedsTask().start(new FeedsContext(new TaskManager(), new ContentStorage(), feedsProperties));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

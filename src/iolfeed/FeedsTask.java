@@ -30,7 +30,8 @@ public class FeedsTask implements Runnable {
         if (context.once) {
             run();
         } else {
-            elapsedExecutorService.scheduleAtFixedRate(this, 1, 3600, TimeUnit.SECONDS);
+            elapsedExecutorService.scheduleAtFixedRate(this, context.initialDelay, 
+                    context.period, TimeUnit.MILLISECONDS);
         }
     }
     

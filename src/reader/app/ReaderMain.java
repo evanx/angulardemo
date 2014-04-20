@@ -7,6 +7,7 @@ import iolfeed.ContentStorage;
 import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import org.apache.log4j.BasicConfigurator;
+import vellum.jx.JMap;
 
 /**
  *
@@ -22,7 +23,8 @@ public class ReaderMain {
             new GitteryServer().start(new GitteryContext(contentStorage, "reader/web",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web",
                     "/home/evanx/NetBeansProjects/git/angulardemo/src/reader/web"));
-            new FeedsTask().start(new FeedsContext(taskManager, contentStorage, true, 4));
+            JMap feedsProperties = new JMap();
+            new FeedsTask().start(new FeedsContext(taskManager, contentStorage, feedsProperties));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

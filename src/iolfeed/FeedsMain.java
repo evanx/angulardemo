@@ -1,6 +1,7 @@
 package iolfeed;
 
 import org.apache.log4j.BasicConfigurator;
+import vellum.jx.JMap;
 
 /**
  *
@@ -11,9 +12,11 @@ public class FeedsMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
+            JMap feedsProperties = new JMap();
             new FeedsTask().start(new FeedsContext(
                     new TaskManager(), 
-                    new ContentStorage()));
+                    new ContentStorage(),
+                    feedsProperties));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
