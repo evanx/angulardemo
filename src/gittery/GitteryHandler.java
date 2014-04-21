@@ -93,12 +93,12 @@ public class GitteryHandler implements HttpHandler {
         if (sourceFile.exists()) {
             return Streams.readBytes(sourceFile);
         }
-        logger.warn("no file: " + file.getAbsolutePath());
+        logger.warn("not local file: " + file.getAbsolutePath());
         String contentUrl = context.repo + "/" + path;
         try {
             return Streams.readContent(contentUrl);
         } catch (FileNotFoundException e) {
-            logger.info(e.getMessage());
+            logger.info("not on github: " + e.getMessage());
         } catch (IOException e) {
             logger.warn("readContent " + contentUrl, e);
         }
