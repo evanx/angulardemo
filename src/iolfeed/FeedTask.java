@@ -1,11 +1,10 @@
 package iolfeed;
 
+import com.google.gson.Gson;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -94,19 +93,12 @@ public class FeedTask extends Thread {
             logger.error("timeout");
         }
         StringBuilder json = new StringBuilder();
+        List<JMap> articleList = new ArrayList();
         for (ArticleTask task : taskList) {
-            if (json.length() > 0) {
-                json.append(",\n");
+            if (task.exception == null) {
+                articleList.add(task.map);
             }
-            json.append("  ").append(task.map.toJson());
-        }
-        json.insert(0, "[\n");
-        json.append("\n]\n");
-        logger.info("json {}", json);
-        File file = new File(section + ".json");
-        logger.info("write file {}", file.getAbsolutePath());
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(json.toString());
-        }
+        }        
+        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
     }
 }

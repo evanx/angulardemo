@@ -13,7 +13,7 @@ public class ContentStorage {
     public void put(String key, byte[] value) {
         map.put(key, value);
     }
-    
+        
     public byte[] get(String key) {
         return map.get(key);
     }

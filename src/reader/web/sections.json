@@ -1,0 +1,38 @@
+[
+    { 
+        "label": "News",
+        "subsections": {
+            
+        }
+    }, 
+    {
+        "label": "Sport",
+        "subsections": {
+            
+        }
+    }, 
+    {
+        "label": "Business",
+        "subsections": {
+            
+        }
+    }, 
+    {
+        "label": "SciTech",
+        "subsections": {
+            
+        }
+    }, 
+    {
+        "label": "Motoring",
+        "subsections": {
+            
+        }
+    }, 
+    {
+        "label": "Tonight",
+        "subsections": {
+            
+        }
+    }
+]
