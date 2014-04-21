@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.jx.JMapException;
 import vellum.util.Streams;
 
 /**
@@ -23,16 +24,16 @@ import vellum.util.Streams;
 public class ArticleTask implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
-    static final Pattern imageLinkPattern = 
-            Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s*");
-    static final Pattern galleryImageLinkPattern = 
-            Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\">\\s*");
-    static final Pattern imageCreditPattern = 
-            Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
-    static final Pattern imageCaptionPattern = 
-            Pattern.compile("<p class=\"captions\">(.*)</p>");
-    static final Pattern paragraphPattern = 
-            Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
+    static final Pattern imageLinkPattern
+            = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s*");
+    static final Pattern galleryImageLinkPattern
+            = Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\">\\s*");
+    static final Pattern imageCreditPattern
+            = Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
+    static final Pattern imageCaptionPattern
+            = Pattern.compile("<p class=\"captions\">(.*)</p>");
+    static final Pattern paragraphPattern
+            = Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
 
     JMap map;
     Throwable exception;
@@ -49,14 +50,16 @@ public class ArticleTask implements Runnable {
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
     List<String> imageList = new ArrayList();
+    boolean completed = false;
 
-    ArticleTask(JMap map, String articleLink) {
+    ArticleTask(JMap map) {
         this.map = map;
-        this.articleLink = articleLink;
     }
 
-    @Override
-    public void run() {
+    public void init() throws JMapException {
+        articleLink = map.getString("link");
+        numDate = map.getString("numDate");
+        section = map.getString("section");
         articleId = articleLink;
         int index = articleId.lastIndexOf("/");
         if (index > 0) {
@@ -66,10 +69,12 @@ public class ArticleTask implements Runnable {
                 articleId = articleId.substring(0, index);
             }
         }
+        articlePath = String.format("%s/articles/%s/%s", numDate, section, articleId);
+    }
+
+    @Override
+    public void run() {
         try {
-            this.numDate = map.getString("numDate");
-            this.section = map.getString("section");
-            articlePath = String.format("%s/articles/%s/%s", numDate, section, articleId);
             URLConnection connection = new URL(articleLink).openConnection();
             connection.setDoOutput(false);
             BufferedReader reader = new BufferedReader(
@@ -80,20 +85,25 @@ public class ArticleTask implements Runnable {
                     break;
                 }
                 if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
-                } else if (matchImageLink(imageLinkPattern.matcher(line))) {                    
-                } else if (matchCaption(imageCaptionPattern.matcher(line))) {                    
+                } else if (matchImageLink(imageLinkPattern.matcher(line))) {
+                } else if (matchCaption(imageCaptionPattern.matcher(line))) {
                 } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
-                } else if (matchParagraph(paragraphPattern.matcher(line))) { 
-                } else {                    
+                } else if (matchParagraph(paragraphPattern.matcher(line))) {
+                } else {
                 }
             }
             store();
+            completed = true;
         } catch (Throwable e) {
-            logger.error("run", e);
+            logger.error("run: " + e.getMessage());
             exception = e;
         }
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+    
     private boolean matchImageLink(Matcher matcher) {
         if (matcher.find()) {
             sourceImageUrl = matcher.group(1);
@@ -110,10 +120,13 @@ public class ArticleTask implements Runnable {
         }
         return false;
     }
-    
+
     private boolean matchCaptionCredit(Matcher matcher) {
         if (matcher.find()) {
-            imageCredit = FeedsUtil.cleanText(matcher.group(1));
+            String text = matcher.group(1);
+            if (text.trim().length() > 1) {
+                imageCredit = FeedsUtil.cleanText(text);
+            }
             return true;
         }
         return false;
@@ -121,9 +134,9 @@ public class ArticleTask implements Runnable {
 
     private boolean matchCaption(Matcher matcher) {
         if (matcher.find()) {
-            String paragraph = matcher.group(1);
-            if (paragraph.trim().length() > 0) {
-                imageCaption = FeedsUtil.cleanText(paragraph);
+            String text = matcher.group(1);
+            if (text.trim().length() > 1) {
+                imageCaption = FeedsUtil.cleanText(text);
             }
             return true;
         }
@@ -139,8 +152,8 @@ public class ArticleTask implements Runnable {
             return true;
         }
         return false;
-    }    
-    
+    }
+
     private void store() throws IOException {
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
@@ -148,22 +161,22 @@ public class ArticleTask implements Runnable {
         map.put("articlePath", articlePath);
         map.put("paragraphs", paragraphs);
         loadImage();
-        map.put("imageLink", imageUrl);        
+        map.put("imageLink", imageUrl);
         String path = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
         context.storage.put(path, map.toJson().getBytes());
         File file = new File(path);
         file.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(map.toJson());
-        }        
+        }
         path = String.format("articles/%s.json", articleId);
         context.storage.put(path, map.toJson().getBytes());
         file = new File(path);
         file.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(map.toJson());
-        }        
-        logger.info("write file {}", file.getAbsolutePath());        
+        }
+        logger.info("write file {}", file.getAbsolutePath());
     }
 
     private void loadImage() throws IOException {
@@ -177,7 +190,7 @@ public class ArticleTask implements Runnable {
             map.put("articleUrl", articleUrl);
         }
     }
-    
+
     private String loadImage(String sourceImageUrl) throws IOException {
         sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
         byte[] content = Streams.readContent(sourceImageUrl);

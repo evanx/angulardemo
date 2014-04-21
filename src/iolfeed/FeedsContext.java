@@ -20,24 +20,26 @@ public final class FeedsContext {
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
-    long initialDelay = Millis.fromSeconds(10);
+    long initialDelay = Millis.fromSeconds(5);
     long period = Millis.fromMinutes(30);
+    long articleTaskTimeoutSeconds = 300;
+    int articleTaskThreadPoolSize = 99;
     boolean once = false;
     int articleCount = 99;
     Map<String, String> feedMap = new HashMap();
     ContentStorage storage;
     TaskManager taskManager;
-    long articleTaskTimeoutSeconds = 300;
-    int articleTaskThreadPoolSize = 99;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
-        putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
         putFeed("news", "News", "http://www.iol.co.za/cmlink/1.640");
-        putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
-        putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
-        putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
-        putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
+        if (true) {
+            putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
+            putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
+            putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
+            putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
+            putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
+        }
         if (false) {
             putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");
         }

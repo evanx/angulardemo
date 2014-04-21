@@ -5,6 +5,7 @@ import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,18 +27,15 @@ public class FeedTask extends Thread {
     static Logger logger = LoggerFactory.getLogger(FeedTask.class);
 
     FeedsContext context;     
-    List<ArticleTask> taskList = new ArrayList();
+    List<ArticleTask> articleTaskList = new ArrayList();
 
     String section;
     int articleCount;
     String feedUrl;
     Exception exception;
 
-    ExecutorService executorService;
-    
     public FeedTask(FeedsContext context) {
         this.context = context;
-        executorService = Executors.newFixedThreadPool(context.articleTaskThreadPoolSize);
     }
 
     public void start(String section, String feedUrl, int articleCount) throws Exception {
@@ -77,9 +75,9 @@ public class FeedTask extends Thread {
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));
             map.put("link", entry.getLink());
-            ArticleTask articleTask = new ArticleTask(map, entry.getLink());
-            executorService.submit(articleTask);
-            taskList.add(articleTask);
+            ArticleTask articleTask = new ArticleTask(map);
+            articleTask.init();
+            articleTaskList.add(articleTask);
             if (articleCount > 0) {
                 articleCount--;
             }
@@ -87,18 +85,42 @@ public class FeedTask extends Thread {
                 break;
             }
         }        
-        executorService.shutdown();
-        boolean completed = executorService.awaitTermination(context.articleTaskTimeoutSeconds, TimeUnit.SECONDS);
-        if (!completed) {
-            logger.error("timeout");
+        while (!performTasks()) {
+            logger.warn("performTasks incomplete");
         }
-        StringBuilder json = new StringBuilder();
+        while (!write()) {
+            logger.warn("write incomplete");
+            performTasks();
+        }
+    }
+    
+    private boolean performTasks() {
+        ExecutorService executorService = Executors.newFixedThreadPool(context.articleTaskThreadPoolSize);
+        for (ArticleTask articleTask : articleTaskList) {
+            if (!articleTask.isCompleted()) {
+                executorService.submit(articleTask);
+            }
+        }
+        executorService.shutdown();
+        try {
+            return executorService.awaitTermination(context.articleTaskTimeoutSeconds, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.warn("performTasks: " + e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    private boolean write() throws IOException {
+        boolean completed = true;
         List<JMap> articleList = new ArrayList();
-        for (ArticleTask task : taskList) {
-            if (task.exception == null) {
-                articleList.add(task.map);
+        for (ArticleTask articleTask : articleTaskList) {
+            if (articleTask.isCompleted()) {
+                articleList.add(articleTask.map);
+            } else {
+                completed = false;
             }
         }        
-        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
-    }
+        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));        
+        return completed;
+    }       
 }

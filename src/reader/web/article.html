@@ -1,10 +1,14 @@
 <div class="row">
   <div class="col-lg-10" ng-show="article">
-    <img align="right" ng-src="{{article.imageLink}}" style="padding: 8px; max-width: 350px;">
+    <div style="padding: 8px; float: right">
+      <img ng-src="{{article.imageLink}}" style="max-width: 350px;">
+      <br>
+      <span style="font-size: 80%;">{{article.imageCaption}}</span>
+    </div>
     <h4><a href="{{article.link}}">{{article.title}}</a></h4>
     <h6>{{article.pubDate}}, <a href="{{article.link}}">IOL.co.za</a></h6>
     <hr>
-    <p ng-repeat="paragraph in article.paragraphs" ng-bind-html="paragraph">
+    <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
     </p>
     <div style="font-size: 10pt;">
       <a href="{{article.link}}">Read on IOL.co.za</a>
