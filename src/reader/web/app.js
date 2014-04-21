@@ -39,12 +39,12 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
                 when("/article/:articleId", {
                     templateUrl: "article.html", 
                     controller: "articleController"}).
-                otherwise({redirectTo: "/section/News"});
+                otherwise({redirectTo: "/section/Top"});
     }]);
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
     function($scope, $location, $window, appService) {
-        $scope.sections = ["News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
+        $scope.sections = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
         $scope.selected = function(section) {
             console.log("selected", section);
             $location.path("section/" + section);

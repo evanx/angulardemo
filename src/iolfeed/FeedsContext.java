@@ -37,21 +37,20 @@ public final class FeedsContext {
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
+        putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
         putFeed("news", "News", "http://www.iol.co.za/cmlink/1.640");
-        if (true) {
-            putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
-            putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
-            putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
-            putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
-            putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
-        }
+        putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
+        putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
+        putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
+        putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
+        putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
         if (false) {
             putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");
         }
         if (false) {
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-extended-1.628986");
-            putFeed("tvbox", "TV Box Teaser", "http://www.iol.co.za/cmlink/tv-box-teaser-rss-1.1537631");
+            putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/tv-box-teaser-rss-1.1537631");
             putFeed("mostcommented", "Most Commmented", "http://www.iol.co.za/cmlink/most-commmented-stories-1.1625");
             putFeed("mostviewed", "Most Viewed", "http://www.iol.co.za/cmlink/most-viewed-stories-1.1624");
             putFeed("editorspick", "Editors Pick", "http://www.iol.co.za/cmlink/editors-pick-extended-rss-1.1137157");
