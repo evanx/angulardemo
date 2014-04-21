@@ -26,7 +26,7 @@ public final class FeedsContext {
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
     long initialDelay = Millis.fromSeconds(5);
-    long period = Millis.fromMinutes(30);
+    long period = Millis.fromMinutes(60);
     long articleTaskTimeoutSeconds = 300;
     int articleTaskThreadPoolSize = 99;
     boolean once = false;
