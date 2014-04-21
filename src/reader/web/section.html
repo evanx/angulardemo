@@ -1,12 +1,13 @@
 <div class="row" ng-show="articles.length > 0">
-  <div class="">
-    <table class="table table-striped table-condensed">
+  <div class="col-lg-8">
+      <table class="table table-striped table-condensed">
       <tbody>
         <tr ng-repeat="article in articles" ng-click="selected(article)">
           <td>
             <img width="125" ng-src="{{article.imageLink}}">
           <td>
-            <h5><a href="#/article/{{article.articleId}}">{{article.title}}</a></h5>
+            <h5><a href="#/article/{{article.articleId}}" style="font-size: 125%"
+                   >{{article.title}}</a></h5>
             <p style="font-family: sans-serif">
               {{article.description}}
             </p>
