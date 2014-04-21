@@ -1,21 +1,25 @@
 package iolfeed;
 
-import static iolfeed.FeedTask.logger;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
 import vellum.jx.JMap;
+import vellum.util.Streams;
 
 /**
  *
  * @author evanx
  */
 public final class FeedsContext {
+    static Logger logger = LoggerFactory.getLogger(FeedsContext.class);
     
-    String contentHost = System.getProperty("reader.host", "localhost:8088");
+    String contentUrl = System.getProperty("reader.contentUrl", "http://chronica.co");
     String contentPath = "iol";
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
@@ -72,7 +76,7 @@ public final class FeedsContext {
     }    
     
     public void putJson(String path, String json) throws IOException {
-        logger.info("write file {}", path);
+        logger.info("putJson {}", path);
         storage.put(path, json.getBytes());
         File file = new File(path);
         file.getParentFile().mkdirs();
@@ -80,5 +84,19 @@ public final class FeedsContext {
             writer.write(json);
         }
     }
+
+    public void putContent(String path, byte[] content) throws IOException {
+        logger.info("putContent {} {}", path, content.length);
+        storage.put(path, content);
+        File file = new File(path);
+        file.getParentFile().mkdirs();
+        Streams.write(content, file);        
+    }
     
+    public void postContent(String path, byte[] content) throws IOException {
+        String localImageUrl = String.format("%s/%s", contentUrl, path);
+        Streams.postHttp(content, new URL(localImageUrl));
+        content = Streams.readContent(localImageUrl);
+        logger.info("imageUrl {} {}", content.length, localImageUrl);
+    }       
 }

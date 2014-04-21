@@ -47,7 +47,7 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
         $scope.sections = ["News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
         $scope.selected = function(section) {
             console.log("selected", section);
-            $location.path("/section/" + section);
+            $location.path("section/" + section);
         };        
     }]);
 
@@ -65,7 +65,7 @@ app.controller("subSectionController", ["$scope", "$location", "$routeParams", "
         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
         $scope.selected = function(article) {
             console.log("selected", article.articleId);
-            $location.path("/article/" + article.articleId);
+            $location.path("article/" + article.articleId);
         };
     }]);
 
@@ -84,12 +84,13 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
         $scope.selected = function(article) {
             console.log("selected", article.articleId);
-            $location.path("/article/" + article.articleId);
+            $location.path("article/" + article.articleId);
         };
     }]);
 
 app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
+        $scope.imageWidth = 300;
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;

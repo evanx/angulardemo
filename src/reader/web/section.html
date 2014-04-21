@@ -4,10 +4,15 @@
       <tbody>
         <tr ng-repeat="article in articles" ng-click="selected(article)">
           <td>
-            <img width="125" ng-src="{{article.imageLink}}">
-          <td>
-            <h5><a href="#/article/{{article.articleId}}" style="font-size: 125%"
-                   >{{article.title}}</a></h5>
+            <div style="margin: 0em; display: inline-block; min-width: 200px;">
+              <h5 style="">
+                <a href="#/article/{{article.articleId}}" style="font-size: 110%"
+                   >{{article.title}}</a>
+              </h5>
+            </div>
+            <div style="margin-right: 1em; max-width: 350px; float: left;">
+              <img width="125" ng-src="{{article.imagePath}}">
+            </div>
             <p style="font-family: sans-serif">
               {{article.description}}
             </p>

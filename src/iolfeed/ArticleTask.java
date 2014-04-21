@@ -37,11 +37,11 @@ public class ArticleTask implements Runnable {
 
     JMap map;
     Throwable exception;
-    String articleLink;
+    String sourceArticleUrl;
+    String sourceImageUrl;
     String articleId;
     String articlePath;
-    String sourceImageUrl;
-    String imageUrl;
+    String imagePath;
     String imageCredit;
     String imageCaption;
     String section;
@@ -57,10 +57,10 @@ public class ArticleTask implements Runnable {
     }
 
     public void init() throws JMapException {
-        articleLink = map.getString("link");
+        sourceArticleUrl = map.getString("link");
         numDate = map.getString("numDate");
         section = map.getString("section");
-        articleId = articleLink;
+        articleId = sourceArticleUrl;
         int index = articleId.lastIndexOf("/");
         if (index > 0) {
             articleId = articleId.substring(index + 1);
@@ -69,13 +69,13 @@ public class ArticleTask implements Runnable {
                 articleId = articleId.substring(0, index);
             }
         }
-        articlePath = String.format("%s/articles/%s/%s", numDate, section, articleId);
+        articlePath = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
     }
 
     @Override
     public void run() {
         try {
-            URLConnection connection = new URL(articleLink).openConnection();
+            URLConnection connection = new URL(sourceArticleUrl).openConnection();
             connection.setDoOutput(false);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()));
@@ -155,28 +155,15 @@ public class ArticleTask implements Runnable {
     }
 
     private void store() throws IOException {
-        map.put("imageCredit", imageCredit);
-        map.put("imageCaption", imageCaption);
         map.put("articleId", articleId);
         map.put("articlePath", articlePath);
         map.put("paragraphs", paragraphs);
+        map.put("imageCredit", imageCredit);
+        map.put("imageCaption", imageCaption);
         loadImage();
-        map.put("imageLink", imageUrl);
-        String path = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
-        context.storage.put(path, map.toJson().getBytes());
-        File file = new File(path);
-        file.getParentFile().mkdirs();
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(map.toJson());
-        }
-        path = String.format("articles/%s.json", articleId);
-        context.storage.put(path, map.toJson().getBytes());
-        file = new File(path);
-        file.getParentFile().mkdirs();
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(map.toJson());
-        }
-        logger.info("write file {}", file.getAbsolutePath());
+        map.put("imagePath", imagePath);
+        context.putJson(articlePath, map.toJson());
+        context.putJson(String.format("articles/%s.json", articleId), map.toJson());
     }
 
     private void loadImage() throws IOException {
@@ -184,10 +171,7 @@ public class ArticleTask implements Runnable {
             sourceImageUrl = imageList.get(0);
         }
         if (sourceImageUrl != null) {
-            imageUrl = loadImage(sourceImageUrl);
-            String articleUrl = String.format("http://%s/%s/articles/%s/%s.json",
-                    context.contentHost, numDate, section, articleId);
-            map.put("articleUrl", articleUrl);
+            imagePath = loadImage(sourceImageUrl);
         }
     }
 
@@ -197,15 +181,14 @@ public class ArticleTask implements Runnable {
         logger.info("content {} {}", content.length, sourceImageUrl);
         String name = Streams.parseFileName(sourceImageUrl);
         String path = numDate + "/images/" + name;
-        File file = new File(path);
-        file.getParentFile().mkdirs();
-        Streams.write(content, file);
-        logger.info("file {} {}", file.length(), file.getCanonicalPath());
-        context.storage.put(path, content);
-        String localImageUrl = String.format("http://%s/%s", context.contentHost, path);
+        context.putContent(path, content);
+        return path;
+    }
+    
+    void postContent(String path, byte[] content) throws IOException {
+        String localImageUrl = String.format("%s/%s", context.contentUrl, path);
         Streams.postHttp(content, new URL(localImageUrl));
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);
-        return localImageUrl;
     }
 }
