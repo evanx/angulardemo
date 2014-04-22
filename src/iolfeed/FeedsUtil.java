@@ -61,6 +61,8 @@ public class FeedsUtil {
         text = text.replaceAll("&#8217;", "'");
         text = text.replaceAll("\u8216;", "'");
         text = text.replaceAll("\u8217;", "'");
+        text = text.replaceAll("&#38;", "&");
+        text = text.replaceAll("&amp;", "&");
         //text = text.replaceAll("\\u0026#8216;", "'");
         //text = text.replaceAll("\\u0026#8217;", "'");
         text = text.replaceAll("\u8220;", "\"");
