@@ -54,14 +54,16 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
 app.controller("subSectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
         console.log("sectionController", $routeParams);
+        var section = $routeParams.section.toLowerCase();
+        var jsonPath = section + "/articles.json";
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
-            $scope.articles = data;            
+            $scope.articles = data;
+            articles[section] = data;
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
         };
-        var jsonPath = $routeParams.section.toLowerCase() + "/articles.json";
         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
         $scope.selected = function(article) {
             console.log("selected", article.articleId);
@@ -72,16 +74,23 @@ app.controller("subSectionController", ["$scope", "$location", "$routeParams", "
 app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
         console.log("sectionController", $routeParams);
+        var section = $routeParams.section.toLowerCase();
+        var jsonPath = section + "/articles.json";
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
-            $scope.articles = data;            
+            $scope.articles = data;
+            articles[section] = data;
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
         };
-        var jsonPath = $routeParams.section.toLowerCase() + "/articles.json";
-        $scope.statusMessage = "Loading " + jsonPath;
-        appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
+        console.log("articles", articles, articles[section]);
+        if (articles[section]) {
+            $scope.articles = articles[section];            
+        } else {
+            $scope.statusMessage = "Loading " + jsonPath;
+            appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
+        }
         $scope.selected = function(article) {
             console.log("selected", article.articleId);
             $location.path("article/" + article.articleId);
@@ -90,7 +99,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
 
 app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
-        $scope.imageWidth = 300;
+        var jsonPath = "articles/" + $routeParams.articleId + ".json";
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;
@@ -99,7 +108,6 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
         };
-        var jsonPath = "articles/" + $routeParams.articleId + ".json";
         console.log("articleController", $routeParams.articleId, jsonPath);
         $scope.statusMessage = "Loading " + jsonPath;
         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);

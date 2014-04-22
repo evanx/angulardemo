@@ -1,6 +1,8 @@
 package gittery;
 
 import iolfeed.ContentStorage;
+import java.io.IOException;
+import vellum.util.Streams;
 
 public class GitteryContext {
     String res;
@@ -18,8 +20,14 @@ public class GitteryContext {
         this.dir = dir;
     }
 
+    void init() throws IOException {
+        storage.init(new String(Streams.readResourceBytes(getClass(), 
+                String.format("/%s/%s", res, defaultPath))));
+    }
+
     @Override
     public String toString() {
         return repo;
     }       
+
 }

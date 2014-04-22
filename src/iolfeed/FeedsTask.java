@@ -28,19 +28,36 @@ public class FeedsTask implements Runnable {
         } else {
             elapsedExecutorService.scheduleAtFixedRate(this, context.initialDelay, 
                     context.period, TimeUnit.MILLISECONDS);
+            elapsedExecutorService.scheduleAtFixedRate(topTask, context.topInitialDelay,
+                    context.topPeriod, TimeUnit.MILLISECONDS);
         }
     }
     
     @Override
     public void run() {
-        logger.info("user.dir {}", System.getProperty("user.dir"));
         for (String section : context.feedMap.keySet()) {
-            String feedUrl = context.feedMap.get(section);
             try {
-                new FeedTask(context).start(section, feedUrl, context.articleCount);
+                perform(section);
             } catch (Exception e) {
                 logger.warn("run", e);
             }
         }
+    }
+    
+    private final Runnable topTask = new Runnable() {
+        final String section = "top";
+        
+        @Override
+        public void run() {
+            try {
+                perform(section);
+            } catch (Exception e) {
+                logger.warn("run: " + section, e);
+            }
+        }
+    };
+            
+    private void perform(String section) throws Exception {
+        new FeedTask(context).start(section, context.feedMap.get(section), context.articleCount);
     }
 }

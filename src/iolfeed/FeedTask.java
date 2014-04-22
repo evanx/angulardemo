@@ -24,7 +24,7 @@ import vellum.jx.JMap;
  */
 public class FeedTask extends Thread {
 
-    static Logger logger = LoggerFactory.getLogger(FeedTask.class);
+    Logger logger = LoggerFactory.getLogger(FeedTask.class);
 
     FeedsContext context;     
     List<ArticleTask> articleTaskList = new ArrayList();
@@ -33,7 +33,8 @@ public class FeedTask extends Thread {
     int articleCount;
     String feedUrl;
     Exception exception;
-
+    boolean refresh;
+    
     public FeedTask(FeedsContext context) {
         this.context = context;
     }
@@ -120,7 +121,8 @@ public class FeedTask extends Thread {
                 completed = false;
             }
         }        
-        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));        
+        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
+        context.storage.buildFastContent();
         return completed;
     }       
 }

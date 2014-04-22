@@ -25,6 +25,9 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.util.Streams;
@@ -40,7 +43,7 @@ public class GitteryHandler implements HttpHandler {
     GitteryContext context;
     HttpExchange he;
     String path;
-
+    
     public GitteryHandler(GitteryContext context) {
         this.context = context;
     }
@@ -50,17 +53,31 @@ public class GitteryHandler implements HttpHandler {
         this.he = he;
         path = he.getRequestURI().getPath();
         logger.info("path [{}]", path);
-        if (path.equals("/")) {
-            path = context.defaultPath;
-        } else if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        logger.info("path [{}]", path);
         try {
+            if (path.equals("/fast")) {
+                if (context.storage.fastContent != null) {
+                    if (requestHeaderMatches("Accept-Encoding", "gzip") &&
+                            context.storage.fastGzippedContent != null) {
+                        writeFast(context.storage.fastGzippedContent);
+                    } else {
+                        write(context.storage.fastContent);
+                    }
+                    return;
+                } else {
+                    path = context.defaultPath;                    
+                }
+            } else if (path.equals("/")) {
+                path = context.defaultPath;
+            } else if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
             if (he.getRequestMethod().equals("POST")) {
                 post();
-            } else {                
-                write(get());
+            } else if (requestHeaderMatches("Accept-Encoding", "gzip")) {
+                writeGzip(get());
+            } else {
+                logger.warn("Accept-Encoding: {}", he.getRequestHeaders().get("Accept-Encoding"));
+                write(get());                
             }
         } catch (Throwable e) {
             writeError();
@@ -68,6 +85,14 @@ public class GitteryHandler implements HttpHandler {
         } finally {
             he.close();
         }
+    }
+    
+    private boolean requestHeaderMatches(String header, String pattern) {
+        List<String> values = he.getRequestHeaders().get(header);
+        if (values != null && !values.isEmpty()) {
+            return values.get(0).contains(pattern);
+        }
+        return false;        
     }
 
     private void post() throws IOException {
@@ -79,6 +104,9 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private byte[] get() throws Exception {
+        if (path.equals("fast") && context.storage.fastContent != null) {
+            return context.storage.fastContent;
+        }
         byte[] content = context.storage.get(path);
         if (content != null) {
             return content;
@@ -108,7 +136,7 @@ public class GitteryHandler implements HttpHandler {
             return Streams.readResourceBytes(getClass(), resourcePath);
         } catch (Throwable e) {
             logger.warn(e.getMessage());
-            return null;
+            throw new FileNotFoundException(path);
         }
     }
 
@@ -118,13 +146,29 @@ public class GitteryHandler implements HttpHandler {
     }
     
     void write(byte[] content) throws IOException {
-        if (content == null) {
-            writeError();
-        } else {
-            logger.info("response {} {}", content.length);
-            he.sendResponseHeaders(200, content.length);
-            he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
-            he.getResponseBody().write(content);
-        }
+        logger.info("response {} {}", content.length);
+        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        he.sendResponseHeaders(200, content.length);
+        he.getResponseBody().write(content);
     }
+    
+    void writeGzip(byte[] content) throws IOException {
+        logger.info("gzip response {} {}", content.length);
+        he.getResponseHeaders().set("Content-Encoding", "gzip");
+        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        he.sendResponseHeaders(200, 0);
+        try (OutputStream stream = new GZIPOutputStream(he.getResponseBody())) {
+            stream.write(content);
+        }
+    }        
+    
+    void writeFast(byte[] content) throws IOException {
+        logger.info("fast response {} {}", content.length);
+        he.getResponseHeaders().set("Content-Encoding", "gzip");
+        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        he.sendResponseHeaders(200, 0);
+        he.getResponseBody().write(content);
+        he.getResponseBody().close();
+    }        
+    
 }
