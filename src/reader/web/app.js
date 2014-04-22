@@ -5,7 +5,7 @@ var articles = {};
 
 function putArticles(articles) {
     for (var i = 0; i < articles.length; i++) {
-        putArticle(articles[0]);
+        putArticle(articles[i]);
     }
 }
 
