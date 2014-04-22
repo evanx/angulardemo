@@ -1,9 +1,6 @@
 package iolfeed;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +27,15 @@ public class FastJsonBuilder {
                 append(section, content);
             }
         }
-        builder.append("console.log('articles', articles);\n");
+        builder.append("console.log('sections', sections);\n");
         builder.append("</script>\n");
         return builder.toString().getBytes();
     }
     
     private void append(String key, byte[] content) {
-        builder.append(String.format("articles['%s'] = ", key));
+        builder.append(String.format("sections['%s'] = {", key));
+        builder.append(" articles: ");
         builder.append(new String(content));
-        builder.append(";\n");
+        builder.append("};\n");
     }
 }
