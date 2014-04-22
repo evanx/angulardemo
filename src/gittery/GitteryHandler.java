@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.data.Millis;
 import vellum.util.Streams;
 
 /**
@@ -147,7 +148,7 @@ public class GitteryHandler implements HttpHandler {
     
     void write(byte[] content) throws IOException {
         logger.info("response {} {}", content.length);
-        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        setContentType();
         he.sendResponseHeaders(200, content.length);
         he.getResponseBody().write(content);
     }
@@ -155,7 +156,7 @@ public class GitteryHandler implements HttpHandler {
     void writeGzip(byte[] content) throws IOException {
         logger.info("gzip response {} {}", content.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
-        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        setContentType();
         he.sendResponseHeaders(200, 0);
         try (OutputStream stream = new GZIPOutputStream(he.getResponseBody())) {
             stream.write(content);
@@ -165,10 +166,17 @@ public class GitteryHandler implements HttpHandler {
     void writeFast(byte[] content) throws IOException {
         logger.info("fast response {} {}", content.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
-        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        setContentType();
         he.sendResponseHeaders(200, 0);
         he.getResponseBody().write(content);
         he.getResponseBody().close();
     }        
+
+    private void setContentType() {
+        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        if (Streams.getContentType(path).startsWith("image/")) {
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(Millis.fromDays(3)));
+        }
+    }
     
 }
