@@ -40,7 +40,7 @@ public class FeedTask extends Thread {
     }
 
     public void start(String section, String feedUrl, int articleCount) throws Exception {
-        logger = LoggerFactory.getLogger("feedtask." + section);
+        logger = LoggerFactory.getLogger("FeedTask." + section);
         this.section = section;
         this.feedUrl = feedUrl;
         this.articleCount = articleCount;

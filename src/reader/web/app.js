@@ -94,7 +94,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
 
 app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
-        var jsonPath = "articles/" + $routeParams.articleId + ".json";
+        var jsonPath = "article/" + $routeParams.articleId + ".json";
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;

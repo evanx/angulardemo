@@ -21,7 +21,7 @@ import vellum.util.Streams;
  */
 public class ArticleTask implements Runnable {
 
-    static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
+    Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static final Pattern imageLinkPattern
             = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpe?g)\"\\s*");
     static final Pattern galleryImageLinkPattern
@@ -56,8 +56,6 @@ public class ArticleTask implements Runnable {
 
     public void init() throws JMapException {
         sourceArticleUrl = map.getString("link");
-        numDate = map.getString("numDate");
-        section = map.getString("section");
         articleId = sourceArticleUrl;
         int index = articleId.lastIndexOf("/");
         if (index > 0) {
@@ -67,7 +65,10 @@ public class ArticleTask implements Runnable {
                 articleId = articleId.substring(0, index);
             }
         }
-        articlePath = String.format("%s/articles/%s/%s.json", numDate, section, articleId);
+        logger = LoggerFactory.getLogger("ArticleTask." + articleId);
+        numDate = map.getString("numDate");
+        section = map.getString("section");
+        articlePath = String.format("%s/%s/%s.json", numDate, section, articleId);
     }
 
     @Override
@@ -165,7 +166,7 @@ public class ArticleTask implements Runnable {
         loadImage();
         map.put("imagePath", imagePath);
         context.putJson(articlePath, map.toJson());
-        context.putJson(String.format("articles/%s.json", articleId), map.toJson());
+        context.putJson(String.format("article/%s.json", articleId), map.toJson());
     }
 
     private void loadImage() throws IOException {
@@ -182,7 +183,7 @@ public class ArticleTask implements Runnable {
         byte[] content = Streams.readContent(sourceImageUrl);
         logger.info("content {} {}", content.length, sourceImageUrl);
         String name = Streams.parseFileName(sourceImageUrl);
-        String path = numDate + "/images/" + name;
+        String path = numDate + "/image/" + name;
         context.putContent(path, content);
         return path;
     }
