@@ -127,8 +127,17 @@ public class FeedTask extends Thread {
                 completed = false;
             }
         }        
-        context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
-        context.storage.buildFastContent();
-        return completed;
+        if (articleList.size() < articleTaskList.size()/2) {
+            logger.error("too many failures so not writing articles");
+            return false;
+        }
+        try {
+            context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
+            context.storage.buildFastContent();
+            return completed;
+        } catch (Throwable e) {
+            logger.error("write", e);
+            return false;            
+        }
     }       
 }

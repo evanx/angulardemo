@@ -92,10 +92,9 @@ public class ArticleTask implements Runnable {
             }
             if (paragraphs.isEmpty()) {
                 throw new Exception("no paragraphs");
-            } else {
-                store();
-                completed = true;
             }
+            store();
+            completed = true;
         } catch (Throwable e) {
             logger.error("run: " + e.getMessage());
             exception = e;
