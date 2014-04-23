@@ -79,4 +79,15 @@ public class FeedsUtil {
         }
         return text;
     }
+
+    public static boolean isText(String text) {
+        if (text == null) return false;
+        text = text.trim();
+        if (text.isEmpty()) return false;
+        if (text.contains("<")) return false;
+        if (text.contains(">")) return false;
+        if (text.contains("#")) return false;
+        if (text.contains("&")) return false;
+        return true;
+    }
 }

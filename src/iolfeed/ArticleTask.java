@@ -135,7 +135,7 @@ public class ArticleTask implements Runnable {
     private boolean matchCaption(Matcher matcher) {
         if (matcher.find()) {
             String text = matcher.group(1);
-            if (text.trim().length() > 1) {
+            if (FeedsUtil.isText(text)) {
                 imageCaption = FeedsUtil.cleanText(text);
             }
             return true;
