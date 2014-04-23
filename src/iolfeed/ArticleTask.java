@@ -25,9 +25,9 @@ public class ArticleTask implements Runnable {
 
     static Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static final Pattern imageLinkPattern
-            = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpg)\"\\s*");
+            = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*.jpe?g)\"\\s*");
     static final Pattern galleryImageLinkPattern
-            = Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpg)\">\\s*");
+            = Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpe?g)\">\\s*");
     static final Pattern imageCreditPattern
             = Pattern.compile("<p class=\"captions_credit_article\">(.*)</p>");
     static final Pattern imageCaptionPattern
