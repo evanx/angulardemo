@@ -51,21 +51,24 @@ public class ArticleTaskIntegrationTest {
 
     @Test
     public void parseArticle() throws Exception {
+        String link = "http://www.iol.co.za/sport/boxing/klitschko-brushes-off-softie-whiner-jibes-1.1679494";
         JMap map = new JMap();
         map.put("section", "news");
-        map.put("title", "Ferrer ousted from Barca Open");
-        map.put("description", "David Ferrer has been ousted from the Barcelona Open days after his career highlight triumph over Rafael Nadal.");
+        map.put("title", "test0title");
+        map.put("description", "test0description");
         map.put("pubDate", "April 23 2014 at 16:27");
         map.put("numDate", "20140423");
-        map.put("link", "http://www.iol.co.za/sport/tennis/ferrer-ousted-from-barca-open-1.1679418");
+        map.put("link", link);
         ArticleTask articleTask = new ArticleTask(map);
         articleTask.init();
         articleTask.run();
         Assert.assertTrue(articleTask.isCompleted());
         Assert.assertTrue(articleTask.paragraphs.size() > 5);
-        Assert.assertEquals("20140423/images/3510090277.jpg", articleTask.imagePath);
-        Assert.assertTrue(articleTask.imageCaption.startsWith("Spanish tennis player David Ferrer"));
+        Assert.assertTrue(articleTask.imagePath.contains("/image/"));
+        logger.info("imagePath {}", articleTask.imagePath);
     }
+
+    
     
     
 }
