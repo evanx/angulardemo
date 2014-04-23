@@ -53,7 +53,7 @@ public class GitteryHandler implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         this.he = he;
         path = he.getRequestURI().getPath();
-        logger.info("path [{}]", path);
+        logger.trace("path [{}]", path);
         try {
             if (path.equals("/fast")) {
                 if (context.storage.fastContent != null) {
@@ -122,18 +122,18 @@ public class GitteryHandler implements HttpHandler {
         if (sourceFile.exists()) {
             return Streams.readBytes(sourceFile);
         }
-        logger.warn("not local file: " + file.getAbsolutePath());
+        logger.trace("not local file: " + file.getAbsolutePath());
         String contentUrl = context.repo + "/" + path;
         try {
             return Streams.readContent(contentUrl);
         } catch (FileNotFoundException e) {
-            logger.info("not on github: " + e.getMessage());
+            logger.trace("not on github: " + e.getMessage());
         } catch (IOException e) {
             logger.warn("readContent " + contentUrl, e);
         }
         try {
             String resourcePath = "/" + context.res + "/" + path;
-            logger.info("resourcePath {}", resourcePath);
+            logger.trace("resourcePath {}", resourcePath);
             return Streams.readResourceBytes(getClass(), resourcePath);
         } catch (Throwable e) {
             logger.warn(e.getMessage());
