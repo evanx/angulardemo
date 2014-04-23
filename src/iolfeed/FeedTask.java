@@ -74,7 +74,7 @@ public class FeedTask extends Thread {
             }
             String description = FeedsUtil.cleanDescription(entry.getDescription().getValue());
             if (!FeedsUtil.isText(description)) {
-                logger.warn("invalid lead {}", description);
+                logger.warn("invalid lead [{}] {}", description, entry.getLink());
                 continue;
             }
             JMap map = new JMap();
