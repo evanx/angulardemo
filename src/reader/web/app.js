@@ -1,7 +1,9 @@
 
-var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
-
 var articles = {};
+
+var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel"];
+
+var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
 function putArticles(articles) {
     for (var i = 0; i < articles.length; i++) {
@@ -53,7 +55,7 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
     function($scope, $location, $window, appService) {
-        $scope.sections = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Tonight"];
+        $scope.sections = sectionList;
         $scope.selected = function(section) {
             console.log("selected", section);
             $location.path("section/" + section);
