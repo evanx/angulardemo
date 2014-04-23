@@ -93,6 +93,7 @@ public class ArticleTask implements Runnable {
             if (paragraphs.isEmpty()) {
                 throw new Exception("no paragraphs");
             }
+            reader.close();
             store();
             completed = true;
         } catch (Throwable e) {
@@ -168,7 +169,7 @@ public class ArticleTask implements Runnable {
     }
 
     private void loadImage() throws IOException {
-        if (imageList.size() > 0) {
+        if (!imageList.isEmpty()) {
             sourceImageUrl = imageList.get(0);
         }
         if (sourceImageUrl != null) {

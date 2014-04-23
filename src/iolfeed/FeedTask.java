@@ -69,15 +69,18 @@ public class FeedTask extends Thread {
             logger.info("title {}", entry.getTitle());
             logger.info("title {}", FeedsUtil.cleanText(entry.getTitle()));
             if (!FeedsUtil.isText(entry.getTitle())) {
+                logger.warn("invalid title {}", entry.getTitle());
                 continue;
             }
-            if (!FeedsUtil.isText(entry.getDescription().getValue())) {
+            String description = FeedsUtil.cleanDescription(entry.getDescription().getValue());
+            if (!FeedsUtil.isText(description)) {
+                logger.warn("invalid lead {}", description);
                 continue;
             }
             JMap map = new JMap();
             map.put("section", section);
             map.put("title", FeedsUtil.cleanText(entry.getTitle()));
-            map.put("description", FeedsUtil.cleanDescription(entry.getDescription().getValue()));
+            map.put("description", description);
             map.put("isoDate", isoTimestampFormat.format(entry.getPublishedDate()));
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));
@@ -92,12 +95,16 @@ public class FeedTask extends Thread {
                 break;
             }
         }        
-        while (!performTasks()) {
-            logger.warn("performTasks incomplete");
-        }
-        while (!write()) {
-            logger.warn("write incomplete");
-            performTasks();
+        if (articleTaskList.isEmpty()) {
+            logger.warn("empty article list");
+        } else {
+            while (!performTasks()) {
+                logger.warn("performTasks incomplete");
+            }
+            while (!write()) {
+                logger.warn("write incomplete");
+                performTasks();
+            }
         }
     }
     
@@ -119,20 +126,23 @@ public class FeedTask extends Thread {
     
     private boolean write() throws IOException {
         boolean completed = true;
-        List<JMap> articleList = new ArrayList();
+        List<JMap> completedArticleList = new ArrayList();
         for (ArticleTask articleTask : articleTaskList) {
             if (articleTask.isCompleted()) {
-                articleList.add(articleTask.map);
+                completedArticleList.add(articleTask.map);
             } else {
                 completed = false;
             }
         }        
-        if (articleList.size() < articleTaskList.size()/2) {
-            logger.error("too many failures so not writing articles");
+        if (completedArticleList.isEmpty()) {
+            logger.error("empty completed article list");
+            return false;
+        } else if (completedArticleList.size() < articleTaskList.size()/2) {
+            logger.error("too few articles completed");
             return false;
         }
         try {
-            context.putJson(String.format("%s/articles.json", section), new Gson().toJson(articleList));
+            context.putJson(String.format("%s/articles.json", section), new Gson().toJson(completedArticleList));
             context.storage.buildFastContent();
             return completed;
         } catch (Throwable e) {

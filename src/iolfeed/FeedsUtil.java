@@ -86,8 +86,6 @@ public class FeedsUtil {
         if (text.isEmpty()) return false;
         if (text.contains("<")) return false;
         if (text.contains(">")) return false;
-        if (text.contains("#")) return false;
-        if (text.contains("&")) return false;
         return true;
     }
 }

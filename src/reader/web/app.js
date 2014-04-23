@@ -70,14 +70,16 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
             $scope.articles = data;
-            sections[section] = { articles: data };
-            putArticles($scope.articles);
+            if (data && data.length > 0) {
+                sections[section] = { articles: data };
+                putArticles($scope.articles);
+            }
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
         };
         console.log("sections", sections, sections[section]);
-        if (sections[section] && sections[section].articles) {
+        if (sections[section] && sections[section].articles && sections[section].articles.length) {
             $scope.articles = sections[section].articles;
             putArticles($scope.articles);
         } else {
