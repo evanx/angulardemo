@@ -45,6 +45,8 @@ public final class FeedsContext {
         putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
         putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
         putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
+        putFeed("lifestyle", "Lifestyle", "http://www.iol.co.za/cmlink/1.999916");
+        putFeed("travel", "Travel", "http://www.iol.co.za/cmlink/1.875733");
         putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
         if (false) {
             putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");

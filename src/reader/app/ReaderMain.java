@@ -22,7 +22,7 @@ public class ReaderMain {
             TaskManager taskManager = new TaskManager();
             new GitteryServer().start(new GitteryContext(contentStorage, "reader/web",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web",
-                    "/home/evanx/NetBeansProjects/git/angulardemo/src/reader/web"));
+                    "/home/evanx/nb/git/angulardemo/src/reader/web"));
             JMap feedsProperties = new JMap();
             new FeedsTask().start(new FeedsContext(taskManager, contentStorage, feedsProperties));
         } catch (Exception e) {
