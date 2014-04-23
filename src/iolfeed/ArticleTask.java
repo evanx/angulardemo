@@ -1,8 +1,6 @@
 package iolfeed;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -92,8 +90,12 @@ public class ArticleTask implements Runnable {
                 } else {
                 }
             }
-            store();
-            completed = true;
+            if (paragraphs.isEmpty()) {
+                throw new Exception("no paragraphs");
+            } else {
+                store();
+                completed = true;
+            }
         } catch (Throwable e) {
             logger.error("run: " + e.getMessage());
             exception = e;

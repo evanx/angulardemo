@@ -68,6 +68,12 @@ public class FeedTask extends Thread {
             SyndEntryImpl entry = (SyndEntryImpl) object;
             logger.info("title {}", entry.getTitle());
             logger.info("title {}", FeedsUtil.cleanText(entry.getTitle()));
+            if (!FeedsUtil.isText(entry.getTitle())) {
+                continue;
+            }
+            if (!FeedsUtil.isText(entry.getDescription().getValue())) {
+                continue;
+            }
             JMap map = new JMap();
             map.put("section", section);
             map.put("title", FeedsUtil.cleanText(entry.getTitle()));
