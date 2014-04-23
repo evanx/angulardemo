@@ -2,14 +2,14 @@
   <div class="col-lg-8" ng-show="articles.length > 0">
       <table class="table table-striped table-condensed">
       <tbody>
-        <tr ng-repeat="article in articles" ng-click="selected(article)">
+        <tr ng-repeat="article in articles track by $index" ng-click="selected(article)">
           <td>
             <div style="margin: 0em; display: inline-block; min-width: 200px;">
               <h5 style="">
                 <a href="#/article/{{article.articleId}}" style="font-size: 110%">{{article.title}}</a>
               </h5>
             </div>
-             <div style="margin-right: 1em; display: block; width: 125px; min-height: 75px; float: left;" ng-show="{{article.imagePath}}">
+             <div style="margin-right: 1em; display: block; width: 125px; min-height: 100px; float: left;" ng-show="article.imagePath">
                 <img width="125" ng-src="{{article.imagePath}}">
             </div>
             <p style="font-family: sans-serif">
