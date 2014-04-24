@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +36,13 @@ public final class FeedsContext {
     boolean once = false;
     int articleCount = 99;
     Map<String, String> feedMap = new HashMap();
+    List<FeedEntity> feedEntityList = new ArrayList();
     ContentStorage storage;
     TaskManager taskManager;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
+        putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
         putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
         putFeed("news", "News", "http://www.iol.co.za/cmlink/1.640");
         putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
@@ -75,8 +79,10 @@ public final class FeedsContext {
         }
     }
     
-    void putFeed(String name, String label, String url) {
-        feedMap.put(name, url);       
+    void putFeed(String id, String label, String url) {
+        FeedEntity feedEntity = new FeedEntity(id, label, url);
+        feedEntityList.add(feedEntity);
+        feedMap.put(id, url);       
     }    
     
     public void putJson(String path, String json) throws IOException {

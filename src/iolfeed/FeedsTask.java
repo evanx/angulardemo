@@ -35,9 +35,9 @@ public class FeedsTask implements Runnable {
     
     @Override
     public void run() {
-        for (String section : context.feedMap.keySet()) {
+        for (FeedEntity entity : context.feedEntityList) {
             try {
-                perform(section);
+                perform(entity.getId());
             } catch (Exception e) {
                 logger.warn("run", e);
             }

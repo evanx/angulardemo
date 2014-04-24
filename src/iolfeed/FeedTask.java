@@ -10,6 +10,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -81,9 +82,12 @@ public class FeedTask extends Thread {
             map.put("section", section);
             map.put("title", FeedsUtil.cleanText(entry.getTitle()));
             map.put("description", description);
+            if (entry.getPublishedDate() == null) {
+                entry.setPublishedDate(new Date());
+            }
             map.put("isoDate", isoTimestampFormat.format(entry.getPublishedDate()));
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
-            map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM","pm"));
+            map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM", "pm"));
             map.put("link", entry.getLink());
             ArticleTask articleTask = new ArticleTask(map);
             articleTask.init();
