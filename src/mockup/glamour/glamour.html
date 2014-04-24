@@ -1,0 +1,46 @@
+<html ng-app="app">
+    <head>
+        <title>Glamour/GQ mockup</title>
+        <link rel="stylesheet" href="glamour.css">
+    </head>
+    
+    <body>
+
+        <div id="col_1_2_3_container_sections">
+            <div id="col_1_2">        
+                <div class="glamour_teasers" ng-controller="glamourController" ng-cloak> 
+                    <div class="glamour_teasers_head">
+                        <h1 class="glamour_teasers_header">
+                            <a href="{{glamour.link}}" target="_blank">{{glamour.title}}</a>
+                        </h1>
+                    </div>
+                    <div class="glamour_teasers_content">
+                        <div class="glamour_teasers_pic">
+                            <img ng-src="{{glamour.entries[0].image}}" alt="">
+                        </div> 
+                        <div class="glamour_teasers_left_text">
+                            <p>
+                                <a class="headlines" href="{{glamour.entries[0].link}}">{{glamour.entries[0].title}}</a>
+                                <br/>
+                                <span ng-bind-html="{{glamour.entries[0].lead}}"></span>
+                            </p>
+                        </div>
+                        <div class="glamour_teasers_right_text_container">
+                            <p class="glamour_teasers_right_text" ng-repeat="entry in glamour.entries | limitTo: 5 | limitTo: -4">
+                                <a href="{{entry.link}}">{{entry.title}}</a>
+                            </p>
+                            <hr />
+                            <p class="glamour_teasers_right_read_more">
+                                <a href="{{glamour.link}}">More {{glamour.title}}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>    
+        <script src="glamour.js"></script>    
+    </body>
+</html>
