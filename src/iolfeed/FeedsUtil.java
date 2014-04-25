@@ -1,5 +1,6 @@
 package iolfeed;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,9 +9,9 @@ import java.util.Map;
  * @author evanx
  */
 public class FeedsUtil {
-    
-    private static final Map<String, Character> unicodeHtmlMap = mapUnicodeHtml();
-    
+
+    public static final Map<Character, String> unicodeHtmlMap = mapUnicodeHtml();
+
     public static String cleanParagraph(String text) {
         text = text.trim();
         if (text.startsWith("\"")) {
@@ -27,7 +28,7 @@ public class FeedsUtil {
         }
         return cleanText(text);
     }
-    
+
     public static String cleanDescription(String text) {
         int index = text.lastIndexOf("<");
         if (index > 0) {
@@ -41,14 +42,22 @@ public class FeedsUtil {
     }
 
     public static boolean isText(String text) {
-        if (text == null) return false;
+        if (text == null) {
+            return false;
+        }
         text = text.trim();
-        if (text.isEmpty()) return false;
-        if (text.contains("<")) return false;
-        if (text.contains(">")) return false;
+        if (text.isEmpty()) {
+            return false;
+        }
+        if (text.contains("<")) {
+            return false;
+        }
+        if (text.contains(">")) {
+            return false;
+        }
         return true;
     }
-        
+
     public static String cleanText(String text) {
         text = text.replaceAll("\u003c", "<");
         text = text.replaceAll("\u003e", ">");
@@ -93,64 +102,109 @@ public class FeedsUtil {
     }
 
     public static String accentHtmlToUnicode(String text) {
-        for (String key : unicodeHtmlMap.keySet()) {
-            char ch = unicodeHtmlMap.get(key);
-            text = text.replaceAll(String.format("&%s;", key), "" + ch);
+        for (char ch: unicodeHtmlMap.keySet()) {
+            String htmlName = unicodeHtmlMap.get(ch);
+            text = text.replaceAll(String.format("&%s;", htmlName), "" + ch);
             text = text.replaceAll(String.format("&#%d;", (int) ch), "" + ch);
         }
         return text;
     }
-    
-    private static Map<String, Character> mapUnicodeHtml() {
-        Map<String, Character> map = new HashMap();
-        map.put("Agrave", (char) 192);
-        map.put("Egrave", (char) 200);
-        map.put("Igrave", (char) 204);
-        map.put("Ograve", (char) 210);
-        map.put("Ugrave", (char) 217);
-        map.put("agrave", (char) 224);
-        map.put("egrave", (char) 232);
-        map.put("igrave", (char) 236);
-        map.put("ograve", (char) 242);
-        map.put("ugrave", (char) 249);
-        map.put("Aacute", (char) 193); 
-        map.put("Eacute", (char) 201);        
-        map.put("Iacute", (char) 205);        
-        map.put("Oacute", (char) 211);        
-        map.put("Uacute", (char) 218);        
-        map.put("Yacute", (char) 221);        
-        map.put("aacute", (char) 225);        
-        map.put("eacute", (char) 233);        
-        map.put("iacute", (char) 237);
-        map.put("oacute", (char) 243);        
-        map.put("uacute", (char) 250);        
-        map.put("yacute", (char) 253);        
-        map.put("Acirc", (char) 194);
-        map.put("Ecirc", (char) 202);
-        map.put("Icirc", (char) 206);
-        map.put("Ocirc", (char) 212);
-        map.put("Ucirc", (char) 219);
-        map.put("acirc", (char) 226);
-        map.put("ecirc", (char) 234);
-        map.put("icirc", (char) 238);
-        map.put("ocirc", (char) 244);
-        map.put("ucirc", (char) 251);
-        map.put("Atilde", (char) 195);
-        map.put("Ntilde", (char) 209);
-        map.put("Otilde", (char) 213);
-        map.put("atilde", (char) 227);
-        map.put("ntilde", (char) 241);
-        map.put("otilde", (char) 245);
-        map.put("Auml", (char) 196);
-        map.put("Euml", (char) 203);
-        map.put("Iuml", (char) 207);
-        map.put("Ouml", (char) 214);
-        map.put("Uuml", (char) 220);
-        map.put("Yuml", (char) 228);
-        map.put("auml", (char) 235);
-        map.put("euml", (char) 239);
-        map.put("iuml", (char) 246);
-        map.put("ouml", (char) 252);
-        return map;        
+
+    private static Map<Character, String> mapUnicodeHtml() {
+        Map<Character, String> map = new HashMap();
+        map.put((char) 60, "lt");
+        map.put((char) 62, "gt");
+        map.put((char) 247, "divide");
+        map.put((char) 176, "deg");
+        map.put((char) 172, "not");
+        map.put((char) 177, "plusmn");
+        map.put((char) 181, "micro");
+        map.put((char) 8734, "infin");
+        map.put((char) 8776, "asymp");
+        map.put((char) 8800, "ne");
+        map.put((char) 8804, "le");
+        map.put((char) 8805, "ge");
+        map.put((char) 162, "cent");
+        map.put((char) 163, "pound");
+        map.put((char) 165, "yen");
+        map.put((char) 8364, "euro");
+        map.put((char) 171, "laquo");
+        map.put((char) 187, "raquo");
+        map.put((char) 8249, "lsaquo");
+        map.put((char) 8250, "rsaquo");
+        map.put((char) 8218, "sbquo");
+        map.put((char) 8222, "bdquo");
+        map.put((char) 8220, "ldquo");
+        map.put((char) 8221, "rdquo");
+        map.put((char) 147, "ldquo");
+        map.put((char) 148, "rdquo");
+        map.put((char) 8216, "lsquo");
+        map.put((char) 8217, "rsquo");
+        map.put((char) 145, "lsquo");
+        map.put((char) 146, "rsquo");
+        map.put((char) 38, "amp");
+        map.put((char) 32, "nbsp");
+        map.put((char) 174, "reg");
+        map.put((char) 169, "copy");
+        map.put((char) 153, "trade");
+        map.put((char) 8482, "trade");
+        map.put((char) 182, "para");
+        map.put((char) 149, "bull");
+        map.put((char) 8226, "bull");
+        map.put((char) 183, "middot");
+        map.put((char) 167, "sect");
+        map.put((char) 150, "ndash");
+        map.put((char) 151, "mdash");
+        map.put((char) 8211, "ndash");
+        map.put((char) 8212, "mdash");
+        map.put((char) 192, "Agrave");
+        map.put((char) 200, "Egrave");
+        map.put((char) 204, "Igrave");
+        map.put((char) 210, "Ograve");
+        map.put((char) 217, "Ugrave");
+        map.put((char) 224, "agrave");
+        map.put((char) 232, "egrave");
+        map.put((char) 236, "igrave");
+        map.put((char) 242, "ograve");
+        map.put((char) 249, "ugrave");
+        map.put((char) 193, "Aacute");
+        map.put((char) 201, "Eacute");
+        map.put((char) 205, "Iacute");
+        map.put((char) 211, "Oacute");
+        map.put((char) 218, "Uacute");
+        map.put((char) 221, "Yacute");
+        map.put((char) 225, "aacute");
+        map.put((char) 233, "eacute");
+        map.put((char) 237, "iacute");
+        map.put((char) 243, "oacute");
+        map.put((char) 250, "uacute");
+        map.put((char) 253, "yacute");
+        map.put((char) 194, "Acirc");
+        map.put((char) 202, "Ecirc");
+        map.put((char) 206, "Icirc");
+        map.put((char) 212, "Ocirc");
+        map.put((char) 219, "Ucirc");
+        map.put((char) 226, "acirc");
+        map.put((char) 234, "ecirc");
+        map.put((char) 238, "icirc");
+        map.put((char) 244, "ocirc");
+        map.put((char) 251, "ucirc");
+        map.put((char) 195, "Atilde");
+        map.put((char) 209, "Ntilde");
+        map.put((char) 213, "Otilde");
+        map.put((char) 227, "atilde");
+        map.put((char) 241, "ntilde");
+        map.put((char) 245, "otilde");
+        map.put((char) 196, "Auml");
+        map.put((char) 203, "Euml");
+        map.put((char) 207, "Iuml");
+        map.put((char) 214, "Ouml");
+        map.put((char) 220, "Uuml");
+        map.put((char) 228, "Yuml");
+        map.put((char) 235, "auml");
+        map.put((char) 239, "euml");
+        map.put((char) 246, "iuml");
+        map.put((char) 252, "ouml");
+        return Collections.unmodifiableMap(map);
     }
 }

@@ -57,6 +57,7 @@ public class FeedsTest {
 
     @Test
     public void fixAccent() {
+        Assert.assertEquals("euro", FeedsUtil.unicodeHtmlMap.get('€'));
         Assert.assertEquals("risqué", FeedsUtil.accentHtmlToUnicode("risqu&#233;"));
     }
 
@@ -111,6 +112,32 @@ public class FeedsTest {
     ö &ouml; 246	
     ü &uuml; 252	
     ÿ &yuml; 255    
+    
+    ¢ &cent; 162
+    £ &pound; 163
+    ¥ &yen; 165
+    € &euro; 8364
+    « &laquo; 171
+    » &raquo; 187
+    ‹ &lsaquo; 8249
+    › &rsaquo; 8250
+    ‚ &sbquo; 8218
+    „ &bdquo; 8222
+    “ &ldquo; 8220
+    ” &rdquo; 8221
+    ‘ &lsquo; 8216
+    ’ &rsquo; 8217
+    
+    ® &reg; 174
+    © &copy; 169
+    ™ &trade; 153
+    ¶ &para; 182
+    • &bull; 149
+    · &middot; 183
+    § &sect; 167
+    – &ndash; 150
+    — &mdash; 151   
+    
     */
     
 }
