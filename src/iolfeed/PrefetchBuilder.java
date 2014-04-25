@@ -22,9 +22,9 @@ public class PrefetchBuilder {
     public byte[] build(ContentStorage storage) throws IOException {
         this.storage = storage;
         contentBuilder = new StringBuilder(storage.defaultHtml);
-        int index = contentBuilder.indexOf(storage.prefetchLinkPattern);
+        int index = contentBuilder.indexOf("</body>");
         if (index > 0) {
-            contentBuilder.replace(index, index + storage.prefetchLinkPattern.length(), formatPrefetchLinks());
+            contentBuilder.insert(index, formatPrefetchLinks());
         }
         contentBuilder.append("<script>\n");
         int sectionCount = 0;
