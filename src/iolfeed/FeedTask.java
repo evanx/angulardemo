@@ -53,7 +53,7 @@ public class FeedTask extends Thread {
         try {
             perform();
         } catch (Exception e) {
-            logger.warn("run", e);
+            logger.warn(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             this.exception = e;
         }
     }
@@ -147,7 +147,7 @@ public class FeedTask extends Thread {
         }
         try {
             context.putJson(String.format("%s/articles.json", section), new Gson().toJson(completedArticleList));
-            context.storage.buildFastContent();
+            context.storage.buildPrefetchContent();
             return completed;
         } catch (Throwable e) {
             logger.error("write", e);

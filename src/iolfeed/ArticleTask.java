@@ -98,7 +98,7 @@ public class ArticleTask implements Runnable {
             store();
             completed = true;
         } catch (Throwable e) {
-            logger.error("run: " + e.getMessage());
+            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             exception = e;
         }
     }
@@ -164,6 +164,7 @@ public class ArticleTask implements Runnable {
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         loadImage();
+        context.storage.linkSet.add(imagePath);
         map.put("imagePath", imagePath);
         context.putJson(articlePath, map.toJson());
         context.putJson(String.format("article/%s.json", articleId), map.toJson());

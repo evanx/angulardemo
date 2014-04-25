@@ -55,13 +55,13 @@ public class GitteryHandler implements HttpHandler {
         path = he.getRequestURI().getPath();
         logger.trace("path [{}]", path);
         try {
-            if (path.equals("/fast")) {
-                if (context.storage.fastContent != null) {
+            if (path.equals("/prefetch")) {
+                if (context.storage.prefetchContent != null) {
                     if (requestHeaderMatches("Accept-Encoding", "gzip") &&
-                            context.storage.fastGzippedContent != null) {
-                        writeFast(context.storage.fastGzippedContent);
+                            context.storage.prefetchGzippedContent != null) {
+                        writeGzipped(context.storage.prefetchGzippedContent);
                     } else {
-                        write(context.storage.fastContent);
+                        write(context.storage.prefetchContent);
                     }
                     return;
                 } else {
@@ -73,7 +73,7 @@ public class GitteryHandler implements HttpHandler {
                 path = path.substring(1);
             }
             if (he.getRequestMethod().equals("POST")) {
-                post();
+                logger.warn("post");
             } else if (requestHeaderMatches("Accept-Encoding", "gzip")) {
                 writeGzip(get());
             } else {
@@ -105,8 +105,8 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private byte[] get() throws Exception {
-        if (path.equals("fast") && context.storage.fastContent != null) {
-            return context.storage.fastContent;
+        if (path.equals("fast") && context.storage.prefetchContent != null) {
+            return context.storage.prefetchContent;
         }
         byte[] content = context.storage.get(path);
         if (content != null) {
@@ -125,7 +125,9 @@ public class GitteryHandler implements HttpHandler {
         logger.trace("not local file: " + file.getAbsolutePath());
         String contentUrl = context.repo + "/" + path;
         try {
-            return Streams.readContent(contentUrl);
+            if (false) {
+                return Streams.readContent(contentUrl);
+            }
         } catch (FileNotFoundException e) {
             logger.trace("not on github: " + e.getMessage());
         } catch (IOException e) {
@@ -163,12 +165,12 @@ public class GitteryHandler implements HttpHandler {
         }
     }        
     
-    void writeFast(byte[] content) throws IOException {
-        logger.info("fast response {} {}", content.length);
+    void writeGzipped(byte[] gzippedContent) throws IOException {
+        logger.info("gzip response {} {}", gzippedContent.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
         setContentType();
         he.sendResponseHeaders(200, 0);
-        he.getResponseBody().write(content);
+        he.getResponseBody().write(gzippedContent);
         he.getResponseBody().close();
     }        
 
