@@ -39,16 +39,6 @@ element {
     float: left;
 }
 
-.headlines {
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
-    color: #000;
-    padding: 0px;
-    margin: 0px;
-    vertical-align: top;
-}
-
 .pics {
     border: 0px none;
 }
@@ -111,9 +101,26 @@ element {
 }
 
 .glamour_teasers_left_text {
+    font-size: 12px;
     width: 156px;
     float: left;
-    margin: 13px 0px 0px 15px;
+    margin: 13px 0px 0px 15px;    
+}
+
+.glamour_teasers_left_text a {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #000;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: top;
+}
+
+.glamour_teasers_left_text span {
+    display: inline-block;
+    border-top: 10px;
+    margin-top: 1em;
 }
 
 .glamour_teasers_right_text_container {

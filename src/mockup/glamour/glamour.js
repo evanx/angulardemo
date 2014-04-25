@@ -12,7 +12,8 @@ app.controller("glamourController", ["$scope",
                 {
                     title: "Johnnie Walker: Meet The New Kings Of Flavour",
                     lead: "In case you haven't already met them in the glossy pages of GQ, it's our pleasure to introduce you to Johnnie Walker's new Kings (and one Queen) of Flavour. ",
-                    link: "http://gq.co.za/2014/04/johnnie-walker-introducing-new-kings-flavour"
+                    link: "http://gq.co.za/2014/04/johnnie-walker-introducing-new-kings-flavour",
+                    image: "http://gq.co.za/wp-content/uploads/2014/04/JW_King-of-Flavour_Bob-Skinstad-1024x535.jpg"
                 },
                 {
                     title: "London Collections: Men Preview – Diego Vanassibara",
@@ -43,7 +44,7 @@ app.controller("glamourController", ["$scope",
             entries: [
                 {
                     title: "Drake and Rihanna are getting serious",
-                    lead: "",
+                    lead: "Drake and Rihanna's relationship is getting serious and their friends think they \"were always meant to be together.\"",
                     link: "http://glamour.co.za/2014/04/drake-rihanna-getting-serious/",
                     image: "http://glamour.co.za/wp-content/uploads/2014/04/MG_8201.jpg"
                 },
