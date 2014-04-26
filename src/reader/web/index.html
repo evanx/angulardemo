@@ -32,7 +32,9 @@ footer {
     <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#/sections" ng-bind="state.title">My Independent</a>
+          <a class="navbar-brand hidden-xs" href="#/sections">My Independent</a>
+          <a class="navbar-brand visible-xs" href="#/sections" ng-bind="state.title"
+             style="white-space: nowrap; width: 100%">My Independent</a>
           <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -57,7 +59,7 @@ footer {
     </div>
 
     <div class="container" ui-view="pagecontent" autoscroll="true" ng-view>
-      <div class="row">
+      <div class="row visible-xs">
         <div class="col-lg-10">
           <table class="table table-striped" style="width: 300px">
             <tbody>

@@ -32,6 +32,7 @@ app.controller("appController", ["$scope", "$location", "appService",
         $scope.userEmail = null;
         $scope.state.title = "My Independent";
         $scope.isActive = function(route) {
+            //console.log("isActive", route, $location.path());
             return route === $location.path();
         };
     }]);
@@ -51,11 +52,12 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
                 when("/article/:articleId", {
                     templateUrl: "article.html",
                     controller: "articleController"}).
-                otherwise({redirectTo: "/sections"});
+                otherwise({redirectTo: "/section/Top"});
     }]);
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
     function($scope, $location, $window, appService) {
+        $scope.state.title = "My Independent";
         $scope.sections = sectionList;
         $scope.selected = function(section) {
             console.log("selected", section);
@@ -65,12 +67,10 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
 
 app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
-        console.log("sectionController", $routeParams);
+        console.log("sectionController", $routeParams, $window);
         var section = $routeParams.section.toLowerCase();
         var jsonPath = section + "/articles.json";
-        if ($window.width < 640) {
-            $scope.state.title = $routeParams.section;
-        }
+        $scope.state.title = $routeParams.section;
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
             $scope.articles = data;
@@ -103,6 +103,7 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
             console.log("articleResult", data);
             $scope.statusMessage = undefined;
             $scope.article = data;
+            $scope.state.title = $scope.article.title;
             putArticle($scope.article);
         };
         $scope.errorHandler = function() {
@@ -111,6 +112,7 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
         console.log("articleController", $routeParams.articleId, jsonPath);
         if (articles[$routeParams.articleId]) {
             $scope.article = articles[$routeParams.articleId];
+            $scope.state.title = $scope.article.title;
         } else {
             $scope.statusMessage = "Loading " + jsonPath;
             appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);

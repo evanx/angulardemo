@@ -1,6 +1,7 @@
 package iolfeed;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -101,6 +102,12 @@ public class ArticleTask implements Runnable {
             reader.close();
             store();
             completed = true;
+        } catch (FileNotFoundException e) {
+            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
+        } catch (IOException e) {
+            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
+        } catch (NullPointerException e) {
+            logger.error("run", e);
         } catch (Throwable e) {
             logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             exception = e;
@@ -181,7 +188,6 @@ public class ArticleTask implements Runnable {
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         loadImage();
-        context.storage.linkSet.add(imagePath);
         map.put("imagePath", imagePath);
         map.put("imageList", imageList);
         context.putJson(articlePath, map.toJson());
@@ -207,6 +213,7 @@ public class ArticleTask implements Runnable {
         String name = Streams.parseFileName(sourceImageUrl);
         String path = numDate + "/image/" + name;
         context.putContent(path, content);
+        context.storage.linkSet.add(path);
         return path;
     }
     
