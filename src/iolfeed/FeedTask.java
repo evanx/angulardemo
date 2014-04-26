@@ -105,7 +105,7 @@ public class FeedTask extends Thread {
             while (!performTasks()) {
                 logger.warn("performTasks incomplete");
             }
-            for (int i = 0; !write() && i < context.retryCount; i++) {
+            for (int i = 0; !write() && i <= context.retryCount; i++) {
                 logger.warn("write incomplete");
                 performTasks();
             }
