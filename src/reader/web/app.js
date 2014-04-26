@@ -30,6 +30,7 @@ app.controller("appController", ["$scope", "$location", "appService",
         $scope.isCollapsed = true;
         $scope.state = {};
         $scope.userEmail = null;
+        $scope.state.title = "My Independent";
         $scope.isActive = function(route) {
             return route === $location.path();
         };
@@ -50,7 +51,7 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
                 when("/article/:articleId", {
                     templateUrl: "article.html",
                     controller: "articleController"}).
-                otherwise({redirectTo: "/section/Top"});
+                otherwise({redirectTo: "/sections"});
     }]);
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
@@ -67,6 +68,9 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         console.log("sectionController", $routeParams);
         var section = $routeParams.section.toLowerCase();
         var jsonPath = section + "/articles.json";
+        if ($window.width < 640) {
+            $scope.state.title = $routeParams.section;
+        }
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
             $scope.articles = data;

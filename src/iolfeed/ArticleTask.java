@@ -23,7 +23,9 @@ public class ArticleTask implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(ArticleTask.class);
     static final Pattern imageLinkPattern
-            = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*\\.jpe?g)\" .* class=\"pics\"/>");
+            = Pattern.compile("^\\s*<img src=\"(/polopoly_fs/\\S*/[0-9]*\\.jpe?g)\" .* class=\"pics\"/>");    
+    static final Pattern galleryCaptionPattern
+            = Pattern.compile("^\\s*<div class=\"tn3 description\">\\s*(.*)\\s*");
     static final Pattern galleryImageLinkPattern
             = Pattern.compile("^\\s*<a href=\"(/polopoly_fs/\\S*/landscape_600/[0-9]*.jpe?g)\">");
     static final Pattern imageCreditPattern
@@ -47,9 +49,10 @@ public class ArticleTask implements Runnable {
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
-    List<String> imageList = new ArrayList();
+    List<ImageEntity> imageList = new ArrayList();
     boolean completed = false;
-
+    String galleryCaption;
+    
     ArticleTask(JMap map) {
         this.map = map;
     }
@@ -83,7 +86,8 @@ public class ArticleTask implements Runnable {
                 if (line == null) {
                     break;
                 }
-                if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
+                if (matchGalleryCaption(galleryCaptionPattern.matcher(line))) {
+                } else if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
                 } else if (matchImageLink(imageLinkPattern.matcher(line))) {
                 } else if (matchCaption(imageCaptionPattern.matcher(line))) {
                 } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
@@ -115,10 +119,23 @@ public class ArticleTask implements Runnable {
         return false;
     }
 
+    private boolean matchGalleryCaption(Matcher matcher) {
+        if (matcher.find()) {
+            String caption = matcher.group(1);            
+            if (FeedsUtil.isText(caption)) {
+                galleryCaption = caption;
+            } else {
+                galleryCaption = null;
+            }
+            return true;
+        }
+        return false;
+    }
+    
     private boolean matchGalleryImageLink(Matcher matcher) {
         if (matcher.find()) {
             String galleryImageUrl = matcher.group(1);
-            imageList.add(galleryImageUrl);
+            imageList.add(new ImageEntity(galleryImageUrl, galleryCaption));
             return true;
         }
         return false;
@@ -166,17 +183,21 @@ public class ArticleTask implements Runnable {
         loadImage();
         context.storage.linkSet.add(imagePath);
         map.put("imagePath", imagePath);
+        map.put("imageList", imageList);
         context.putJson(articlePath, map.toJson());
         context.putJson(String.format("article/%s.json", articleId), map.toJson());
     }
 
     private void loadImage() throws IOException {
         if (!imageList.isEmpty()) {
-            sourceImageUrl = imageList.get(0);
-        }
-        if (sourceImageUrl != null) {
+            for (ImageEntity image : imageList) {
+                image.path = loadImage(image.sourceUrl);
+            }
+            imagePath = imageList.get(0).path;
+            imageCaption = imageList.get(0).caption;
+        } else if (sourceImageUrl != null) {
             imagePath = loadImage(sourceImageUrl);
-        }
+        }    
     }
 
     private String loadImage(String sourceImageUrl) throws IOException {
