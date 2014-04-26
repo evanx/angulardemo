@@ -48,7 +48,7 @@ public final class FeedsContext {
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
-        putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
+        //putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
         putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
         putFeed("news", "News", "http://www.iol.co.za/cmlink/1.640");
         putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
