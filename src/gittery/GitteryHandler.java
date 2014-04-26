@@ -112,13 +112,17 @@ public class GitteryHandler implements HttpHandler {
         if (content != null) {
             return content;
         }
-        File file = new File(path);
+        File file = new File(context.appResourceDir, path);
         if (file.exists()) {
             return Streams.readBytes(file);
-        } else if (path.startsWith("2")) {
+        }
+        file = new File(context.storage.contentDir, path);
+        if (file.exists()) {
+            return Streams.readBytes(file);
+        } else if (path.startsWith("20") || path.endsWith(".json")) {
             throw new IOException("no file: " + file.getAbsolutePath());
         }
-        File sourceFile = new File(context.dir + "/" + path);
+        File sourceFile = new File(context.appResourceDir + "/" + path);
         if (sourceFile.exists()) {
             return Streams.readBytes(sourceFile);
         }

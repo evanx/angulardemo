@@ -5,7 +5,7 @@ import iolfeed.ContentStorage;
 public class GitteryContext {
     String webResourcePath;
     String repo;
-    String dir;
+    String appResourceDir;
     String defaultPath;
     int port = 8088; 
     ContentStorage storage;
@@ -15,7 +15,7 @@ public class GitteryContext {
         this.storage = storage;
         this.webResourcePath = webResourcePath;
         this.defaultPath = defaultPath;
-        this.dir = appResourceDir;
+        this.appResourceDir = appResourceDir;
         this.repo = repo;
     }
 

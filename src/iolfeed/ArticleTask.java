@@ -46,7 +46,8 @@ public class ArticleTask implements Runnable {
     String imageCredit;
     String imageCaption;
     String section;
-    String numDate;
+    String subsection;
+    String numDate;    
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
@@ -74,6 +75,25 @@ public class ArticleTask implements Runnable {
         numDate = map.getString("numDate");
         section = map.getString("section");
         articlePath = String.format("%s/%s/%s.json", numDate, section, articleId);
+        if (section.equals("top")) {
+            if (sourceArticleUrl.contains("/news/")) {
+                section = "news";
+            } else if (sourceArticleUrl.contains("/sport/")) {
+                section = "sport";
+            } else if (sourceArticleUrl.contains("/business/")) {
+                section = "business";
+            } else if (sourceArticleUrl.contains("/scitech/")) {
+                section = "scitech";
+            } else if (sourceArticleUrl.contains("/motoring/")) {
+                section = "motoring";
+            } else if (sourceArticleUrl.contains("/lifestyle/")) {
+                section = "lifestyle";
+            } else if (sourceArticleUrl.contains("/tonight/")) {
+                section = "tonight";
+            } else if (sourceArticleUrl.contains("/travel/")) {
+                section = "travel";
+            }
+        }
     }
 
     @Override

@@ -14,7 +14,7 @@ public class PrefetchBuilder {
     ContentStorage storage;
     StringBuilder contentBuilder = new StringBuilder();
     String[] sections = {"top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel"};
-    int sectionLimit = 99;
+    int sectionLimit = 4;
     
     public PrefetchBuilder() {
     }
