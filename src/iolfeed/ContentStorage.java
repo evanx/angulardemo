@@ -23,15 +23,17 @@ public class ContentStorage {
     
     Map<String, byte[]> map = new HashMap();
     
-    File prefetchFile;
+    String contentBaseDir;
     String defaultHtml;
+    File prefetchFile;
     public byte[] prefetchContent;
     public byte[] prefetchGzippedContent;
     public Set<String> linkSet = new ConcurrentSkipListSet();
     
-    public synchronized void init(String defaultHtml, String prefetchPath) {
+    public synchronized void init(String contentBaseDir, String defaultHtml, String prefetchPath) {
+        this.contentBaseDir = contentBaseDir;
         this.defaultHtml = defaultHtml;        
-        this.prefetchFile = new File(prefetchPath);
+        this.prefetchFile = new File(contentBaseDir, prefetchPath);
     }
     
     public synchronized void put(String key, byte[] value) {

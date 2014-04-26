@@ -134,7 +134,7 @@ public class GitteryHandler implements HttpHandler {
             logger.warn("readContent " + contentUrl, e);
         }
         try {
-            String resourcePath = "/" + context.res + "/" + path;
+            String resourcePath = "/" + context.webResourcePath + "/" + path;
             logger.trace("resourcePath {}", resourcePath);
             return Streams.readResourceBytes(getClass(), resourcePath);
         } catch (Throwable e) {

@@ -20,11 +20,13 @@ public class ReaderMain {
             BasicConfigurator.configure();
             ContentStorage contentStorage = new ContentStorage();
             TaskManager taskManager = new TaskManager();
-            new GitteryServer().start(new GitteryContext(contentStorage, "reader/web",
-                    "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web",
-                    "/home/evanx/nb/git/angulardemo/src/reader/web"));
             JMap feedsProperties = new JMap();
-            new FeedsTask().start(new FeedsContext(taskManager, contentStorage, feedsProperties));
+            FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
+            feedsContext.init();
+            new GitteryServer().start(new GitteryContext(contentStorage, feedsContext.webResourcePath,
+                    feedsContext.defaultPath, "/home/evanx/nb/git/angulardemo/src/reader/web",
+                    "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web"));
+            new FeedsTask().start(feedsContext);
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

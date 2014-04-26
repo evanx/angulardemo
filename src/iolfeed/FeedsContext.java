@@ -21,8 +21,13 @@ import vellum.util.Streams;
 public final class FeedsContext {
     static Logger logger = LoggerFactory.getLogger(FeedsContext.class);
     
-    String contentUrl = System.getProperty("reader.contentUrl", "http://chronica.co");
-    String contentPath = "iol";
+    public final String contentUrl = System.getProperty("reader.contentUrl", "http://chronica.co");
+    public final String contentBaseDir = System.getProperty("reader.contentBaseDir", "/home/evanx/angulardemo/html");
+    public final String webResourcePath = "reader/web";
+    public final String defaultPath = "index.html";
+    public final String prefetchPath = "prefetch.html";
+    public final String contentPath = "iol";
+    String defaultHtml;
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
@@ -85,10 +90,17 @@ public final class FeedsContext {
         feedMap.put(id, url);       
     }    
     
+    public void init() throws IOException {
+        this.defaultHtml = new String(Streams.readResourceBytes(getClass(), 
+                String.format("/%s/%s", webResourcePath, defaultPath)));
+        storage.init(contentBaseDir, defaultHtml, prefetchPath);
+    }
+    
+    
     public void putJson(String path, String json) throws IOException {
         logger.info("putJson {}", path);
         storage.put(path, json.getBytes());
-        File file = new File(path);
+        File file = new File(contentBaseDir, path);
         file.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(json);
@@ -98,7 +110,7 @@ public final class FeedsContext {
     public void putContent(String path, byte[] content) throws IOException {
         logger.info("putContent {} {}", path, content.length);
         storage.put(path, content);
-        File file = new File(path);
+        File file = new File(contentBaseDir, path);
         file.getParentFile().mkdirs();
         Streams.write(content, file);        
     }
