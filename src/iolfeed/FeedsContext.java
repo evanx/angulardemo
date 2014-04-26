@@ -38,6 +38,7 @@ public final class FeedsContext {
     boolean refresh = false;
     long articleTaskTimeoutSeconds = 120;
     int articleTaskThreadPoolSize = 4;
+    int retryCount = 4;
     boolean once = false;
     int articleCount = 99;
     Map<String, String> feedMap = new HashMap();

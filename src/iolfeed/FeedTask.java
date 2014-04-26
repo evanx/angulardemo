@@ -105,7 +105,7 @@ public class FeedTask extends Thread {
             while (!performTasks()) {
                 logger.warn("performTasks incomplete");
             }
-            while (!write()) {
+            for (int i = 0; !write() && i < context.retryCount; i++) {
                 logger.warn("write incomplete");
                 performTasks();
             }
@@ -134,8 +134,9 @@ public class FeedTask extends Thread {
         for (ArticleTask articleTask : articleTaskList) {
             if (articleTask.isCompleted()) {
                 completedArticleList.add(articleTask.map);
-            } else {
+            } else if (articleTask.isRetry()) {
                 completed = false;
+            } else {
             }
         }        
         if (completedArticleList.isEmpty()) {

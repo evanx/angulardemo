@@ -52,6 +52,7 @@ public class ArticleTask implements Runnable {
     List<String> paragraphs = new ArrayList();
     List<ImageEntity> imageList = new ArrayList();
     boolean completed = false;
+    boolean retry = false;
     String galleryCaption;
     
     ArticleTask(JMap map) {
@@ -97,15 +98,18 @@ public class ArticleTask implements Runnable {
                 }
             }
             if (paragraphs.isEmpty()) {
-                throw new Exception("no paragraphs");
+                throw new ArticleImportException("no paragraphs");
             }
             reader.close();
             store();
             completed = true;
+        } catch (FeedException e) {
+            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
         } catch (FileNotFoundException e) {
             logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
         } catch (IOException e) {
             logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
+            retry = true;
         } catch (NullPointerException e) {
             logger.error("run", e);
         } catch (Throwable e) {
@@ -114,6 +118,10 @@ public class ArticleTask implements Runnable {
         }
     }
 
+    public boolean isRetry() {
+        return retry;
+    }
+    
     public boolean isCompleted() {
         return completed;
     }
