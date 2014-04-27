@@ -35,12 +35,8 @@ public class ContentStorage {
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
     
-    public synchronized void init(String contentDir) {
-        this.contentDir = contentDir;
-        this.prefetchFile = new File(contentDir, prefetchPath);
-    }
-    
     public void init() throws IOException {
+        this.prefetchFile = new File(contentDir, prefetchPath);
         this.defaultHtml = Streams.readString(new File(contentDir, defaultPath));
     }
     
