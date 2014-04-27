@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vellum.provider.VellumProvider;
 
 /**
  *
@@ -21,8 +20,6 @@ public class FeedsTask implements Runnable {
     
     public void start(FeedsContext context) throws Exception {
         this.context = context;
-        VellumProvider.provider.put(context);
-        VellumProvider.provider.put(context.storage);
         if (context.once) {
             run();
         } else {

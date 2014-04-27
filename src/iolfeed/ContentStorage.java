@@ -2,7 +2,6 @@ package iolfeed;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -50,6 +49,7 @@ public class ContentStorage {
 
     public synchronized void buildPrefetchContent() throws IOException {
         logger.info("buildPrefetchContent {}", linkSet.size());
+        defaultHtml = Streams.readString(new File(contentDir, defaultPath));
         prefetchContent = new PrefetchBuilder().build(this);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream stream = new GZIPOutputStream(baos)) {
@@ -74,7 +74,9 @@ public class ContentStorage {
         put(path, content);
         File file = new File(contentDir, path);
         file.getParentFile().mkdirs();
-        if (!file.exists() || file.length() != content.length) {
+        if (file.exists() && file.length() == content.length) {
+            logger.info("unchanged {}" + path);
+        } else {
             Streams.write(content, file);        
         }
     }

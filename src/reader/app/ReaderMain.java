@@ -8,6 +8,7 @@ import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import org.apache.log4j.BasicConfigurator;
 import vellum.jx.JMap;
+import vellum.provider.VellumProvider;
 
 /**
  *
@@ -28,6 +29,9 @@ public class ReaderMain {
                     "index.html", "/home/evanx/nb/git/angulardemo/src/reader/web",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web");
             gitteryContext.init();
+            VellumProvider.provider.put(feedsContext);
+            VellumProvider.provider.put(contentStorage);
+            VellumProvider.provider.put(gitteryContext);
             new GitteryServer().start(gitteryContext);
             new FeedsTask().start(feedsContext);
         } catch (Exception e) {

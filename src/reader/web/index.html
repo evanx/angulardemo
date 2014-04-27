@@ -20,6 +20,7 @@
       }
       body {
         padding-top: 70px;
+        font-family: sans-serif;
       }
       footer {
         padding: 30px 0;
@@ -27,6 +28,22 @@
       .section-link {
         font-size: 16pt;
         font-weight: bold;
+      }
+      .article-lead {
+      }
+      .article-link {
+        margin: 0em; 
+        display: inline-block; 
+        min-width: 200px; 
+        font-size: 12pt; 
+        font-weight: bold; 
+      }
+      .article-image {
+        margin-right: 1em; 
+        display: block; 
+        float: left;
+        width: 125px; 
+        min-height: 100px; 
       }
     </style>
 </head>
@@ -68,7 +85,7 @@
           <table class="table table-striped" style="width: 300px">
             <tbody>
               <tr ng-click="selected('top')">
-                <td class="section-lik"><a href="#/section/Top">Top</a></td>
+                <td class="section-link"><a href="#/section/Top">Top</a></td>
               </tr>
               <tr ng-click="selected('news')">
                 <td class="section-link"><a href="#/section/News">News</a></td>
