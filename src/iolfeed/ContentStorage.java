@@ -76,7 +76,7 @@ public class ContentStorage {
         File file = new File(contentDir, path);
         file.getParentFile().mkdirs();
         if (file.exists() && file.length() == content.length) {
-            logger.info("unchanged {}" + path);
+            logger.info("unchanged {}", path);
         } else {
             Streams.write(content, file);        
         }
