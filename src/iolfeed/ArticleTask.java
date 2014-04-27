@@ -45,6 +45,7 @@ public class ArticleTask implements Runnable {
     String imagePath;
     String imageCredit;
     String imageCaption;
+    String originalSection;
     String section;
     String subsection;
     String numDate;    
@@ -77,21 +78,21 @@ public class ArticleTask implements Runnable {
         articlePath = String.format("%s/%s/%s.json", numDate, section, articleId);
         if (section.equals("top")) {
             if (sourceArticleUrl.contains("/news/")) {
-                section = "news";
+                originalSection = "news";
             } else if (sourceArticleUrl.contains("/sport/")) {
-                section = "sport";
+                originalSection = "sport";
             } else if (sourceArticleUrl.contains("/business/")) {
-                section = "business";
+                originalSection = "business";
             } else if (sourceArticleUrl.contains("/scitech/")) {
-                section = "scitech";
+                originalSection = "scitech";
             } else if (sourceArticleUrl.contains("/motoring/")) {
-                section = "motoring";
+                originalSection = "motoring";
             } else if (sourceArticleUrl.contains("/lifestyle/")) {
-                section = "lifestyle";
+                originalSection = "lifestyle";
             } else if (sourceArticleUrl.contains("/tonight/")) {
-                section = "tonight";
+                originalSection = "tonight";
             } else if (sourceArticleUrl.contains("/travel/")) {
-                section = "travel";
+                originalSection = "travel";
             }
         }
     }
@@ -218,8 +219,8 @@ public class ArticleTask implements Runnable {
         loadImage();
         map.put("imagePath", imagePath);
         map.put("imageList", imageList);
-        context.putJson(articlePath, map.toJson());
-        context.putJson(String.format("article/%s.json", articleId), map.toJson());
+        context.storage.putJson(articlePath, map.toJson());
+        context.storage.putJson(String.format("article/%s.json", articleId), map.toJson());
     }
 
     private void loadImage() throws IOException {
@@ -240,13 +241,13 @@ public class ArticleTask implements Runnable {
         logger.info("content {} {}", content.length, sourceImageUrl);
         String name = Streams.parseFileName(sourceImageUrl);
         String path = numDate + "/image/" + name;
-        context.putContent(path, content);
-        context.storage.linkSet.add(path);
+        context.storage.putContent(path, content);
+        context.storage.addLink(section, path);
         return path;
     }
     
     void postContent(String path, byte[] content) throws IOException {
-        String localImageUrl = String.format("%s/%s", context.contentUrl, path);
+        String localImageUrl = String.format("%s/%s", context.storage.contentUrl, path);
         Streams.postHttp(content, new URL(localImageUrl));
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);

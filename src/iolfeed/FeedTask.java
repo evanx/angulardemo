@@ -147,7 +147,8 @@ public class FeedTask extends Thread {
             return false;
         }
         try {
-            context.putJson(String.format("%s/articles.json", section), new Gson().toJson(completedArticleList));
+            context.storage.putJson(String.format("%s/articles.json", section), 
+                    new Gson().toJson(completedArticleList));
             context.storage.buildPrefetchContent();
             return completed;
         } catch (Throwable e) {

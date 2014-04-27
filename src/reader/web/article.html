@@ -8,7 +8,7 @@
           {{article.imageCaption}}
       </div>
     </div>
-    <h4 style="display: inline-block; min-width: 200px;"><a href="{{article.link}}">{{article.title}}</a></h4>
+    <h4 style="display: inline-block; min-width: 200px; font-weight: bold;"><a href="{{article.link}}">{{article.title}}</a></h4>
     <h6>{{article.pubDate}}, <a href="{{article.link}}">IOL.co.za</a></h6>
     <hr>
     <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">

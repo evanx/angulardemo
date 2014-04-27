@@ -1,9 +1,5 @@
 package iolfeed;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
 import vellum.jx.JMap;
-import vellum.util.Streams;
 
 /**
  *
@@ -21,12 +16,6 @@ import vellum.util.Streams;
 public final class FeedsContext {
     static Logger logger = LoggerFactory.getLogger(FeedsContext.class);
     
-    public final String contentUrl = System.getProperty("reader.contentUrl", "http://chronica.co");
-    public final String contentBaseDir = System.getProperty("reader.contentBaseDir", "/home/evanx/angulardemo/html");
-    public final String webResourcePath = "reader/web";
-    public final String defaultPath = "index.html";
-    public final String prefetchPath = "prefetch.html";
-    public final String contentPath = "iol";
     String defaultHtml;
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
@@ -90,36 +79,7 @@ public final class FeedsContext {
         feedEntityList.add(feedEntity);
         feedMap.put(id, url);       
     }    
-    
-    public void init() throws IOException {
-        this.defaultHtml = new String(Streams.readResourceBytes(getClass(), 
-                String.format("/%s/%s", webResourcePath, defaultPath)));
-        storage.init(contentBaseDir, defaultHtml, prefetchPath);
-    }
-    
-    
-    public void putJson(String path, String json) throws IOException {
-        logger.info("putJson {}", path);
-        storage.put(path, json.getBytes());
-        File file = new File(contentBaseDir, path);
-        file.getParentFile().mkdirs();
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(json);
-        }
-    }
 
-    public void putContent(String path, byte[] content) throws IOException {
-        logger.info("putContent {} {}", path, content.length);
-        storage.put(path, content);
-        File file = new File(contentBaseDir, path);
-        file.getParentFile().mkdirs();
-        Streams.write(content, file);        
-    }
-    
-    public void postContent(String path, byte[] content) throws IOException {
-        String localImageUrl = String.format("%s/%s", contentUrl, path);
-        Streams.postHttp(content, new URL(localImageUrl));
-        content = Streams.readContent(localImageUrl);
-        logger.info("imageUrl {} {}", content.length, localImageUrl);
-    }       
+    public void init() {
+    }           
 }

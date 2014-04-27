@@ -2,8 +2,10 @@ package iolfeed;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -23,17 +25,23 @@ public class ContentStorage {
     
     Map<String, byte[]> map = new HashMap();
     
-    public String contentDir;
-    String defaultHtml;
-    File prefetchFile;
+    public String contentUrl = System.getProperty("storage.contentUrl", "http://chronica.co");
+    public String contentDir = System.getProperty("storage.contentDir", "/home/evanx/angulardemo/html");
+    public String defaultHtml;
+    public final String defaultPath = "index.html";
+    public final String prefetchPath = "prefetch.html";
     public byte[] prefetchContent;
     public byte[] prefetchGzippedContent;
-    public Set<String> linkSet = new ConcurrentSkipListSet();
+    File prefetchFile;
+    Set<String> linkSet = new ConcurrentSkipListSet();
     
-    public synchronized void init(String contentDir, String defaultHtml, String prefetchPath) {
+    public synchronized void init(String contentDir) {
         this.contentDir = contentDir;
-        this.defaultHtml = defaultHtml;        
         this.prefetchFile = new File(contentDir, prefetchPath);
+    }
+    
+    public void init() throws IOException {
+        this.defaultHtml = Streams.readString(new File(contentDir, defaultPath));
     }
     
     public synchronized void put(String key, byte[] value) {
@@ -54,4 +62,32 @@ public class ContentStorage {
         prefetchGzippedContent = baos.toByteArray();
         Streams.write(prefetchContent, prefetchFile);
     }
+
+    public void addLink(String section, String path) {
+        if (section.equals("top") || section.equals("news")) {
+            linkSet.add(path);
+        }
+    }
+    
+    public void putJson(String path, String json) throws IOException {
+        putContent(path, json.getBytes());
+    }
+
+    public void putContent(String path, byte[] content) throws IOException {
+        logger.info("putContent {} {}", path, content.length);
+        put(path, content);
+        File file = new File(contentDir, path);
+        file.getParentFile().mkdirs();
+        if (!file.exists() || file.length() != content.length) {
+            Streams.write(content, file);        
+        }
+    }
+    
+    public void postContent(String path, byte[] content) throws IOException {
+        String localImageUrl = String.format("%s/%s", contentUrl, path);
+        Streams.postHttp(content, new URL(localImageUrl));
+        content = Streams.readContent(localImageUrl);
+        logger.info("imageUrl {} {}", content.length, localImageUrl);
+    }       
+    
 }
