@@ -170,8 +170,8 @@ public class ArticleTask implements Runnable {
     
     private boolean matchGalleryImageLink(Matcher matcher) {
         if (matcher.find()) {
-            String galleryImageUrl = matcher.group(1);
-            imageList.add(new ImageEntity(galleryImageUrl, galleryCaption));
+            String source = matcher.group(1);
+            imageList.add(new ImageEntity(source, galleryCaption));
             return true;
         }
         return false;
@@ -226,10 +226,10 @@ public class ArticleTask implements Runnable {
     private void loadImage() throws IOException {
         if (!imageList.isEmpty()) {
             for (ImageEntity image : imageList) {
-                image.path = loadImage(image.sourceUrl);
+                image.image = loadImage(image.source);
             }
-            imagePath = imageList.get(0).path;
-            imageCaption = imageList.get(0).caption;
+            imagePath = imageList.get(0).image;
+            imageCaption = imageList.get(0).text;
         } else if (sourceImageUrl != null) {
             imagePath = loadImage(sourceImageUrl);
         }    

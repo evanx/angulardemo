@@ -6,13 +6,13 @@ package iolfeed;
  * @author evanx
  */
 public class ImageEntity {
-    String sourceUrl;
-    String caption;
-    String path;
+    String source;
+    String text;
+    String image;
 
-    public ImageEntity(String sourceUrl, String caption) {
-        this.sourceUrl = sourceUrl;
-        this.caption = caption;
+    public ImageEntity(String source, String text) {
+        this.source = source;
+        this.text = text;
     }
     
     
