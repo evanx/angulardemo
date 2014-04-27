@@ -36,6 +36,7 @@ public class ContentStorage {
     
     public void init() throws IOException {
         this.prefetchFile = new File(contentDir, prefetchPath);
+        prefetchFile.delete();
         this.defaultHtml = Streams.readString(new File(contentDir, defaultPath));
     }
     
