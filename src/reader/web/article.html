@@ -1,16 +1,18 @@
 <div class="row">
-  <div class="col-lg-10" ng-show="article">
-    <div style="margin: 1em; float: right; max-width: 100%" ng-show="article.imagePath">
-      <img ng-src="{{article.imagePath}}" ng-hide="article.imageList.length > 1" 
+  <div ng-show="article.imageList.length > 1" style="display: inline-block;">
+    <carousel interval="5000">
+      <slide ng-repeat="slide in article.imageList" active="slide.active">
+        <img ng-src="{{slide.image}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
+        <div class="carousel-caption">
+          <p>{{slide.text}}</p>
+        </div>
+      </slide>
+    </carousel>      
+  </div>
+  <div class="col-lg-10">
+    <div style="margin: 1em; float: right; max-width: 100%" ng-hide="article.imageList.length > 1">
+      <img ng-src="{{article.imagePath}}" 
            class="article-image">
-      <carousel interval="5000" ng-show="article.imageList.length > 1">
-        <slide ng-repeat="slide in article.imageList" active="slide.active">
-          <img ng-src="{{slide.image}}">
-          <div class="carousel-caption">
-            <p>{{slide.text}}</p>
-          </div>
-        </slide>
-      </carousel>      
       <br>
       <div style="font-size: 80%; width: 302px; border-bottom: 1px solid lightgray;">
           {{article.imageCaption}}
