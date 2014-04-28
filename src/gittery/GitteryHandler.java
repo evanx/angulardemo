@@ -56,7 +56,8 @@ public class GitteryHandler implements HttpHandler {
         logger.trace("path [{}]", path);
         try {
             if (path.equals("/") || path.equals("/prefetch")) {
-                path = context.defaultPath;                    
+               logger.info("app");
+                path = context.storage.defaultPath;                  
                 if (context.storage.prefetchContent != null) {
                     if (requestHeaderMatches("Accept-Encoding", "gzip") &&
                             context.storage.prefetchGzippedContent != null) {
@@ -67,7 +68,7 @@ public class GitteryHandler implements HttpHandler {
                     return;
                 }
             } else if (path.equals("/")) {
-                path = context.defaultPath;
+                path = context.storage.defaultPath;
             } else if (path.startsWith("/")) {
                 path = path.substring(1);
             }
@@ -105,27 +106,26 @@ public class GitteryHandler implements HttpHandler {
 
     private byte[] get() throws Exception {
         if (path.equals("prefetch") && context.storage.prefetchContent != null) {
+            logger.info("prefetch: {}", path);
             return context.storage.prefetchContent;
         }
         byte[] content = context.storage.get(path);
         if (content != null) {
+            logger.info("memory: {}", path);
             return content;
         }
-        File file = new File(context.appResourceDir, path);
+        File file = new File(context.storage.appDir, path);
         if (file.exists()) {
             return Streams.readBytes(file);
         }
+        logger.info("not app file: " + file.getAbsolutePath());
         file = new File(context.storage.storageDir, path);
         if (file.exists()) {
             return Streams.readBytes(file);
         } else if (path.startsWith("20") || path.endsWith(".json")) {
             throw new IOException("no file: " + file.getAbsolutePath());
         }
-        File sourceFile = new File(context.appResourceDir + "/" + path);
-        if (sourceFile.exists()) {
-            return Streams.readBytes(sourceFile);
-        }
-        logger.trace("not local file: " + file.getAbsolutePath());
+        logger.info("not storage file: " + file.getAbsolutePath());
         String contentUrl = context.repo + "/" + path;
         try {
             if (false) {
@@ -152,14 +152,14 @@ public class GitteryHandler implements HttpHandler {
     }
     
     void write(byte[] content) throws IOException {
-        logger.info("response {} {}", content.length);
+        logger.info("response {} {}", path, content.length);
         setContentType();
         he.sendResponseHeaders(200, content.length);
         he.getResponseBody().write(content);
     }
     
     void writeGzip(byte[] content) throws IOException {
-        logger.info("gzip response {} {}", content.length);
+        logger.info("gzip response {} {}", path, content.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
         setContentType();
         he.sendResponseHeaders(200, 0);
@@ -169,7 +169,7 @@ public class GitteryHandler implements HttpHandler {
     }        
     
     void writeGzipped(byte[] gzippedContent) throws IOException {
-        logger.info("gzip response {} {}", gzippedContent.length);
+        logger.info("gzipped response {} {}", path, gzippedContent.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
         setContentType();
         he.sendResponseHeaders(200, 0);
