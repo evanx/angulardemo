@@ -25,8 +25,7 @@ public class ReaderMain {
             JMap feedsProperties = new JMap();
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
             feedsContext.init();
-            GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web",
-                    "index.html", "/home/evanx/nb/git/angulardemo/src/reader/web",
+            GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web");
             gitteryContext.init();
             VellumProvider.provider.put(feedsContext);

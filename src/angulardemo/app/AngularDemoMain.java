@@ -25,9 +25,8 @@ public class AngularDemoMain {
         try {
             BasicConfigurator.configure();
             new GitteryServer().start(new GitteryContext(
-                    new ContentStorage(), "angulardemo/web",
-                    "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web",
-                "/home/evanx/NetBeansProjects/git/angulardemo/angulardemo/web", "index.html"));
+                    new ContentStorage(), "angulardemo/web", "index.html",
+                    "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web"));
             JMap feedsProperties = new JMap();
             new FeedsTask().start(new FeedsContext(new TaskManager(), new ContentStorage(), feedsProperties));
         } catch (Exception e) {

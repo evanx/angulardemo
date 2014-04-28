@@ -3,6 +3,9 @@
 
 package iolfeed;
 
+import static com.sun.xml.internal.ws.util.ServiceFinder.find;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,15 +22,15 @@ import vellum.provider.VellumProvider;
  *
  * @author evanx
  */
-public class ArticleTaskIntegrationTest {
+public class VideoArticleTaskIntegrationTest {
 
-    Logger logger = LoggerFactory.getLogger(ArticleTaskIntegrationTest.class);
+    Logger logger = LoggerFactory.getLogger(VideoArticleTaskIntegrationTest.class);
     ContentStorage contentStorage = new ContentStorage();
     TaskManager taskManager = new TaskManager();
     JMap feedsProperties = new JMap();
     FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
 
-    public ArticleTaskIntegrationTest() {
+    public VideoArticleTaskIntegrationTest() {
         VellumProvider.provider.put(feedsContext);
         VellumProvider.provider.put(contentStorage);        
     }
@@ -48,10 +51,23 @@ public class ArticleTaskIntegrationTest {
     @After
     public void tearDown() {
     }
+    
+    @Test
+    public void parseVideoTitle() {
+        Pattern videoTitlePattern = Pattern.compile(
+            "\\s*<h1 class=\"article_headers_multimedia\">(.*)</h1>");
+        Matcher matcher = videoTitlePattern.matcher(" <h1 class=\"article_headers_multimedia\">VIDEO: DA seeks gains in Free State</h1> ");
+        Assert.assertTrue(matcher.find());
+        Assert.assertTrue(matcher.group(1).equals("VIDEO: DA seeks gains in Free State"));
+    }
 
     @Test
+    public void parseVideo() {
+    }
+    
+    //@Test
     public void parseArticle() throws Exception {
-        String link = "http://www.iol.co.za/motoring/cars/nissan/self-cleaning-car-created-by-nissan-1.1680061";
+        String link = "http://www.iol.co.za/news/politics/video-da-seeks-gains-in-free-state-1.1678471";
         JMap map = new JMap();
         map.put("section", "news");
         map.put("title", "test0title");

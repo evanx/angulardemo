@@ -55,7 +55,7 @@ public class GitteryHandler implements HttpHandler {
         path = he.getRequestURI().getPath();
         logger.trace("path [{}]", path);
         try {
-            if (path.equals("/prefetch")) {
+            if (path.equals("/") || path.equals("/prefetch")) {
                 if (context.storage.prefetchContent != null) {
                     if (requestHeaderMatches("Accept-Encoding", "gzip") &&
                             context.storage.prefetchGzippedContent != null) {
@@ -105,7 +105,7 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private byte[] get() throws Exception {
-        if (path.equals("fast") && context.storage.prefetchContent != null) {
+        if (path.equals("prefetch") && context.storage.prefetchContent != null) {
             return context.storage.prefetchContent;
         }
         byte[] content = context.storage.get(path);
@@ -116,7 +116,7 @@ public class GitteryHandler implements HttpHandler {
         if (file.exists()) {
             return Streams.readBytes(file);
         }
-        file = new File(context.storage.contentDir, path);
+        file = new File(context.storage.storageDir, path);
         if (file.exists()) {
             return Streams.readBytes(file);
         } else if (path.startsWith("20") || path.endsWith(".json")) {

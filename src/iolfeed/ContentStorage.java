@@ -25,7 +25,8 @@ public class ContentStorage {
     Map<String, byte[]> map = new HashMap();
     
     public String contentUrl = System.getProperty("storage.contentUrl", "http://chronica.co");
-    public String contentDir = System.getProperty("storage.contentDir", "/home/evanx/angulardemo/html");
+    public String storageDir = System.getProperty("storage.storageDir", "/home/evanx/angulardemo/storage");
+    public String appDir = System.getProperty("storage.appDir", "/home/evanx/angulardemo/app");
     public String defaultHtml;
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
@@ -34,10 +35,17 @@ public class ContentStorage {
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
     
-    public void init() throws IOException {
-        this.prefetchFile = new File(contentDir, prefetchPath);
+    public void init() throws IOException {        
+        prefetchFile = new File(storageDir, prefetchPath);
         prefetchFile.delete();
-        this.defaultHtml = Streams.readString(new File(contentDir, defaultPath));
+        this.defaultHtml = Streams.readString(new File(appDir, defaultPath));
+        loadContent("top/articles.json");
+        loadContent("news/articles.json");
+        buildPrefetchContent();
+    }
+    
+    private void loadContent(String path) throws IOException {
+        map.put(path, Streams.readBytes(new File(storageDir, path)));
     }
     
     public synchronized void put(String key, byte[] value) {
@@ -50,7 +58,7 @@ public class ContentStorage {
 
     public synchronized void buildPrefetchContent() throws IOException {
         logger.info("buildPrefetchContent {}", linkSet.size());
-        defaultHtml = Streams.readString(new File(contentDir, defaultPath));
+        defaultHtml = Streams.readString(new File(appDir, defaultPath));
         prefetchContent = new PrefetchBuilder().build(this);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream stream = new GZIPOutputStream(baos)) {
@@ -73,7 +81,7 @@ public class ContentStorage {
     public void putContent(String path, byte[] content) throws IOException {
         logger.info("putContent {} {}", path, content.length);
         put(path, content);
-        File file = new File(contentDir, path);
+        File file = new File(storageDir, path);
         file.getParentFile().mkdirs();
         if (file.exists() && file.length() == content.length) {
             logger.info("unchanged {}", path);

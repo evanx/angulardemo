@@ -11,11 +11,11 @@ public class GitteryContext {
     ContentStorage storage;
     
     public GitteryContext(ContentStorage storage, String webResourcePath, String defaultPath, 
-            String appResourceDir, String repo) throws Exception {
+            String repo) throws Exception {
         this.storage = storage;
         this.webResourcePath = webResourcePath;
         this.defaultPath = defaultPath;
-        this.appResourceDir = appResourceDir;
+        this.appResourceDir = storage.storageDir;
         this.repo = repo;
     }
 
