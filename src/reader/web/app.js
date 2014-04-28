@@ -24,6 +24,13 @@ app.factory("appService", ["$http", function($http) {
         }
     }]);
 
+app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
+        $sceDelegateProvider.resourceUrlWhitelist([
+            'self',
+            'http://www.youtube.com/**',
+        ]);
+    }]);
+
 app.controller("appController", ["$scope", "$location", "appService",
     function($scope, $location, appService) {
         console.log("appController");
@@ -97,9 +104,10 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         };
     }]);
 
-app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "appService",
-    function($scope, $location, $routeParams, $window, appService) {
+app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "$sce", "appService",
+    function($scope, $location, $routeParams, $window, $sce, appService) {
         var jsonPath = "article/" + $routeParams.articleId + ".json";
+        //$sce.trustAsResourceUrl("http://www.youtube.com/embed/eH_WMLxmfA8");
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;

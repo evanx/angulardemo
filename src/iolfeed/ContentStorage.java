@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.jx.JMap;
 import vellum.util.Streams;
 
 /**
@@ -23,6 +24,7 @@ public class ContentStorage {
     final String prefetchLinkPattern = "<!--link-->\n";                
     
     Map<String, byte[]> map = new HashMap();
+    Map<String, JMap> jsonMap = new HashMap();
     
     public String contentUrl = System.getProperty("storage.contentUrl", "http://chronica.co");
     public String storageDir = System.getProperty("storage.storageDir", "/home/evanx/angulardemo/storage");
@@ -73,6 +75,15 @@ public class ContentStorage {
             linkSet.add(path);
         }
     }
+
+    public JMap getMap(String path) throws IOException {
+        return jsonMap.get(path);
+    }
+    
+    public void putJson(String path, JMap map) throws IOException {
+        jsonMap.put(path, map);
+        putContent(path, map.toJson().getBytes());
+    }
     
     public void putJson(String path, String json) throws IOException {
         putContent(path, json.getBytes());
@@ -89,12 +100,20 @@ public class ContentStorage {
             Streams.write(content, file);        
         }
     }
+
+    public boolean containsKey(String path) {
+        return map.containsKey(path);
+    }
+    
+    public boolean exists(String path) {
+        File file = new File(storageDir, path);
+        return file.exists();
+    }
     
     public void postContent(String path, byte[] content) throws IOException {
         String localImageUrl = String.format("%s/%s", contentUrl, path);
         Streams.postHttp(content, new URL(localImageUrl));
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);
-    }       
-    
+    }    
 }

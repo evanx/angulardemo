@@ -5,12 +5,12 @@ package iolfeed;
  *
  * @author evanx
  */
-public class ImageEntity {
+public class ImageItem {
     String source;
     String text;
     String image;
 
-    public ImageEntity(String source, String text) {
+    public ImageItem(String source, String text) {
         this.source = source;
         this.text = text;
     }

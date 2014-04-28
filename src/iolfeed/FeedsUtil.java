@@ -98,7 +98,7 @@ public class FeedsUtil {
             text = text.replaceAll("<", "&lt;");
             text = text.replaceAll(">", "&gt;");
         }
-        return accentHtmlToUnicode(text);
+        return accentHtmlToUnicode(text).trim();
     }
 
     public static String accentHtmlToUnicode(String text) {

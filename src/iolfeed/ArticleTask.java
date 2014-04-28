@@ -35,7 +35,17 @@ public class ArticleTask implements Runnable {
             = Pattern.compile("<p class=\"captions\">(.*)</p>");
     static final Pattern paragraphPattern
             = Pattern.compile("<p class=\"arcticle_text\">(.*)</p>");
-
+    static final Pattern videoTitlePattern = Pattern.compile(
+            "\\s*<h1 class=\"article_headers_multimedia\">(.*)</h1>");
+    static final Pattern videoSizePattern = Pattern.compile(
+            "\\s*<object width=\"([0-9]*)\" height=\"([0-9]*)\">");
+    static final Pattern videoIdPattern = Pattern.compile(
+            "\\s*<param name=\"movie\" value=\"(\\w*)\"></param>");
+    static final Pattern multimediaCaptionPattern = Pattern.compile(
+            "\\s*<p class=\"multimedia_gal_captions\">([^<]*)");
+    static final Pattern multimediaTimestampPattern = Pattern.compile(
+            "<span class=\"lead-stories-comment\">(.*)</span");
+    
     JMap map;
     Throwable exception;
     String sourceArticleUrl;
@@ -48,14 +58,18 @@ public class ArticleTask implements Runnable {
     String originalSection;
     String section;
     String subsection;
-    String numDate;    
+    String numDate;
+    String multimediaCaption;
+    String multimediaTimestamp;
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
-    List<ImageEntity> imageList = new ArrayList();
+    List<ImageItem> imageList = new ArrayList();
+    List<YoutubeItem> youtubeList = new ArrayList();
     boolean completed = false;
     boolean retry = false;
     String galleryCaption;
+    YoutubeItem youtubeItem;
     
     ArticleTask(JMap map) {
         this.map = map;
@@ -97,32 +111,24 @@ public class ArticleTask implements Runnable {
         }
     }
 
+    public boolean isRetry() {
+        return retry;
+    }
+    
+    public boolean isCompleted() {
+        return completed;
+    }
+    
     @Override
     public void run() {
         try {
-            URLConnection connection = new URL(sourceArticleUrl).openConnection();
-            connection.setDoOutput(false);
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                if (matchGalleryCaption(galleryCaptionPattern.matcher(line))) {
-                } else if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
-                } else if (matchImageLink(imageLinkPattern.matcher(line))) {
-                } else if (matchCaption(imageCaptionPattern.matcher(line))) {
-                } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
-                } else if (matchParagraph(paragraphPattern.matcher(line))) {
-                } else {
-                }
+            if (context.storage.containsKey(articlePath)) {
+                logger.info("containsKey {}", articlePath);
+                map = context.storage.getMap(articlePath);
+            } else {
+                parseArticle();
+                store();
             }
-            if (paragraphs.isEmpty()) {
-                throw new ArticleImportException("no paragraphs");
-            }
-            reader.close();
-            store();
             completed = true;
         } catch (FeedException e) {
             logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
@@ -139,12 +145,85 @@ public class ArticleTask implements Runnable {
         }
     }
 
-    public boolean isRetry() {
-        return retry;
+    private void parseArticle() throws Exception {
+        URLConnection connection = new URL(sourceArticleUrl).openConnection();
+        connection.setDoOutput(false);
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()))) {
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                if (matchParagraph(paragraphPattern.matcher(line))) {
+                } else if (matchMultimediaCaption(multimediaCaptionPattern.matcher(line))) {
+                } else if (matchMultimediaTimestamp(multimediaTimestampPattern.matcher(line))) {
+                } else if (matchVideoTitle(videoTitlePattern.matcher(line))) {
+                } else if (matchVideoSize(videoSizePattern.matcher(line))) {
+                } else if (matchVideoId(videoIdPattern.matcher(line))) {
+                } else if (matchGalleryCaption(galleryCaptionPattern.matcher(line))) {
+                } else if (matchGalleryImageLink(galleryImageLinkPattern.matcher(line))) {
+                } else if (matchImageLink(imageLinkPattern.matcher(line))) {
+                } else if (matchCaption(imageCaptionPattern.matcher(line))) {
+                } else if (matchCaptionCredit(imageCreditPattern.matcher(line))) {
+                } else {
+                }
+            }
+            if (paragraphs.isEmpty()) {
+                if (multimediaCaption != null) {
+                    paragraphs.add(multimediaCaption);
+                }
+            }
+            if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
+                throw new ArticleImportException("no content");
+            }
+        }
     }
     
-    public boolean isCompleted() {
-        return completed;
+    private boolean matchMultimediaCaption(Matcher matcher) {
+        if (matcher.find()) {
+            multimediaCaption = FeedsUtil.cleanText(matcher.group(1));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean matchMultimediaTimestamp(Matcher matcher) {
+        if (matcher.find()) {
+            multimediaTimestamp = FeedsUtil.cleanText(matcher.group(1));
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean matchVideoTitle(Matcher matcher) {
+        if (matcher.find()) {
+            String title = matcher.group(1);
+            youtubeItem = new YoutubeItem(FeedsUtil.cleanText(title));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean matchVideoSize(Matcher matcher) {
+        if (matcher.find()) {
+            if (youtubeItem != null) {
+                youtubeItem.width = matcher.group(1);
+                youtubeItem.height = matcher.group(2);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean matchVideoId(Matcher matcher) {
+        if (matcher.find()) {
+            youtubeItem.url = String.format("http://www.iol.co.za/embed/%s", matcher.group(1));
+            youtubeList.add(youtubeItem);
+            youtubeItem = null;
+            return true;
+        }
+        return false;
     }
     
     private boolean matchImageLink(Matcher matcher) {
@@ -159,7 +238,7 @@ public class ArticleTask implements Runnable {
         if (matcher.find()) {
             String caption = matcher.group(1);            
             if (FeedsUtil.isText(caption)) {
-                galleryCaption = caption;
+                galleryCaption = caption.trim();
             } else {
                 galleryCaption = null;
             }
@@ -171,7 +250,7 @@ public class ArticleTask implements Runnable {
     private boolean matchGalleryImageLink(Matcher matcher) {
         if (matcher.find()) {
             String source = matcher.group(1);
-            imageList.add(new ImageEntity(source, galleryCaption));
+            imageList.add(new ImageItem(source, galleryCaption));
             return true;
         }
         return false;
@@ -219,13 +298,22 @@ public class ArticleTask implements Runnable {
         loadImage();
         map.put("imagePath", imagePath);
         map.put("imageList", imageList);
-        context.storage.putJson(articlePath, map.toJson());
+        if (!youtubeList.isEmpty()) {
+            map.put("youtubeList", youtubeList);
+        }
+        if (multimediaCaption != null) {
+            map.put("multimediaCaption", multimediaCaption);
+        }
+        if (multimediaTimestamp != null) {
+            map.put("multimediaTimetamp", multimediaTimestamp);
+        }
+        context.storage.putJson(articlePath, map);
         context.storage.putJson(String.format("article/%s.json", articleId), map.toJson());
     }
 
     private void loadImage() throws IOException {
         if (!imageList.isEmpty()) {
-            for (ImageEntity image : imageList) {
+            for (ImageItem image : imageList) {
                 image.image = loadImage(image.source);
             }
             imagePath = imageList.get(0).image;
@@ -237,11 +325,15 @@ public class ArticleTask implements Runnable {
 
     private String loadImage(String sourceImageUrl) throws IOException {
         sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
-        byte[] content = Streams.readContent(sourceImageUrl);
-        logger.info("content {} {}", content.length, sourceImageUrl);
         String name = Streams.parseFileName(sourceImageUrl);
         String path = numDate + "/image/" + name;
-        context.storage.putContent(path, content);
+        if (context.storage.containsKey(path)) {
+            logger.info("containsKey {} {}", path, sourceImageUrl);
+        } else {
+            byte[] content = Streams.readContent(sourceImageUrl);
+            logger.info("content {} {}", content.length, sourceImageUrl);
+            context.storage.putContent(path, content);
+        }
         context.storage.addLink(section, path);
         return path;
     }

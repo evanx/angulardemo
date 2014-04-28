@@ -1,4 +1,8 @@
-<div class="row ng-cloak" ng-cloak>
+<div class="row">
+  <div ng-show="article.youtubeList.length > 0" ng-repeat="youtube in article.youtubeList">
+      <iframe width="{{youtube.width}}" height="{{youtube.height}}" 
+              ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+  </div>
   <div ng-show="article.imageList.length > 1" style="display: inline-block;">
     <carousel interval="3000">
       <slide ng-repeat="slide in article.imageList" active="slide.active">
@@ -15,19 +19,19 @@
            class="article-image">
       <br>
       <div style="font-size: 80%; width: 302px; border-bottom: 1px solid lightgray;">
-          {{article.imageCaption}}
+        {{article.imageCaption}}
       </div>
     </div>
     <h4 style="display: inline-block; min-width: 200px; font-weight: bold;">
       <a href="{{article.link}}">{{article.title}}</a>
     </h4>
-    <h6>{{article.pubDate}}, <a href="{{article.link}}">IOL.co.za</a></h6>
+    <h6>{{article.pubDate}}</h6>
     <hr>
     <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
     </p>
     <hr>
     <div style="font-size: 10pt; margin-bottom: 1em;">
-      <a href="{{article.link}}">Read on IOL.co.za</a>
+      Read on <a href="{{article.link}}">IOL.co.za</a>
     </div>
   </div>
 </div>
