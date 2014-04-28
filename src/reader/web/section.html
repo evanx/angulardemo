@@ -17,5 +17,12 @@
         </tr>
       </tbody>
     </table>
+    <hr>
+    <div style="font-size: 10pt; margin-left: 8px; margin-bottom: 1em;" ng-show="section !== 'top'">
+      Read <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a>
+    </div>
+    <div style="font-size: 10pt; margin-left: 8px; margin-bottom: 1em;" ng-show="section == 'top'">
+      Read <a href="http://www.iol.co.za">IOL.co.za</a>
+    </div>
   </div>
 </div>

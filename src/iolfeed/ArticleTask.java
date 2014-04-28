@@ -72,9 +72,9 @@ public class ArticleTask implements Runnable {
                 articleId = articleId.substring(0, index);
             }
         }
-        logger = LoggerFactory.getLogger("ArticleTask." + articleId);
-        numDate = map.getString("numDate");
         section = map.getString("section");
+        logger = LoggerFactory.getLogger(String.format("ArticleTask.%s.%s", section, articleId));
+        numDate = map.getString("numDate");
         articlePath = String.format("%s/%s/%s.json", numDate, section, articleId);
         if (section.equals("top")) {
             if (sourceArticleUrl.contains("/news/")) {

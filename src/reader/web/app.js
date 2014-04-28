@@ -67,24 +67,25 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
 
 app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
-        console.log("sectionController", $routeParams, $window);
-        var section = $routeParams.section.toLowerCase();
-        var jsonPath = section + "/articles.json";
+        $scope.section = $routeParams.section.toLowerCase();
+        console.log("sectionController", $scope.section);
         $scope.state.title = $routeParams.section;
+        var jsonPath = $scope.section + "/articles.json";
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
             $scope.articles = data;
             if (data && data.length > 0) {
-                sections[section] = { articles: data };
+                sections[$scope.section] = { articles: data };
                 putArticles($scope.articles);
             }
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
         };
-        console.log("sections", sections, sections[section]);
-        if (sections[section] && sections[section].articles && sections[section].articles.length) {
-            $scope.articles = sections[section].articles;
+        console.log("sections", sections, sections[$scope.section]);
+        if (sections[$scope.section] && sections[$scope.section].articles && 
+                sections[$scope.section].articles.length) {
+            $scope.articles = sections[$scope.section].articles;
             putArticles($scope.articles);
         } else {
             $scope.statusMessage = "Loading " + jsonPath;
