@@ -1,169 +1,182 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="favicon.ico">
-    <title>My Independent</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <!--link href="lib/bootstrap.min.css" rel="stylesheet"-->
-    <!--link href="lib/offcanvas.css" rel="stylesheet"-->
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"-->
-    <style>
-      html,
-      body {
-        overflow-x: hidden;
-      }
-      body {
-        padding-top: 70px;
-        font-family: sans-serif;
-      }
-      footer {
-        padding: 30px 0;
-      }
-      .section-link {
-        font-size: 16pt;
-        font-weight: bold;
-      }
-      .article-lead {
-      }
-      .article-link {
-        margin: 0em; 
-        display: inline-block; 
-        min-width: 200px; 
-        font-size: 12pt; 
-        font-weight: bold; 
-      }
-      .article-link-image {
-        margin-right: 1em; 
-        display: block; 
-        float: left;
-        width: 125px; 
-        min-height: 90px; 
-      }
-      .article-image {
-        max-width: 320px; 
-        border: 1px solid black;      
-      }
-      .carousel-indicators {
-        display: none;
-        margin: 4px 0 0 0;
-        padding: 0px;
-        top: -1em;
-      }
-      .carousel-indicators .active {
-        margin: 0 1px 0 0;
-      }
-      .carousel-indicators li {
-        margin: 0 1px 0 0;
-      }
-      .carousel-caption {
-        padding: 0;
-        bottom: -.9em;
-        left: 0%;
-        right: 0%;
-        font-size: 9pt;
-        background: rgba(0, 0, 0, .2);
-      }
-      @media screen and (min-width: 768px) {
-        .carousel-caption {
-            font-size: 11pt;
-            bottom: -.7em;
-        }
-      }
-      
-    </style>
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="favicon.ico">
+        <title>My Independent</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <!--link href="lib/bootstrap.min.css" rel="stylesheet"-->
+        <!--link href="lib/offcanvas.css" rel="stylesheet"-->
+        <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
+        <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"-->
+        <style>
+            html,
+            body {
+                overflow-x: hidden;
+            }
+            body {
+                padding-top: 70px;
+                font-family: sans-serif;
+            }
+            footer {
+                padding: 30px 0;
+            }
+            .section-link {
+                font-size: 16pt;
+                font-weight: bold;
+            }
+            .article-lead {
+            }
+            .article-link {
+                margin: 0em; 
+                display: inline-block; 
+                min-width: 200px; 
+                font-size: 12pt; 
+                font-weight: bold; 
+            }
+            .article-link-image {
+                margin-right: 1em; 
+                display: block; 
+                float: left;
+                width: 125px; 
+                min-height: 90px; 
+            }
+            .article-image {
+                max-width: 320px; 
+                border: 1px solid black;      
+            }
+            .carousel-indicators {
+                display: none;
+                margin: 4px 0 0 0;
+                padding: 0px;
+                top: -1em;
+            }
+            .carousel-indicators .active {
+                margin: 0 1px 0 0;
+            }
+            .carousel-indicators li {
+                margin: 0 1px 0 0;
+            }
+            .carousel-caption {
+                padding: 0;
+                bottom: -.9em;
+                left: 0%;
+                right: 0%;
+                font-size: 9pt;
+                background: rgba(0, 0, 0, .2);
+            }
+            @media screen and (min-width: 768px) {
+                .carousel-caption {
+                    font-size: 11pt;
+                    bottom: -.7em;
+                }
+            }
+            .video-container {
+                position: relative;
+                padding-bottom: 56.25%;
+                padding-top: 30px; height: 0; overflow: hidden;
+            }
+            .video-container iframe,
+            .video-container object,
+            .video-container embed {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
 
-  <body ng-controller="appController">
+    <body ng-controller="appController">
 
-    <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand hidden-xs" href="#/sections">My Independent</a>
-          <a class="navbar-brand visible-xs" href="#/sections" ng-bind="state.title"
-             style="white-space: nowrap; width: 100%">My Independent</a>
-          <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button-->
+        <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand hidden-xs" href="#/sections">My Independent</a>
+                    <a class="navbar-brand visible-xs" href="#/sections" ng-bind="state.title"
+                       style="white-space: nowrap; width: 100%">My Independent</a>
+                    <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button-->
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Top</a></li>
+                        <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
+                        <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
+                        <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
+                        <li ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">Tech</a></li>
+                        <li ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
+                        <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
+                        <li ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
+                        <li ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
+                        <li ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Multimedia</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Top</a></li>
-            <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
-            <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
-            <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
-            <li ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">Tech</a></li>
-            <li ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
-            <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
-            <li ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
-            <li ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-            <li ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Multimedia</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
 
-    <div class="container ng-cloak" ui-view="pagecontent" autoscroll="true" ng-view ng-cloak>
-      <div class="row visible-xs">
-        <div class="col-lg-10">
-          <table class="table table-striped" style="width: 300px">
-            <tbody>
-              <tr ng-click="selected('top')">
-                <td class="section-link"><a href="#/section/Top">Top</a></td>
-              </tr>
-              <tr ng-click="selected('news')">
-                <td class="section-link"><a href="#/section/News">News</a></td>
-              </tr>
-              <tr ng-click="selected('sport')">
-                <td class="section-link"><a href="#/section/Sport">Sport</a></td>
-              </tr>
-              <tr ng-click="selected('business')">
-                <td class="section-link"><a href="#/section/Business">Business</a></td>
-              </tr>
-              <tr ng-click="selected('scitech')">
-                <td class="section-link"><a href="#/section/SciTech">SciTech</a></td>
-              </tr>
-              <tr ng-click="selected('motoring')">
-                <td class="section-link"><a href="#/section/Motoring">Motoring</a></td>
-              </tr>
-              <tr ng-click="selected('lifestyle')">
-                <td class="section-link"><a href="#/section/Lifestyle">Lifestyle</a></td>
-              </tr>
-              <tr ng-click="selected('tonight')">
-                <td class="section-link"><a href="#/section/Tonight">Tonight</a></td>
-              </tr>
-              <tr ng-click="selected('travel')">
-                <td class="section-link"><a href="#/section/Travel">Travel</a></td>
-              </tr>
-              <tr ng-click="selected('multimedia')">
-                <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
-              </tr>
-            </tbody>
-          </table>    
+        <div class="container ng-cloak" ui-view="pagecontent" autoscroll="true" ng-view ng-cloak>
+            <div class="row visible-xs">
+                <div class="col-lg-10">
+                    <table class="table table-striped" style="width: 300px">
+                        <tbody>
+                            <tr ng-click="selected('top')">
+                                <td class="section-link"><a href="#/section/Top">Top</a></td>
+                            </tr>
+                            <tr ng-click="selected('news')">
+                                <td class="section-link"><a href="#/section/News">News</a></td>
+                            </tr>
+                            <tr ng-click="selected('sport')">
+                                <td class="section-link"><a href="#/section/Sport">Sport</a></td>
+                            </tr>
+                            <tr ng-click="selected('business')">
+                                <td class="section-link"><a href="#/section/Business">Business</a></td>
+                            </tr>
+                            <tr ng-click="selected('scitech')">
+                                <td class="section-link"><a href="#/section/SciTech">SciTech</a></td>
+                            </tr>
+                            <tr ng-click="selected('motoring')">
+                                <td class="section-link"><a href="#/section/Motoring">Motoring</a></td>
+                            </tr>
+                            <tr ng-click="selected('lifestyle')">
+                                <td class="section-link"><a href="#/section/Lifestyle">Lifestyle</a></td>
+                            </tr>
+                            <tr ng-click="selected('tonight')">
+                                <td class="section-link"><a href="#/section/Tonight">Tonight</a></td>
+                            </tr>
+                            <tr ng-click="selected('travel')">
+                                <td class="section-link"><a href="#/section/Travel">Travel</a></td>
+                            </tr>
+                            <tr ng-click="selected('multimedia')">
+                                <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
+                            </tr>
+                        </tbody>
+                    </table>    
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-touch.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-route.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>    
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script> 
-    <!--script src="lib/offcanvas.js"></script-->
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <script>
-    var sections = {};    
-    </script>
-    <script src="app.js"></script>    
-    <!--link-->
-  </body>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-touch.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-route.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>    
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script> 
+        <!--script src="lib/offcanvas.js"></script-->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script>
+                                        var sections = {};
+        </script>
+        <script src="app.js"></script>    
+        <!--link-->
+    </body>
 </html>
