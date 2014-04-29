@@ -1,7 +1,7 @@
 <div class="row">
   <div class="video-container" ng-show="article.youtubeList.length > 0">
     <div ng-repeat="youtube in article.youtubeList">
-          <iframe width="{{youtube.width}}" height="{{youtube.height}}" 
+          <iframe width="560" height="315"
                   ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
     </div>
   </div>
