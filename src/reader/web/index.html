@@ -98,8 +98,8 @@
               body {
                 padding-top: 0px;
               }
-              .video-container {
-                border: 4px solid black;
+              .video-container iframe {
+                border: 4px solid white;
               }
             
         </style>
@@ -131,7 +131,8 @@
                         <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
                         <li ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
                         <li ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-                        <li ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Multimedia</a></li>
+                        <li ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
+                        <li ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
                     </ul>
                 </div>
             </div>
@@ -171,6 +172,9 @@
                             </tr>
                             <tr ng-click="selected('multimedia')">
                                 <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
+                            </tr>
+                            <tr ng-click="selected('videos)">
+                                <td class="section-link"><a href="#/section/Videos">Videos</a></td>
                             </tr>
                         </tbody>
                     </table>    
