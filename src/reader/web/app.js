@@ -1,7 +1,7 @@
 
 var articles = {};
 
-var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel", "Multimedia"];
+var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel", "Multimedia", "Videos"];
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
@@ -107,7 +107,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
 app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "$sce", "appService",
     function($scope, $location, $routeParams, $window, $sce, appService) {
         var jsonPath = "article/" + $routeParams.articleId + ".json";
-        //$sce.trustAsResourceUrl("http://www.youtube.com/embed/eH_WMLxmfA8");
+        //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;

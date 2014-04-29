@@ -38,6 +38,7 @@ public final class FeedsContext {
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
         //putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
+        putFeed("videos", "News Videos", "http://www.iol.co.za/cmlink/news-rss-multimedia-videos-feed-1.1152520");
         putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
         putFeed("news", "News", "http://www.iol.co.za/cmlink/1.640");
         putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
@@ -48,7 +49,6 @@ public final class FeedsContext {
         putFeed("travel", "Travel", "http://www.iol.co.za/cmlink/1.875733");
         putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
         putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");
-        //http://iol.co.za/cmlink/1.1539
         if (false) {
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-extended-1.628986");

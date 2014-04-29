@@ -218,7 +218,7 @@ public class ArticleTask implements Runnable {
 
     private boolean matchVideoId(Matcher matcher) {
         if (matcher.find()) {
-            youtubeItem.url = String.format("http://www.iol.co.za/embed/%s", matcher.group(1));
+            youtubeItem.url = String.format("http://www.youtube.com/embed/%s", matcher.group(1));
             youtubeList.add(youtubeItem);
             youtubeItem = null;
             return true;
