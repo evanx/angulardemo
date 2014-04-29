@@ -3,7 +3,7 @@
       <table class="table table-striped table-condensed">
       <tbody>
         <tr ng-repeat="article in articles track by $index" ng-click="selected(article)">
-          <td style="height: 150px">
+          <td style="">
             <div class="article-link">
               <a href="#/article/{{article.articleId}}">{{article.title}}</a>
             </div>
@@ -12,7 +12,7 @@
             </div>
              <div class="article-link-image-youtube" 
                   ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
-                <img width="190" ng-src="{{article.youtubeList[0].thumbnail}}">
+                <img width="125" ng-src="{{article.youtubeList[0].thumbnail}}">
             </div>
             <p class="article-lead">{{article.description}}</p>
           </td>
@@ -21,10 +21,10 @@
     </table>
     <hr>
     <div style="font-size: 10pt; margin-left: 8px; margin-bottom: 1em;" ng-show="section !== 'top'">
-      Read <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a>
+      <span>Read <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a></span>
     </div>
     <div style="font-size: 10pt; margin-left: 8px; margin-bottom: 1em;" ng-show="section == 'top'">
-      Read <a href="http://www.iol.co.za">IOL.co.za</a>
+      <span>Read <a href="http://www.iol.co.za">IOL.co.za</a></span>
     </div>
   </div>
 </div>
