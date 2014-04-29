@@ -10,6 +10,7 @@ public class YoutubeItem {
     String width;
     String height;
     String url;
+    String thumbnail;
 
     public YoutubeItem(String title) {
         this.title = title;
