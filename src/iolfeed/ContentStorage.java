@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 import vellum.jx.JMap;
 import vellum.util.Streams;
 
@@ -36,6 +38,7 @@ public class ContentStorage {
     public byte[] prefetchGzippedContent;
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
+    boolean evict = false;
     
     public void init() throws IOException {        
         prefetchFile = new File(storageDir, prefetchPath);
@@ -44,6 +47,13 @@ public class ContentStorage {
         loadContent("top/articles.json");
         loadContent("news/articles.json");
         buildPrefetchContent();
+        Signal.handle(new Signal("HUP"), new SignalHandler() {
+            @Override
+            public void handle(Signal signal) {
+                logger.info("signal {}", signal);
+                evict = true;
+            }
+        });
     }
     
     private void loadContent(String path) throws IOException {
@@ -55,6 +65,11 @@ public class ContentStorage {
     }
         
     public synchronized byte[] get(String key) {
+        if (evict) {
+            evict = false;
+            map.clear();
+            return null;
+        }
         return map.get(key);
     }
 
@@ -116,4 +131,5 @@ public class ContentStorage {
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);
     }    
+    
 }
