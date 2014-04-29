@@ -2,9 +2,9 @@
   <div class="col-lg-10" ng-show="sections.length > 0">
     <table class="table table-striped" style="width: 300px">
       <tbody>
-        <tr ng-repeat="section in sections" ng-click="selected(section)">
+        <tr ng-repeat="section in sections" ng-click="selected(section.name)">
           <td class="section-link">
-            <a href="#/section/{{section}}">{{section}}</a>
+            <a href="#/section/{{section.name}}">{{section.label}}</a>
           </td>
         </tr>
       </tbody>

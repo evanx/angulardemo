@@ -1,7 +1,52 @@
 
 var articles = {};
 
-var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel", "Multimedia", "Videos"];
+var sectionList = [
+    {
+        name: "Top",
+        label: "Top"
+    }, 
+    {
+        name: "News",
+        label: "News"
+    }, 
+    {
+        name: "Sport", 
+        label: "Sport"
+    }, 
+    {
+        name: "Business", 
+        label: "Business"
+    }, 
+    { 
+        name: "SciTech", 
+        label: "Science & Technology"
+    }, 
+    { 
+        name: "Motoring", 
+        label: "Motoring"
+    }, 
+    { 
+        name: "Lifestyle", 
+        label: "Lifestyle"
+    }, 
+    { 
+        name: "Tonight", 
+        label: "Tonight"
+    }, 
+    { 
+        name: "Travel", 
+        label: "Travel"
+    }, 
+    { 
+        name: "Multimedia", 
+        label: "Galleries"
+    }, 
+    { 
+        name: "Videos",
+        label: "Videos"
+    }
+];
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
