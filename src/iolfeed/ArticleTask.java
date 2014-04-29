@@ -40,7 +40,7 @@ public class ArticleTask implements Runnable {
     static final Pattern videoSizePattern = Pattern.compile(
             "\\s*<object width=\"([0-9]*)\" height=\"([0-9]*)\">");
     static final Pattern videoIdPattern = Pattern.compile(
-            "\\s*<param name=\"movie\" value=\"(\\w*)\"></param>");
+            "\\s*<param name=\"movie\" value=\"([^&]*).*\">");
     static final Pattern multimediaCaptionPattern = Pattern.compile(
             "\\s*<p class=\"multimedia_gal_captions\">([^<]*)");
     static final Pattern multimediaTimestampPattern = Pattern.compile(
@@ -50,6 +50,7 @@ public class ArticleTask implements Runnable {
     Throwable exception;
     String sourceArticleUrl;
     String sourceImageUrl;
+    String description;
     String articleId;
     String articlePath;
     String imagePath;
@@ -77,6 +78,7 @@ public class ArticleTask implements Runnable {
 
     public void init() throws JMapException {
         sourceArticleUrl = map.getString("link");
+        description = map.getString("description");
         articleId = sourceArticleUrl;
         int index = articleId.lastIndexOf("/");
         if (index > 0) {
@@ -169,10 +171,20 @@ public class ArticleTask implements Runnable {
                 } else {
                 }
             }
-            if (paragraphs.isEmpty()) {
-                if (multimediaCaption != null) {
+            if (multimediaCaption != null) {
+                if (paragraphs.isEmpty()) {
                     paragraphs.add(multimediaCaption);
                 }
+                if (description.isEmpty()) {
+                    description = multimediaCaption;
+                    map.put("description", description);
+                }
+            }
+            if (description.isEmpty()) {
+                throw new ArticleImportException("empty lead");
+            }
+            if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
+                throw new ArticleImportException("no content");
             }
             if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
                 throw new ArticleImportException("no content");

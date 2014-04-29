@@ -20,10 +20,10 @@ public final class FeedsContext {
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
-    long initialDelay = Millis.fromSeconds(30);
-    long period = Millis.fromMinutes(60);
-    long topInitialDelay = Millis.fromSeconds(15);
+    long topInitialDelay = Millis.fromSeconds(1);
     long topPeriod = Millis.fromMinutes(5);
+    long initialDelay = Millis.fromSeconds(15);
+    long period = Millis.fromMinutes(60);
     boolean refresh = false;
     long articleTaskTimeoutSeconds = 120;
     int articleTaskThreadPoolSize = 4;

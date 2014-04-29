@@ -74,11 +74,11 @@ public class VideoArticleTaskIntegrationTest {
     @Test
     public void parseVideoId() {
         Pattern videoIdPattern = Pattern.compile(
-            "\\s*<param name=\"movie\" value=\"(\\w*)\"></param>");
-        String line = " <param name=\"movie\" value=\"eH_WMLxmfA8\"></param> ";
+            "\\s*<param name=\"movie\" value=\"([^&]*).*\">");
+        String line = " <param name=\"movie\" value=\"IO3xDa1Hvcc&feature=youtu.be\"> ";
         Matcher matcher = videoIdPattern.matcher(line);
         Assert.assertTrue(matcher.find());
-        Assert.assertEquals("eH_WMLxmfA8", matcher.group(1));
+        Assert.assertEquals("IO3xDa1Hvcc", matcher.group(1));
     }
 
     @Test

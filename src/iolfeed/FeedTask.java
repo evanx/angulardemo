@@ -74,7 +74,9 @@ public class FeedTask extends Thread {
                 continue;
             }
             String description = FeedsUtil.cleanDescription(entry.getDescription().getValue());
-            if (!FeedsUtil.isText(description)) {
+            if (description.isEmpty()) {
+                logger.warn("empty lead {}", description, entry.getLink());
+            } else if (!FeedsUtil.isText(description)) {
                 logger.warn("invalid lead [{}] {}", description, entry.getLink());
                 continue;
             }
