@@ -69,6 +69,12 @@
         font-size: 9pt;
         background: rgba(0, 0, 0, .2);
       }
+      @media screen and (min-width: 768px) {
+        .carousel-caption {
+            font-size: 11pt;
+            bottom: -.7em;
+        }
+      }
     </style>
 </head>
 
@@ -98,6 +104,7 @@
             <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
             <li ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
             <li ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
+            <li ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Multimedia</a></li>
           </ul>
         </div>
       </div>
@@ -134,6 +141,9 @@
               </tr>
               <tr ng-click="selected('travel')">
                 <td class="section-link"><a href="#/section/Travel">Travel</a></td>
+              </tr>
+              <tr ng-click="selected('multimedia')">
+                <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
               </tr>
             </tbody>
           </table>    

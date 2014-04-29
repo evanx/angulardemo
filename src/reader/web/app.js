@@ -1,7 +1,7 @@
 
 var articles = {};
 
-var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel"];
+var sectionList = ["Top", "News", "Sport", "Business", "SciTech", "Motoring", "Lifestyle", "Tonight", "Travel", "Multimedia"];
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
