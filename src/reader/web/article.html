@@ -32,7 +32,10 @@
     <hr>
     <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
     </p>
-    <div class="addthis_toolbox addthis_default_style addthis_32x32_style"
+    <div style="font-size: 10pt; margin: 1em 0 1em 0;">
+      Read on <a href="{{article.link}}">IOL.co.za</a>
+    </div>
+    <div class="addthis_toolbox addthis_default_style addthis_32x32_style" style="display: none"
          addthis:title="{{article.title}}" addthis:url="http://chronica.co/#article/{{article.articleId}}">
       <a class="addthis_button_preferred_1"></a>
       <a class="addthis_button_preferred_2"></a>
@@ -40,9 +43,6 @@
       <a class="addthis_button_preferred_4"></a>
       <a class="addthis_button_compact"></a>
       <a class="addthis_counter addthis_bubble_style"></a>
-    </div>
-    <div style="font-size: 10pt; margin: 1em 0 1em 0;">
-      Read on <a href="{{article.link}}">IOL.co.za</a>
     </div>
   </div>
 </div>
