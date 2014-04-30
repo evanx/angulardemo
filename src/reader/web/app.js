@@ -149,16 +149,23 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         };
     }]);
 
-app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "$sce", "appService",
-    function($scope, $location, $routeParams, $window, $sce, appService) {
+app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "$sce", "$timeout", "appService",
+    function($scope, $location, $routeParams, $window, $sce, $timeout, appService) {
         var jsonPath = "article/" + $routeParams.articleId + ".json";
         //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
+        $scope.scheduleAddThis = function() {
+            $timeout(function() {
+                console.log("addthis", addthis);
+                addthis.toolbox(".addthis_toolbox");
+            }, 200);
+        };
         $scope.resultHandler = function(data) {
             console.log("articleResult", data);
             $scope.statusMessage = undefined;
             $scope.article = data;
             $scope.state.title = $scope.article.title;
             putArticle($scope.article);
+            $scope.scheduleAddThis();
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
@@ -167,6 +174,7 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
         if (articles[$routeParams.articleId]) {
             $scope.article = articles[$routeParams.articleId];
             $scope.state.title = $scope.article.title;
+            $scope.scheduleAddThis();
         } else {
             $scope.statusMessage = "Loading " + jsonPath;
             appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);

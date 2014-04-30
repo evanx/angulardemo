@@ -67,6 +67,8 @@ public class GitteryHandler implements HttpHandler {
                     }
                     return;
                 }
+            } else if (path.contains("undefined")) {
+                logger.warn("path {}", path);
             } else if (path.equals("/")) {
                 path = context.storage.defaultPath;
             } else if (path.startsWith("/")) {
