@@ -6,10 +6,11 @@
     </div>
     <hr>
   </div>
-  <div ng-show="article.imageList.length > 1" style="display: inline-block;">
+  <div ng-show="article.imageList.length > 1" 
+       style="display: inline-block; overflow: hidden; min-height: {{article.maxHeight}}px">
     <carousel interval="3000">
       <slide ng-repeat="slide in article.imageList" active="slide.active">
-        <img ng-src="{{slide.image}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
+        <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
         <div class="carousel-caption">
           <p>{{slide.text}}</p>
         </div>

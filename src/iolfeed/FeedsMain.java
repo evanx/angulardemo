@@ -1,5 +1,6 @@
 package iolfeed;
 
+import storage.ContentStorage;
 import org.apache.log4j.BasicConfigurator;
 import vellum.jx.JMap;
 

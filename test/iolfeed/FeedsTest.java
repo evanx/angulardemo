@@ -3,6 +3,7 @@
 
 package iolfeed;
 
+import storage.ContentStorage;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 import org.junit.After;

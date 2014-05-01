@@ -1,5 +1,6 @@
-package iolfeed;
+package storage;
 
+import storage.ContentStorage;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class PrefetchBuilder {
     ContentStorage storage;
     StringBuilder contentBuilder = new StringBuilder();
     String[] sections = {"top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel"};
-    int sectionLimit = 2;
+    int sectionLimit = 1;
     
     public PrefetchBuilder() {
     }
@@ -30,7 +31,7 @@ public class PrefetchBuilder {
         int sectionCount = 0;
         for (String section : sections) {
             String key = String.format("%s/articles.json", section);
-            byte[] content = storage.get(key);
+            byte[] content = storage.map.get(key);
             if (content != null) {
                 append(section, content);
             }

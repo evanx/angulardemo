@@ -3,6 +3,7 @@
 
 package iolfeed;
 
+import storage.ContentStorage;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.After;
 import org.junit.AfterClass;

@@ -1,6 +1,9 @@
 package iolfeed;
 
+import storage.ContentStorage;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
@@ -62,6 +66,8 @@ public class ArticleTask implements Runnable {
     String numDate;
     String multimediaCaption;
     String multimediaTimestamp;
+    Integer maxWidth;
+    Integer maxHeight;
     FeedsContext context = FeedsProvider.getContext();
     ContentStorage storage = FeedsProvider.getStorage();
     List<String> paragraphs = new ArrayList();
@@ -310,6 +316,12 @@ public class ArticleTask implements Runnable {
         map.put("imageCredit", imageCredit);
         map.put("imageCaption", imageCaption);
         loadImage();
+        if (maxWidth != null && maxWidth > 0) {
+            map.put("maxWidth", maxWidth);
+        }
+        if (maxHeight != null && maxHeight > 0) {
+            map.put("maxHeight", maxHeight);
+        }
         map.put("imagePath", imagePath);
         map.put("imageList", imageList);
         if (!youtubeList.isEmpty()) {
@@ -327,30 +339,43 @@ public class ArticleTask implements Runnable {
 
     private void loadImage() throws IOException {
         if (!imageList.isEmpty()) {
+            maxWidth = 0;
+            maxHeight = 0;
             for (ImageItem image : imageList) {
-                image.image = loadImage(image.source);
+                loadImage(image);
+                if (image.width != null && image.width > maxWidth) maxWidth = image.width;
+                if (image.height != null && image.height > maxHeight) maxHeight = image.height;
             }
-            imagePath = imageList.get(0).image;
+            imagePath = imageList.get(0).path;
             imageCaption = imageList.get(0).text;
         } else if (sourceImageUrl != null) {
-            imagePath = loadImage(sourceImageUrl);
+            imagePath = loadImage(new ImageItem(sourceImageUrl));
         }    
     }
 
-    private String loadImage(String sourceImageUrl) throws IOException {
-        sourceImageUrl = "http://www.iol.co.za" + sourceImageUrl;
-        String name = Streams.parseFileName(sourceImageUrl);
-        String path = numDate + "/image/" + name;
-        if (context.storage.containsKey(path)) {
-            logger.info("containsKey {} {}", path, sourceImageUrl);
+    private String loadImage(ImageItem image) throws IOException {
+        image.source = "http://www.iol.co.za" + image.source;
+        String name = Streams.parseFileName(image.source);
+        image.path = numDate + "/image/" + name;
+        byte[] content = context.storage.get(image.path);
+        if (content != null) {
+            logger.info("containsKey {}", image.path);
         } else {
-            byte[] content = Streams.readContent(sourceImageUrl);
-            logger.info("content {} {}", content.length, sourceImageUrl);
-            context.storage.putContent(path, content);
+            logger.info("loadImage {}", image.path);
+            content = Streams.readContent(image.source);
+            context.storage.putContent(image.path, content);
         }
-        context.storage.addLink(section, path);
-        return path;
+        BufferedImage img = ImageIO.read(new ByteArrayInputStream(content));
+        image.width = img.getWidth();
+        image.height = img.getHeight();
+        logger.info("loadImage {} {}", content.length, image);
+        if (image.width <= 0 || image.height <= 0) {
+            throw new IOException("invalid image size");
+        }
+        context.storage.addLink(section, image.path);
+        return image.path;
     }
+
     
     void postContent(String path, byte[] content) throws IOException {
         String localImageUrl = String.format("%s/%s", context.storage.contentUrl, path);

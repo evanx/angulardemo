@@ -84,8 +84,14 @@ app.controller("appController", ["$scope", "$location", "appService",
         $scope.userEmail = null;
         $scope.state.title = "My Independent";
         $scope.isActive = function(route) {
-            //console.log("isActive", route, $location.path());
             return route === $location.path();
+        };
+        $scope.personalize = function() {
+            console.log("personalize", $location.path());
+            if ($location.path().indexOf("/section/") === 0) {
+                return $location.path().substring(1);
+            }
+            return null;
         };
     }]);
 

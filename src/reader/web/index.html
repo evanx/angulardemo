@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="favicon.ico">
     <title>My Independent</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <!--link href="lib/bootstrap.min.css" rel="stylesheet"-->
     <!--link href="lib/offcanvas.css" rel="stylesheet"-->
     <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
@@ -83,7 +83,6 @@
         }
       }
       .video-container iframe {
-        background-color: black;
       }
       @media screen and (max-width: 560px) {
         .video-container {
@@ -101,7 +100,7 @@
           height: 100%;
         }
       }
-      @media only screen and (max-height: 400px) {
+      @media screen and (max-device-height: 400px) {
         .navbar {
           display: none;
         }
@@ -129,6 +128,9 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button-->
+            <div class="navbar-text hidden" ng-show="personalize()">
+              <a href="#/personalize/{{personalize()}}"><span class="glyphicon glyphicon-user"></span></a>
+            </div>
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -192,14 +194,14 @@
         </div>
       </div>
 
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-touch.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-route.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>    
-      <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script> 
-      <!--script src="lib/offcanvas.js"></script-->
-      <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+      <script src="/mirror/ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
+      <script src="/mirror/ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-touch.min.js"></script>
+      <script src="/mirror/ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-route.min.js"></script>
+      <script src="/mirror/ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>
+      <script src="/mirror/ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>    
+      <script src="/mirror/cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script> 
+      <!--script src="/mirror/offcanvas.js"></script-->
+      <script src="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
         var sections = {};
         var addthis_config = {"data_track_addressbar": true};
@@ -215,7 +217,7 @@
           }
         };
       </script>
-      <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script>    
+      <script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script>    
       <script src="app.js"></script>    
       <!--link-->
     </body>

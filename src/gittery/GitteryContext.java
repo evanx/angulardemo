@@ -1,6 +1,6 @@
 package gittery;
 
-import iolfeed.ContentStorage;
+import storage.ContentStorage;
 import vellum.util.Args;
 
 public class GitteryContext {

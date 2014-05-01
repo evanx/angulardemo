@@ -1,5 +1,6 @@
 package iolfeed;
 
+import storage.ContentStorage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

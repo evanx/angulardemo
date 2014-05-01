@@ -1,4 +1,4 @@
-package iolfeed;
+package storage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,6 +31,7 @@ public class ContentStorage {
     public String contentUrl = System.getProperty("storage.contentUrl", "http://chronica.co");
     public String storageDir = System.getProperty("storage.storageDir", "/home/evanx/angulardemo/storage");
     public String appDir = System.getProperty("storage.appDir", "/home/evanx/angulardemo/app");
+    public boolean isCaching = Boolean.getBoolean("storage.caching");
     public String defaultHtml;
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
@@ -61,7 +62,9 @@ public class ContentStorage {
     }
     
     public synchronized void put(String key, byte[] value) {
-        map.put(key, value);
+        if (isCaching || key.endsWith(".json")) {
+            map.put(key, value);
+        }        
     }
         
     public synchronized byte[] get(String key) {
@@ -70,7 +73,10 @@ public class ContentStorage {
             map.clear();
             return null;
         }
-        return map.get(key);
+        if (isCaching) {
+            return map.get(key);
+        }
+        return null;
     }
 
     public synchronized void buildPrefetchContent() throws IOException {

@@ -3,7 +3,7 @@ package reader.app;
 import gittery.GitteryContext;
 import iolfeed.FeedsTask;
 import gittery.GitteryServer;
-import iolfeed.ContentStorage;
+import storage.ContentStorage;
 import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import org.apache.log4j.BasicConfigurator;

@@ -1,5 +1,6 @@
 package iolfeed;
 
+import storage.ContentStorage;
 import vellum.provider.VellumProvider;
 
 /**
