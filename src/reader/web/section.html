@@ -7,7 +7,7 @@
             <div class="article-link">
               <a href="#/article/{{article.articleId}}">{{article.title}}</a>
             </div>
-             <div class="article-link-image" ng-show="article.imagePath">
+             <div ng-show="article.imagePath" class="article-link-image">
                 <img width="125" ng-src="{{article.imagePath}}">
             </div>
              <div class="article-link-image-youtube" 
