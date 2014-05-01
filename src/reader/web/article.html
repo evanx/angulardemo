@@ -7,7 +7,7 @@
     <p>{{article.description}}</p>
   </div>
   <div ng-show="article.imageList.length > 1" 
-       style="display: inline-block; overflow: hidden; min-height: {{article.maxHeight}}px">
+       style="display: inline-block; overflow: hidden; min-height: {{galleryHeight(article)}}px">
     <carousel interval="3000">
       <slide ng-repeat="slide in article.imageList" active="slide.active">
         <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
@@ -15,7 +15,8 @@
           <p>{{slide.text}}</p>
         </div>
       </slide>
-    </carousel>
+    </carousel>    
+    <!--p style="font-color: gray;">{{develInfo}}</p-->
   </div>
   <div class="col-lg-10">
     <div style="margin: 1em; float: right; max-width: 100%" 

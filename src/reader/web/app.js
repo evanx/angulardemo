@@ -87,7 +87,7 @@ app.controller("appController", ["$scope", "$location", "appService",
             return route === $location.path();
         };
         $scope.personalize = function() {
-            console.log("personalize", $location.path());
+            //console.log("personalize", $location.path());
             if ($location.path().indexOf("/section/") === 0) {
                 return $location.path().substring(1);
             }
@@ -155,10 +155,12 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
         };
     }]);
 
-app.controller("articleController", ["$scope", "$location", "$routeParams", "$window", "$sce", "$timeout", "appService",
-    function($scope, $location, $routeParams, $window, $sce, $timeout, appService) {
+app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
+    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
         var jsonPath = "article/" + $routeParams.articleId + ".json";
         //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
+        $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
+        console.log("article", $window);
         $scope.scheduleAddThis = function() {
             $timeout(function() {
                 console.log("addthis", addthis);
@@ -175,6 +177,12 @@ app.controller("articleController", ["$scope", "$location", "$routeParams", "$wi
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
+        };
+        $scope.galleryHeight = function(article) {
+            if ($window.innerWidth < article.maxWidth) {
+                return 4 + article.maxHeight*$window.innerWidth/article.maxWidth;
+            }
+            return article.maxHeight;
         };
         console.log("articleController", $routeParams.articleId, jsonPath);
         if (articles[$routeParams.articleId]) {
