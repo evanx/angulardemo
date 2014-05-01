@@ -181,7 +181,9 @@ public class GitteryHandler implements HttpHandler {
 
     private void setContentType() {
         he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
-        if (Streams.getContentType(path).startsWith("image/")) {
+        if (path.startsWith("mirror/")) {
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(Millis.fromDays(28)));
+        } else if (Streams.getContentType(path).startsWith("image/")) {
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(Millis.fromDays(3)));
         }
     }
