@@ -35,8 +35,7 @@
     <div ng-hide="article.youtubeList.length > 0 && article.paragraphs.length === 1">
       <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
       </p>
-      <hr>
-      <div style="font-size: 10pt; margin: 0; font-weight: bold;">
+      <div style="font-size: 10pt; margin: 0; font-weight: bold; border-top: 1px solid lightgray;">
         Read on <a href="{{article.link}}">IOL.co.za</a>
       </div>
     </div>
