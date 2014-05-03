@@ -67,8 +67,8 @@ public class FeedTask extends Thread {
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
         for (Object object : feed.getEntries()) {
             SyndEntryImpl entry = (SyndEntryImpl) object;
-            logger.info("title {}", entry.getTitle());
-            logger.info("title {}", FeedsUtil.cleanText(entry.getTitle()));
+            String title = FeedsUtil.cleanText(entry.getTitle());
+            logger.info("title {}", title);
             if (!FeedsUtil.isText(entry.getTitle())) {
                 logger.warn("invalid title {}", entry.getTitle());
                 continue;
@@ -82,7 +82,7 @@ public class FeedTask extends Thread {
             }
             JMap map = new JMap();
             map.put("section", section);
-            map.put("title", FeedsUtil.cleanText(entry.getTitle()));
+            map.put("title", title);
             map.put("description", description);
             if (entry.getPublishedDate() == null) {
                 entry.setPublishedDate(new Date());
@@ -117,7 +117,11 @@ public class FeedTask extends Thread {
     private boolean performTasks() {
         ExecutorService executorService = Executors.newFixedThreadPool(context.articleTaskThreadPoolSize);
         for (ArticleTask articleTask : articleTaskList) {
-            if (!articleTask.isCompleted()) {
+            if (articleTask.isCompleted()) {
+                if (articleTask.imagePath != null) {
+                    context.storage.addLink(section, articleTask.imagePath);
+                }
+            } else {
                 executorService.submit(articleTask);
             }
         }

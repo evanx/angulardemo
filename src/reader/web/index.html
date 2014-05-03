@@ -25,11 +25,11 @@
       footer {
         padding: 30px 0;
       }
-      .section-footer {
+      .view-footer {
         font-size: 10pt; 
         font-weight: bold;
-        margin-left: 8px; 
-        margin-bottom: 1em; 
+        margin-bottom: 8px; 
+        padding-top: 4px; 
         border-top: 1px solid lightgray;
       }
       .section-link {
@@ -108,7 +108,7 @@
           height: 100%;
         }
       }
-      @media screen and (max-height: 350px) {
+      @media screen and (max-height: 350px) and (max-width: 768px) {
         .navbar {
           display: none;
         }
@@ -142,15 +142,16 @@
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-              <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Top</a></li>
+              <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Frontpage</a></li>
               <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
               <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
               <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
+              <li ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">Tech</a></li>
               <li ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
               <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
-              <li ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
+              <li class="visible-lg" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
               <li class="visible-lg" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-              <li class="visible-lg" ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">Tech</a></li>
+              <li class="visible-lg" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
               <li class="visible-lg" ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
               <li class="visible-lg" ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
             </ul>
@@ -164,7 +165,7 @@
             <table class="table table-striped" style="width: 300px">
               <tbody>
                 <tr ng-click="selected('top')">
-                  <td class="section-link"><a href="#/section/Top">Top</a></td>
+                  <td class="section-link"><a href="#/section/Top">Frontpage</a></td>
                 </tr>
                 <tr ng-click="selected('news')">
                   <td class="section-link"><a href="#/section/News">News</a></td>

@@ -35,9 +35,9 @@
     <div ng-hide="article.youtubeList.length > 0 && article.paragraphs.length === 1">
       <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
       </p>
-      <div style="font-size: 10pt; margin: 0; font-weight: bold; border-top: 1px solid lightgray;">
-        Read on <a href="{{article.link}}">IOL.co.za</a>
-      </div>
+    </div>
+    <div class="view-footer">
+      Read on <a href="{{article.link}}">IOL.co.za</a>
     </div>
     <!--div class="addthis_toolbox addthis_default_style addthis_32x32_style" style="margin-bottom: 1em"
          addthis:title="{{article.title}}" addthis:url="http://chronica.co/#article/{{article.articleId}}">
@@ -55,6 +55,14 @@
       <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
       <a class="addthis_button_tweet"></a>
     </div>
-    <hr>
+    <div style="margin: 8px 0; padding-bottom: 4px; border-bottom: 2px solid lightgray;" 
+         ng-show="article.relatedArticleList">
+      <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
+      <div ng-repeat="relatedArticle in article.relatedArticleList track by $index" 
+           style="margin-bottom: .5em">
+        <a href="#/{{relatedArticle.path}}" 
+           style="font-weight: bold;">{{relatedArticle.title}}</a>
+      </div>
+    </div>
   </div>
 </div>

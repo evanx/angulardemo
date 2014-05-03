@@ -4,7 +4,7 @@ var articles = {};
 var sectionList = [
     {
         name: "Top",
-        label: "Top"
+        label: "Frontpage"
     }, 
     {
         name: "News",
@@ -37,6 +37,10 @@ var sectionList = [
     { 
         name: "Travel", 
         label: "Travel"
+    }, 
+    { 
+        name: "Backpage", 
+        label: "Backpage"
     }, 
     { 
         name: "Multimedia", 

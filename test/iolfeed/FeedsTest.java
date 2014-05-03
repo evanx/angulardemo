@@ -5,6 +5,7 @@ package iolfeed;
 
 import storage.ContentStorage;
 import java.text.ParseException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -56,6 +57,19 @@ public class FeedsTest {
         Assert.assertTrue(imageLinkPattern.matcher(line).find());
     }        
 
+    @Test
+    public void parseRelatedArticle() throws ParseException {
+        Pattern relatedArticlePattern
+            = Pattern.compile("^\\s*<li><a class=\"related_articles\" href=\"(.*)\">(.*)</a>");
+        String line = " <li><a class=\"related_articles\" href=\"http://www.iol.co.za/news/special-features/ministers-protecting-zuma-vents-malema-1.1682333\">Ministers protecting Zuma, vents Malema</a>";
+        Matcher matcher = relatedArticlePattern.matcher(line);
+        Assert.assertTrue(matcher.find());
+        Assert.assertEquals("http://www.iol.co.za/news/special-features/ministers-protecting-zuma-vents-malema-1.1682333", 
+                matcher.group(1));
+        Assert.assertEquals("Ministers protecting Zuma, vents Malema", 
+                matcher.group(2));
+    }        
+    
     @Test
     public void fixAccent() {
         Assert.assertEquals("euro", FeedsUtil.unicodeHtmlMap.get('€'));

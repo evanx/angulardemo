@@ -25,7 +25,6 @@ public final class FeedsContext {
     long topPeriod = Millis.fromMinutes(5);
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(60);
-    boolean refresh = false;
     long articleTaskTimeoutSeconds = 120;
     int articleTaskThreadPoolSize = 4;
     int retryCount = 4;
@@ -35,6 +34,7 @@ public final class FeedsContext {
     List<FeedEntity> feedEntityList = new ArrayList();
     ContentStorage storage;
     TaskManager taskManager;
+    int maxDepth = 3;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
@@ -50,6 +50,7 @@ public final class FeedsContext {
         putFeed("travel", "Travel", "http://www.iol.co.za/cmlink/1.875733");
         putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
         putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");
+        putFeed("backpage", "News Back Page", "http://www.iol.co.za/cmlink/news-back-page-extended-1.628990");
         if (false) {
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-extended-1.628986");

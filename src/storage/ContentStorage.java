@@ -32,6 +32,7 @@ public class ContentStorage {
     public String storageDir = System.getProperty("storage.storageDir", "/home/evanx/angulardemo/storage");
     public String appDir = System.getProperty("storage.appDir", "/home/evanx/angulardemo/app");
     public boolean isCaching = Boolean.getBoolean("storage.caching");
+    public boolean refresh = Boolean.getBoolean("storage.refresh");
     public String defaultHtml;
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
@@ -58,7 +59,10 @@ public class ContentStorage {
     }
     
     private void loadContent(String path) throws IOException {
-        map.put(path, Streams.readBytes(new File(storageDir, path)));
+        File file = new File(storageDir, path);
+        if (file.exists()) {
+            map.put(path, Streams.readBytes(file));
+        }
     }
     
     public synchronized void put(String key, byte[] value) {
