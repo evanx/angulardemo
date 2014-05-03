@@ -213,11 +213,8 @@ public class ArticleTask implements Runnable {
             if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
                 throw new ArticleImportException("no content");
             }
-            if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
-                throw new ArticleImportException("no content");
-            }
         }
-        logger.info("parseArticle {}", relatedArticleList.size());
+        logger.info("parseArticle {} {}", depth, relatedArticleList.size());
     }
 
     private boolean matchTimestamp(Matcher matcher) {
@@ -344,9 +341,9 @@ public class ArticleTask implements Runnable {
 
     private boolean matchParagraph(Matcher matcher) {
         if (matcher.find()) {
-            String paragraph = matcher.group(1);
-            if (paragraph.trim().length() > 0) {
-                paragraphs.add(FeedsUtil.cleanParagraph(paragraph));
+            String paragraph = FeedsUtil.cleanParagraph(matcher.group(1));
+            if (!paragraph.isEmpty()) {
+                paragraphs.add(paragraph);
             }
             return true;
         }
