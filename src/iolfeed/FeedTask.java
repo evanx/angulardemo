@@ -121,13 +121,18 @@ public class FeedTask extends Thread {
                 if (articleTask.imagePath != null) {
                     context.storage.addLink(section, articleTask.imagePath);
                 }
+            } else if (articleTask.currentThread != null) {
+                logger.error("articleTask running");
             } else {
                 executorService.submit(articleTask);
             }
         }
         executorService.shutdown();
         try {
-            return executorService.awaitTermination(context.articleTaskTimeoutSeconds, TimeUnit.SECONDS);
+            while (!executorService.awaitTermination(context.articleTaskTimeoutSeconds, TimeUnit.SECONDS)) {
+                logger.warn("executor awaitTermination {}s", context.articleTaskTimeoutSeconds);
+            }
+            return true;
         } catch (InterruptedException e) {
             logger.warn("performTasks: " + e.getMessage(), e);
             return false;

@@ -80,6 +80,7 @@ public class ArticleTask implements Runnable {
     String galleryCaption;
     YoutubeItem youtubeItem;
     int depth = 0;
+    Thread currentThread;
     
     ArticleTask(JMap map) {
         this.map = map;
@@ -124,6 +125,10 @@ public class ArticleTask implements Runnable {
     
     @Override
     public void run() {
+        if (currentThread != null) {
+            logger.error("currentThread: " + currentThread.getName());
+        }
+        currentThread = Thread.currentThread();
         try {
             if (!context.storage.refresh && context.storage.containsKey(articlePath)) {
                 logger.info("containsKey {}", articlePath);
@@ -149,13 +154,13 @@ public class ArticleTask implements Runnable {
         } catch (NullPointerException e) {
             logger.error("run", e);
         } catch (Throwable e) {
-            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
+            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()), e);
             exception = e;
         }
+        currentThread = null;
     }
 
     private void parseRelatedArticle() throws Exception {
-        List<ArticleTask> taskList = new ArrayList();
         List<RelatedArticleItem> parsedRelatedArticleList = new ArrayList();
         for (RelatedArticleItem item : relatedArticleList) {
             ArticleTask task = new ArticleTask(depth + 1, item);
