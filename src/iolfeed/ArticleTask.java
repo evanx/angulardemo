@@ -131,7 +131,7 @@ public class ArticleTask implements Runnable {
             } else {
                 clear();
                 parseArticle();
-                if (depth < context.maxDepth) {
+                if (relatedArticleList.size() > 0 && depth < context.maxDepth) {
                     parseRelatedArticle();
                 } else {
                     relatedArticleList.clear();
@@ -166,6 +166,7 @@ public class ArticleTask implements Runnable {
                 parsedRelatedArticleList.add(item);
             }
         }
+        logger.info("parseRelatedArticle {} {}", relatedArticleList.size(), parsedRelatedArticleList.size());
         relatedArticleList.clear();
         relatedArticleList.addAll(parsedRelatedArticleList);
     }
@@ -216,6 +217,7 @@ public class ArticleTask implements Runnable {
                 throw new ArticleImportException("no content");
             }
         }
+        logger.info("parseArticle {}", relatedArticleList.size());
     }
 
     private boolean matchTimestamp(Matcher matcher) {
@@ -352,7 +354,7 @@ public class ArticleTask implements Runnable {
     }
 
     private void store() throws IOException {
-        logger.info("store {}", depth);
+        logger.info("store {} {}", depth, relatedArticleList.size());
         map.put("articleId", articleId);
         map.put("articlePath", articlePath);
         map.put("paragraphs", paragraphs);
