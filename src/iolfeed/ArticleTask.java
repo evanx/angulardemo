@@ -223,7 +223,7 @@ public class ArticleTask implements Runnable {
                 }
             }
             if (description == null || description.isEmpty()) {
-                if (depth > 0) {
+                if (depth == 0) {
                     logger.warn("empty lead");
                 }
             }

@@ -71,6 +71,17 @@ public class FeedsTest {
     }        
     
     @Test
+    public void parseBylineTimestamp() throws ParseException {
+        Pattern bylineTimestampPattern 
+            = Pattern.compile("^\\s*(.* 20.* at .*\\w)\\s*<br/>");
+        String line = " April 29 2014 at 11:13am <br/>";
+        Matcher matcher = bylineTimestampPattern.matcher(line);
+        Assert.assertTrue(matcher.find());
+        Assert.assertEquals("April 29 2014 at 11:13am", 
+                matcher.group(1));
+    }
+    
+    @Test
     public void fixAccent() {
         Assert.assertEquals("euro", FeedsUtil.unicodeHtmlMap.get('€'));
         Assert.assertEquals("risqué", FeedsUtil.accentHtmlToUnicode("risqu&#233;"));

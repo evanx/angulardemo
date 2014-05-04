@@ -54,6 +54,15 @@ var sectionList = [
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
+function getSectionLabel(name) {
+    for (var i = 0; i < sectionList.length; i++) {
+        if (sectionList[i].name === name) {
+            return sectionList[i].label;
+        }
+        return name;
+    }
+}
+
 function putArticles(articles) {
     for (var i = 0; i < articles.length; i++) {
         putArticle(articles[i]);
@@ -131,7 +140,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
     function($scope, $location, $routeParams, $window, appService) {
         $scope.section = $routeParams.section.toLowerCase();
         console.log("sectionController", $scope.section);
-        $scope.state.title = $routeParams.section;
+        $scope.state.title = getSectionLabel($routeParams.section);
         var jsonPath = $scope.section + "/articles.json";
         $scope.resultHandler = function(data) {
             $scope.statusMessage = undefined;
