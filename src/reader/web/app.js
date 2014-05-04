@@ -175,6 +175,21 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
         $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
         console.log("article", $window);
         $scope.addThisVisible = false;
+        $scope.galleryStyle = "";
+        $scope.setStyle = function() {
+            if ($scope.article.maxHeight) {
+                var height = $scope.article.maxHeight;
+                if ($window.innerWidth < $scope.article.maxWidth) {
+                    height = ($scope.article.maxHeight * $window.innerWidth / $scope.article.maxWidth);
+                }
+                $scope.galleryStyle = { 
+                    "display": "inline-block",
+                    "overflow": "hidden",
+                    "min-height": "" + height + "px"
+                };
+            }
+            console.log("galleryStyle", $scope.galleryStyle);
+        };
         $scope.scheduleAddThis = function() {
             $timeout(function() {
                 console.log("addthis", addthis);
@@ -186,23 +201,13 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
             console.log("articleResult", data);
             $scope.statusMessage = undefined;
             $scope.article = data;
+            $scope.setStyle();
             $scope.state.title = $scope.article.title;
             putArticle($scope.article);
             $scope.scheduleAddThis();
         };
         $scope.errorHandler = function() {
             $scope.statusMessage = undefined;
-        };
-        $scope.galleryHeight = function(article) {
-            if (article.maxWidth) {
-                if ($window.innerWidth < article.maxWidth) {
-                    var width = 4 + article.maxHeight * $window.innerWidth / article.maxWidth;
-                    return "" + width + "px";
-                }
-                return "" + article.maxHeight + "px";
-            } else {
-                return "100%";
-            }
         };
         console.log("articleController", $routeParams.articleId, jsonPath);
         if (articles[$routeParams.articleId]) {

@@ -26,7 +26,7 @@ public final class FeedsContext {
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(60);
     int maxDepth = 6;
-    long articleTaskTimeoutSeconds = 600;
+    long articleTaskTimeoutSeconds = 1200;
     int articleTaskThreadPoolSize = 4;
     int retryCount = 4;
     boolean once = false;
