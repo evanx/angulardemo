@@ -5,10 +5,12 @@
         <iframe width="560" height="315"
                 ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
       </div>
+    </div>
+    <div class="video-container" ng-show="article.youtubeList.length > 0">
       <p>{{article.description}}</p>
     </div>
     <div ng-show="article.imageList.length > 1" 
-         ng-style="display: inline-block; min-height: {{galleryHeight(article)}}">
+         style="display: inline-block; min-height: {{galleryHeight(article)}}">
       <carousel interval="3000">
         <slide ng-repeat="slide in article.imageList" active="slide.active">
           <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
@@ -51,23 +53,7 @@
 </div>
 <div class="row" ng-cloak>
   <div class="col-lg-8">
-    <div class="view-footer" ng-show="article.link">
-      <p>Read on <a href="{{article.link}}">IOL.co.za</a></p>
-    </div>
-    <!--div class="addthis_toolbox addthis_default_style addthis_32x32_style" style="margin-bottom: 1em"
-         addthis:title="{{article.title}}" addthis:url="http://chronica.co/#article/{{article.articleId}}">
-      <a class="addthis_button_twitter"></a>
-      <a class="addthis_button_facebook"></a>
-      <a class="addthis_button_gmail"></a>
-      <a class="addthis_button_google_plusone_share"></a>
-      <a class="addthis_button_compact"></a>
-      <a class="addthis_counter addthis_bubble_style"></a>
-    </div-->
-  </div>
-</div>
-<div class="row" ng-cloak>
-  <div class="col-lg-8">
-    <div style="margin: .5em 0; padding-bottom: 4px; border-bottom: 2px solid lightgray; clear: left;" 
+    <div style="" 
          ng-show="article.relatedArticleList">
       <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
       <div ng-repeat="relatedArticle in article.relatedArticleList track by $index" 
@@ -75,6 +61,13 @@
         <a href="#/{{relatedArticle.path}}" 
            style="font-weight: bold;">{{relatedArticle.title}}</a>
       </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-cloak>
+  <div class="col-lg-8">
+    <div class="view-footer" ng-show="article.link">
+      <p>Read on <a href="{{article.link}}">IOL.co.za</a></p>
     </div>
   </div>
 </div>
