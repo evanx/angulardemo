@@ -96,19 +96,29 @@ public class ArticleTask implements Runnable {
         map.put("title", storyItem.title);
     }
     
-    public void init() throws JMapException {
+    public void init() throws JMapException, FeedException {
         sourceArticleUrl = map.getString("link");
-        int index = sourceArticleUrl.lastIndexOf("/");
-        if (index > 0) {
-            articleId = sourceArticleUrl.substring(index + 1);
-            index = articleId.lastIndexOf("-");
-            if (index > 0) {
-                articleId = articleId.substring(0, index);
-            }
-        }
+        articleId = parseArticleId(sourceArticleUrl);
         logger = LoggerFactory.getLogger(String.format("ArticleTask.%s", articleId));
-        articlePath = String.format("article/%s.json", articleId);
+        articlePath = formatArticlePath(articleId);
         // todo category from source link
+    }
+
+    private static String formatArticlePath(String id) {
+        return String.format("article/%s.json", id);
+    }
+    
+    private static String parseArticleId(String source) throws FeedException {
+        int index = source.lastIndexOf("/");
+        if (index > 0) {
+            String id = source.substring(index + 1);
+            index = id.lastIndexOf("-");
+            if (index > 0) {
+                id = id.substring(0, index);
+            }
+            return id;
+        }
+        throw new FeedException("Invalid link: " + source);
     }
 
     public boolean isRetry() {
@@ -166,12 +176,17 @@ public class ArticleTask implements Runnable {
     private void parseRelatedArticle() throws Exception {
         List<RelatedArticleItem> parsedRelatedArticleList = new ArrayList();
         for (RelatedArticleItem item : relatedArticleList) {
-            ArticleTask task = new ArticleTask(depth + 1, item);
-            task.init();
-            task.run();
-            if (task.isCompleted()) {
-                item.path = String.format("article/%s", task.articleId);    
+            item.path = formatArticlePath(parseArticleId(item.source));
+            if (!context.storage.refresh && context.storage.exists(item.path)) {
+                logger.info("relatedArticlePath exists {}", item.path);
                 parsedRelatedArticleList.add(item);
+            } else {
+                ArticleTask task = new ArticleTask(depth + 1, item);
+                task.init();
+                task.run();
+                if (task.isCompleted()) {
+                    parsedRelatedArticleList.add(item);
+                }
             }
         }
         logger.info("parseRelatedArticle {} {}", relatedArticleList.size(), parsedRelatedArticleList.size());
