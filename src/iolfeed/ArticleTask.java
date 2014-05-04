@@ -176,9 +176,11 @@ public class ArticleTask implements Runnable {
     private void parseRelatedArticle() throws Exception {
         List<RelatedArticleItem> parsedRelatedArticleList = new ArrayList();
         for (RelatedArticleItem item : relatedArticleList) {
-            item.path = formatArticlePath(parseArticleId(item.source));
-            if (!context.storage.refresh && context.storage.exists(item.path)) {
-                logger.info("relatedArticlePath exists {}", item.path);
+            String id = parseArticleId(item.source);
+            item.path = String.format("article/%s", id);
+            String jsonPath = String.format("article/%s.json", id);
+            if (!context.storage.refresh && context.storage.exists(jsonPath)) {
+                logger.info("relatedArticlePath exists {}", jsonPath);
                 parsedRelatedArticleList.add(item);
             } else {
                 ArticleTask task = new ArticleTask(depth + 1, item);
