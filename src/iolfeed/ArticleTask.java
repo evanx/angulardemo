@@ -213,7 +213,9 @@ public class ArticleTask implements Runnable {
                 }
             }
             if (description == null || description.isEmpty()) {
-                logger.warn("empty lead");
+                if (depth > 0) {
+                    logger.warn("empty lead");
+                }
             }
             if (paragraphs.isEmpty() && youtubeList.isEmpty() && imageList.isEmpty()) {
                 throw new ArticleImportException("no content");
@@ -224,9 +226,12 @@ public class ArticleTask implements Runnable {
 
     private boolean matchTimestamp(Matcher matcher) {
         if (matcher.find()) {
-            String string = matcher.group(1);
+            String string = matcher.group(1).trim();
             if (string.contains(" 20")) {
                 timestampLabel = string;
+                if (depth > 0) {
+                    map.put("pubDate", timestampLabel);
+                }
             }
             return true;
         }

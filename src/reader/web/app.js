@@ -165,10 +165,12 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
         //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
         $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
         console.log("article", $window);
+        $scope.addThisVisible = false;
         $scope.scheduleAddThis = function() {
             $timeout(function() {
                 console.log("addthis", addthis);
                 addthis.toolbox(".addthis_toolbox");
+                $scope.addThisVisible = true;
             }, 200);
         };
         $scope.resultHandler = function(data) {

@@ -25,7 +25,8 @@ public final class FeedsContext {
     long topPeriod = Millis.fromMinutes(5);
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(60);
-    long articleTaskTimeoutSeconds = 300;
+    int maxDepth = 6;
+    long articleTaskTimeoutSeconds = 600;
     int articleTaskThreadPoolSize = 4;
     int retryCount = 4;
     boolean once = false;
@@ -34,7 +35,6 @@ public final class FeedsContext {
     List<FeedEntity> feedEntityList = new ArrayList();
     ContentStorage storage;
     TaskManager taskManager;
-    int maxDepth = 3;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
