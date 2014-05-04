@@ -27,8 +27,11 @@ import vellum.util.Streams;
 public class ArticleTask implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(ArticleTask.class);
-    static final Pattern timestampPattern
-            = Pattern.compile("^\\s*<p class=\"byline\">([^<]*)");
+    
+    static final Pattern bylinePattern
+            = Pattern.compile("^\\s*<p class=\"byline\">");
+    static final Pattern bylineTimestampPattern 
+            = Pattern.compile("^\\s*(.* 20.* at .*\\w)\\s*<br/>");
     static final Pattern relatedArticlePattern
             = Pattern.compile("^\\s*<li><a class=\"related_articles\" href=\"(.*)\">(.*)</a>");
     static final Pattern imageLinkPattern
@@ -64,7 +67,6 @@ public class ArticleTask implements Runnable {
     String imageCredit;
     String imageCaption;
     String originalSection;
-    String timestampLabel;
     String multimediaCaption;
     String multimediaTimestamp;
     Integer maxWidth;
@@ -81,6 +83,7 @@ public class ArticleTask implements Runnable {
     YoutubeItem youtubeItem;
     int depth = 0;
     Thread currentThread;
+    boolean byline;
     
     ArticleTask(JMap map) {
         this.map = map;
@@ -186,7 +189,14 @@ public class ArticleTask implements Runnable {
                 if (line == null) {
                     break;
                 }
-                if (matchTimestamp(timestampPattern.matcher(line))) {
+                if (byline) {
+                    byline = false;
+                    if (matchTimestamp(bylineTimestampPattern.matcher(line))) {
+                        continue;
+                    }                    
+                }
+                if (bylinePattern.matcher(line).matches()) {
+                    byline = true;
                 } else if (matchRelatedArticle(relatedArticlePattern.matcher(line))) {
                 } else if (matchParagraph(paragraphPattern.matcher(line))) {
                 } else if (matchMultimediaCaption(multimediaCaptionPattern.matcher(line))) {
@@ -226,14 +236,12 @@ public class ArticleTask implements Runnable {
 
     private boolean matchTimestamp(Matcher matcher) {
         if (matcher.find()) {
-            String string = matcher.group(1).trim();
-            if (string.contains(" 20")) {
-                timestampLabel = string;
-                if (depth > 0) {
-                    map.put("pubDate", timestampLabel);
-                }
+            String string = matcher.group(1);
+            logger.info("parseTimestamp {}", string);
+            if (depth > 0) {
+                map.put("pubDate", string);
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -376,9 +384,6 @@ public class ArticleTask implements Runnable {
         }
         map.put("imagePath", imagePath);
         map.put("imageList", imageList);
-        if (timestampLabel != null) {
-            map.put("timestampLabel", timestampLabel);
-        }
         if (!relatedArticleList.isEmpty()) {
             map.put("relatedArticleList", relatedArticleList);
         }

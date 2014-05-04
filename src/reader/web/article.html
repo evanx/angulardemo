@@ -1,24 +1,24 @@
-<div class="row">
-  <div class="video-container" ng-show="article.youtubeList.length > 0">
-    <div ng-repeat="youtube in article.youtubeList">
-          <iframe width="560" height="315"
-            ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+<div class="row" ng-cloak>
+  <div class="col-lg-8">
+    <div class="video-container" ng-show="article.youtubeList.length > 0">
+      <div ng-repeat="youtube in article.youtubeList">
+        <iframe width="560" height="315"
+                ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+      </div>
+      <p>{{article.description}}</p>
     </div>
-    <p>{{article.description}}</p>
-  </div>
-  <div ng-show="article.imageList.length > 1" 
-       style="display: inline-block; overflow: hidden; min-height: {{galleryHeight(article)}}px">
-    <carousel interval="3000">
-      <slide ng-repeat="slide in article.imageList" active="slide.active">
-        <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
-        <div class="carousel-caption">
-          <p>{{slide.text}}</p>
-        </div>
-      </slide>
-    </carousel>    
-    <!--p style="font-color: gray;">{{develInfo}}</p-->
-  </div>
-  <div class="col-lg-10">
+    <div ng-show="article.imageList.length > 1" 
+         ng-style="display: inline-block; min-height: {{galleryHeight(article)}}">
+      <carousel interval="3000">
+        <slide ng-repeat="slide in article.imageList" active="slide.active">
+          <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
+          <div class="carousel-caption">
+            <p>{{slide.text}}</p>
+          </div>
+        </slide>
+      </carousel>    
+      <!--p style="font-color: gray;">{{develInfo}}</p-->
+    </div>
     <div style="margin: 1em; float: right; max-width: 100%" 
          ng-hide="!article.imagePath || article.imageList.length > 1">
       <img ng-src="{{article.imagePath}}" 
@@ -31,11 +31,26 @@
     <h4 style="display: inline-block; min-width: 200px; font-weight: bold;">
       <a href="{{article.link}}">{{article.title}}</a>
     </h4>
-    <h6 ng-show="article.link"><a href="{{article.link}}">IOL.co.za</a> {{article.pubDate}}</h6>
+    <h6 ng-show="article.link">{{article.pubDate}} <a href="{{article.link}}">IOL.co.za</a></h6>
     <div ng-hide="article.youtubeList.length > 0 && article.paragraphs.length === 1">
       <p ng-repeat="paragraph in article.paragraphs track by $index" ng-bind-html="paragraph">
       </p>
     </div>
+  </div>
+</div>
+<div class="row" ng-cloak style="min-height: 20px;">
+  <div class="col-lg-8" style="">
+    <div class="addthis_toolbox addthis_default_style" ng-show="addThisVisible"
+         style=""
+         addthis:title="{{article.title}}" addthis:url="{{article.link}}">
+      <a class="addthis_counter addthis_pill_style"></a>
+      <!--a class="addthis_button_facebook_like" fb:like:layout="button_count"></a-->
+      <a class="addthis_button_tweet"></a>
+    </div>
+  </div>
+</div>
+<div class="row" ng-cloak>
+  <div class="col-lg-8">
     <div class="view-footer" ng-show="article.link">
       <p>Read on <a href="{{article.link}}">IOL.co.za</a></p>
     </div>
@@ -48,14 +63,11 @@
       <a class="addthis_button_compact"></a>
       <a class="addthis_counter addthis_bubble_style"></a>
     </div-->
-    <div class="addthis_toolbox addthis_default_style" 
-         style="margin: 1em 0; max-width: 90%; max-width: 600px;" ng-show="addThisVisible"
-         addthis:title="{{article.title}}" addthis:url="{{article.link}}">
-      <a class="addthis_counter addthis_pill_style"></a>
-      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
-      <a class="addthis_button_tweet"></a>
-    </div>
-    <div style="margin: 8px 0; padding-bottom: 4px; border-bottom: 2px solid lightgray;" 
+  </div>
+</div>
+<div class="row" ng-cloak>
+  <div class="col-lg-8">
+    <div style="margin: .5em 0; padding-bottom: 4px; border-bottom: 2px solid lightgray; clear: left;" 
          ng-show="article.relatedArticleList">
       <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
       <div ng-repeat="relatedArticle in article.relatedArticleList track by $index" 

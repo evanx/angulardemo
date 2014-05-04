@@ -185,10 +185,15 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
             $scope.statusMessage = undefined;
         };
         $scope.galleryHeight = function(article) {
-            if ($window.innerWidth < article.maxWidth) {
-                return 4 + article.maxHeight*$window.innerWidth/article.maxWidth;
+            if (article.maxWidth) {
+                if ($window.innerWidth < article.maxWidth) {
+                    var width = 4 + article.maxHeight * $window.innerWidth / article.maxWidth;
+                    return "" + width + "px";
+                }
+                return "" + article.maxHeight + "px";
+            } else {
+                return "100%";
             }
-            return article.maxHeight;
         };
         console.log("articleController", $routeParams.articleId, jsonPath);
         if (articles[$routeParams.articleId]) {
