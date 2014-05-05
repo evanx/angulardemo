@@ -59,8 +59,14 @@ public class FeedTaskIntegrationTest {
     }
     
     private void perform(String section) throws Exception {
-        new FeedTask(feedsContext).start(section, 
-                feedsContext.feedMap.get(section), feedsContext.articleCount);
+        String feedUrl = feedsContext.feedMap.get(section);
+        logger.info("feedUrl {}", feedUrl);
+        FeedTask feedTask = new FeedTask(feedsContext);
+        feedTask.start(section, feedUrl, feedsContext.articleCount);
+        feedTask.join();
+        for (ArticleTask articleTask : feedTask.articleTaskList) {
+            logger.info("article {} {}", articleTask.completed, articleTask.articleId);
+        }
     }
     
 }
