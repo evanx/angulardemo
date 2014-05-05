@@ -65,6 +65,7 @@ public class FeedTask extends Thread {
         logger.info("feedUrl {}", feedUrl);
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(new XmlReader(new URL(feedUrl)));
+        logger.info("entries {} {}", feedUrl, feed.getEntries().size());
         for (Object object : feed.getEntries()) {
             SyndEntryImpl entry = (SyndEntryImpl) object;
             String title = FeedsUtil.cleanText(entry.getTitle());

@@ -52,7 +52,7 @@ public final class FeedsContext {
         putFeed("motoring", "Motoring", "http://www.iol.co.za/cmlink/1.746734");
         putFeed("sport", "Sport", "http://www.iol.co.za/cmlink/sport-category-rss-1.704");
         putFeed("business", "Business", "http://www.iol.co.za/cmlink/1.730910");
-        putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/science-technology-business-rss-1.847516");
+        putFeed("scitech", "SciTech", "http://www.iol.co.za/cmlink/1.847476");
         putFeed("lifestyle", "Lifestyle", "http://www.iol.co.za/cmlink/1.999916");
         putFeed("travel", "Travel", "http://www.iol.co.za/cmlink/1.875733");
         putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
