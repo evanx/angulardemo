@@ -15,8 +15,9 @@ import vellum.jx.JMap;
  * @author evanx
  */
 public final class FeedsContext {
+
     static Logger logger = LoggerFactory.getLogger(FeedsContext.class);
-    
+
     String defaultHtml;
     String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
@@ -26,6 +27,7 @@ public final class FeedsContext {
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(60);
     int maxDepth = 6;
+    int maxDepthExtended = 9;
     long articleTaskTimeoutSeconds = 3600;
     int articleTaskThreadPoolSize = 4;
     int retryCount = 4;
@@ -35,7 +37,7 @@ public final class FeedsContext {
     List<FeedEntity> feedEntityList = new ArrayList();
     ContentStorage storage;
     TaskManager taskManager;
-    
+
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
         //putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
@@ -74,13 +76,16 @@ public final class FeedsContext {
             putFeed("sport/golf", "Sport Golf", "http://www.iol.co.za/cmlink/sport-golf-extended-1.679220");
         }
     }
-    
+
     void putFeed(String id, String label, String url) {
         FeedEntity feedEntity = new FeedEntity(id, label, url);
         feedEntityList.add(feedEntity);
-        feedMap.put(id, url);       
-    }    
+        feedMap.put(id, url);
+    }
 
     public void init() {
-    }           
+        if (!storage.refresh) {
+            maxDepth = maxDepthExtended;
+        }
+    }
 }
