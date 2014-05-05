@@ -22,7 +22,7 @@ public class ReaderMain {
             ContentStorage contentStorage = new ContentStorage();
             contentStorage.init();
             TaskManager taskManager = new TaskManager();
-            JMap feedsProperties = new JMap();
+            JMap feedsProperties = new JMap(System.getProperties());
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
             feedsContext.init();
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html",

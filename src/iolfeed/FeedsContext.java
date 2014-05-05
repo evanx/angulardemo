@@ -27,7 +27,6 @@ public final class FeedsContext {
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(60);
     int maxDepth = 6;
-    int maxDepthExtended = 9;
     long articleTaskTimeoutSeconds = 3600;
     int articleTaskThreadPoolSize = 4;
     int retryCount = 4;
@@ -37,9 +36,15 @@ public final class FeedsContext {
     List<FeedEntity> feedEntityList = new ArrayList();
     ContentStorage storage;
     TaskManager taskManager;
-
+    JMap properties;
+    
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
+        this.properties = properties;
+        putFeed();
+    }
+    
+    private void putFeed() {
         //putFeed("lxer", "LXer", "http://lxer.com/module/newswire/headlines.rdf");
         putFeed("videos", "News Videos", "http://www.iol.co.za/cmlink/news-rss-multimedia-videos-feed-1.1152520");
         putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
@@ -84,8 +89,6 @@ public final class FeedsContext {
     }
 
     public void init() {
-        if (!storage.refresh) {
-            maxDepth = maxDepthExtended;
-        }
+        maxDepth = properties.getInt("maxDepth", maxDepth);
     }
 }

@@ -69,8 +69,4 @@ public class ArticleTaskIntegrationTest {
         logger.info("imagePath {}", articleTask.imagePath);
         Assert.assertTrue(articleTask.imageList.size() == 4);
     }
-
-    
-    
-    
 }
