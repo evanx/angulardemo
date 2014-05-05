@@ -26,12 +26,12 @@ public class ReaderMain {
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web");
+            gitteryContext.init();
+            new GitteryServer().start(gitteryContext);
             VellumProvider.provider.put(feedsContext);
             VellumProvider.provider.put(contentStorage);
             VellumProvider.provider.put(gitteryContext);
             feedsContext.init();
-            gitteryContext.init();
-            new GitteryServer().start(gitteryContext);
             new FeedsTask().start(feedsContext);
         } catch (Exception e) {
             e.printStackTrace(System.err);
