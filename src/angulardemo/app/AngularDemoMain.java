@@ -16,23 +16,24 @@ import vellum.jx.JMap;
  * @author evanx
  */
 public class AngularDemoMain {
+
     static Logger logger = LoggerFactory.getLogger(AngularDemoMain.class);
 
     public void start() throws Exception {
     }
-    
+
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            new GitteryServer().start(new GitteryContext(
-                    new ContentStorage(), "angulardemo/web", "index.html",
+            ContentStorage storage = new ContentStorage(new JMap("storage", System.getProperties()));
+            new GitteryServer().start(new GitteryContext(storage,
+                    "angulardemo/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web"));
-            JMap feedsProperties = new JMap();
-            new FeedsTask().start(new FeedsContext(new TaskManager(), new ContentStorage(), feedsProperties));
+            new FeedsTask().start(new FeedsContext(new TaskManager(), storage,
+                    new JMap("feeds", System.getProperties())));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
     }
-    
-    
+
 }

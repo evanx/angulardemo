@@ -23,7 +23,7 @@ import vellum.provider.VellumProvider;
 public class ArticleTaskIntegrationTest {
 
     Logger logger = LoggerFactory.getLogger(ArticleTaskIntegrationTest.class);
-    ContentStorage contentStorage = new ContentStorage();
+    ContentStorage contentStorage = new ContentStorage(new JMap("storage", System.getProperties()));
     TaskManager taskManager = new TaskManager();
     JMap feedsProperties = new JMap();
     FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);

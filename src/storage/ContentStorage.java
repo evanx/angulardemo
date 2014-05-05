@@ -28,11 +28,11 @@ public class ContentStorage {
     Map<String, byte[]> map = new HashMap();
     Map<String, JMap> jsonMap = new HashMap();
     
-    public String contentUrl = System.getProperty("storage.contentUrl", "http://chronica.co");
-    public String storageDir = System.getProperty("storage.storageDir", "/home/evanx/angulardemo/storage");
-    public String appDir = System.getProperty("storage.appDir", "/home/evanx/angulardemo/app");
-    public boolean isCaching = Boolean.getBoolean("storage.caching");
-    public boolean refresh = Boolean.getBoolean("storage.refresh");
+    public String contentUrl;
+    public String storageDir;
+    public String appDir;
+    public boolean isCaching;
+    public boolean refresh;
     public String defaultHtml;
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
@@ -41,6 +41,14 @@ public class ContentStorage {
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
+
+    public ContentStorage(JMap properties) {
+        contentUrl = properties.getString("contentUrl", "http://chronica.co");
+        storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
+        appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
+        isCaching = properties.getBoolean("storage.caching", false);
+        refresh = properties.getBoolean("storage.refresh", false);        
+    }
     
     public void init() throws IOException {        
         prefetchFile = new File(storageDir, prefetchPath);

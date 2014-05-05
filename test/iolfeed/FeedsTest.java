@@ -21,8 +21,9 @@ import vellum.jx.JMap;
  */
 public class FeedsTest {
 
-    JMap feedsProperties = new JMap();
-    FeedsContext context = new FeedsContext(new TaskManager(), new ContentStorage(), feedsProperties);
+    FeedsContext context = new FeedsContext(new TaskManager(), new ContentStorage(
+            new JMap("storage", System.getProperties())), 
+            new JMap("feeds", System.getProperties()));
 
     public FeedsTest() {
     }

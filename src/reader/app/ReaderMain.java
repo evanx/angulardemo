@@ -19,10 +19,10 @@ public class ReaderMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            ContentStorage contentStorage = new ContentStorage();
+            ContentStorage contentStorage = new ContentStorage(new JMap("storage", System.getProperties()));
             contentStorage.init();
             TaskManager taskManager = new TaskManager();
-            JMap feedsProperties = new JMap(System.getProperties());
+            JMap feedsProperties = new JMap("feeds", System.getProperties());
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
             feedsContext.init();
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html",
