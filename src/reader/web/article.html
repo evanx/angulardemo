@@ -6,7 +6,7 @@
                 ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
       </div>
     </div>
-    <div class="col-lg-8" ng-show="article.youtubeList.length > 0">
+    <div ng-show="article.youtubeList.length > 0" style="margin: 0 .5em; max-width: 550px">
       <p>{{article.description}}</p>
     </div>
     <div ng-show="article.imageList.length > 1" ng-style="galleryStyle">
