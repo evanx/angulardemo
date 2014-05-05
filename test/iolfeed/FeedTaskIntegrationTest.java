@@ -4,6 +4,7 @@
 package iolfeed;
 
 import java.io.IOException;
+import junit.framework.Assert;
 import storage.ContentStorage;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.After;
@@ -67,6 +68,7 @@ public class FeedTaskIntegrationTest {
         for (ArticleTask articleTask : feedTask.articleTaskList) {
             logger.info("article {} {}", articleTask.completed, articleTask.articleId);
         }
+        Assert.assertTrue(feedTask.articleTaskList.size() > 5);
     }
     
 }

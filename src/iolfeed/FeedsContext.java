@@ -88,7 +88,14 @@ public final class FeedsContext {
         feedMap.put(id, url);
     }
 
-    public void init() {
+    public void init() throws Exception {
         maxDepth = properties.getInt("maxDepth", maxDepth);
+        String first = properties.getString("first", null);
+        if (first != null) {
+            logger.info("first", first);
+            FeedTask feedTask = new FeedTask(this);
+            feedTask.start(first, feedMap.get(first), articleCount);
+            feedTask.join();
+        }
     }
 }
