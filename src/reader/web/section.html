@@ -1,6 +1,7 @@
 <div class="row" ng-show="articles.length > 0" style="margin-bottom: 1em;">  
   <div class="col-lg-6" style="padding-right: 0;"
-       ng-hide="!articles[0].imagePath || articles[0].imageList.length > 1"
+       ng-hide="!articles[0].imagePath"
+       ng-hide="articles[0].imageList.length > 1"
        ng-hide="article.youtubeList.length > 0"
        >
     <div style="max-width: 300px;">

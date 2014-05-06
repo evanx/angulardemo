@@ -9,7 +9,8 @@
     <div ng-show="article.youtubeList.length > 0" style="margin: 0 .5em; max-width: 550px">
       <p>{{article.description}}</p>
     </div>
-    <div class="carousel" ng-show="article.imageList.length > 1" ng-style="galleryStyle" style="margin-bottom: .5em;">
+    <div class="carousel" ng-show="article.imageList.length > 1" ng-style="galleryStyle" 
+         style="margin-bottom: .5em; float: left;">
       <carousel interval="3000">
         <slide ng-repeat="slide in article.imageList" active="slide.active">
           <img ng-src="{{slide.path}}" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
@@ -20,7 +21,7 @@
       </carousel>    
     </div>
   </div>
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <div style="margin: 1em; float: right; max-width: 100%" 
          ng-hide="!article.imagePath || article.imageList.length > 1">
       <img ng-src="{{article.imagePath}}" 
