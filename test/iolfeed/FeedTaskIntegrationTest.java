@@ -29,7 +29,7 @@ public class FeedTaskIntegrationTest {
     JMap feedsProperties = new JMap();
     FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
 
-    public FeedTaskIntegrationTest() throws IOException {
+    public FeedTaskIntegrationTest() throws Exception {
         feedsContext.maxDepth = 3;
         contentStorage.init();
         feedsContext.init();
