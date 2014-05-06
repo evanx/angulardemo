@@ -1,18 +1,46 @@
+<div class="row" ng-show="articles.length > 0" style="margin-bottom: 1em;">  
+  <div class="col-lg-6" style="padding-right: 0;"
+       ng-hide="!articles[0].imagePath || articles[0].imageList.length > 1"
+       ng-hide="article.youtubeList.length > 0"
+       >
+    <div style="max-width: 300px;">
+      <img ng-src="{{articles[0].imagePath}}" 
+           style="max-width: 100%; margin: 0; margin-right: .75em; float: left; display: inline-block;">
+    </div>
+    <div style="padding-left: 1em;">
+      <h4 style="font-weight: bold;"><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
+      <p>{{articles[0].description}}</p>
+    </div>
+  </div>
+  <div ng-show="articles[0].youtubeList.length > 0">
+    <div class="video-container">
+      <div ng-repeat="youtube in articles[0].youtubeList">
+        <iframe width="560" height="315"
+                ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+      </div>
+    </div>  
+    <h4 style="font-weight: bold;"><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
+    <div ng-show="articles[0].youtubeList.length > 0" style="margin: 0 .5em; max-width: 550px">
+      <p>{{articles[0].description}}</p>
+    </div>
+  </div>
+</div>
 <div class="row">  
-  <div class="col-lg-8" ng-show="articles.length > 0">
-      <table class="table table-striped table-condensed">
+  <div class="col-lg-6" ng-show="articles.length > 1">
+    <table class="table table-striped table-condensed">
       <tbody>
-        <tr ng-repeat="article in articles track by $index" ng-click="selected(article)">
+        <tr ng-repeat="article in articles track by $index" ng-click="selected(article)"
+            ng-if="$index > 0">
           <td style="">
             <div class="article-link">
               <a href="#/article/{{article.articleId}}">{{article.title}}</a>
             </div>
-             <div ng-show="article.imagePath" class="article-link-image">
-                <img width="125" ng-src="{{article.imagePath}}">
+            <div ng-show="article.imagePath" class="article-link-image">
+              <img width="125" ng-src="{{article.imagePath}}">
             </div>
-             <div class="article-link-image-youtube" 
-                  ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
-                <img width="125" ng-src="{{article.youtubeList[0].thumbnail}}">
+            <div class="article-link-image-youtube" 
+                 ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
+              <img width="125" ng-src="{{article.youtubeList[0].thumbnail}}">
             </div>
             <p class="article-lead">{{article.description}}</p>
           </td>

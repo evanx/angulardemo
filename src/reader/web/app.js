@@ -52,8 +52,6 @@ var sectionList = [
     }
 ];
 
-var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
-
 function getSectionLabel(name) {
     for (var i = 0; i < sectionList.length; i++) {
         if (sectionList[i].name === name) {
@@ -72,6 +70,15 @@ function putArticles(articles) {
 function putArticle(article) {
     articles[article.articleId] = article;
 }
+
+var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
+
+app.filter('sliceFrom', function() {
+    return function(array, start) {
+        console.log("sliceFrom", array, start);
+        return array.slice(start, array.length - start);
+    };
+});
 
 app.factory("appService", ["$http", function($http) {
         return {
