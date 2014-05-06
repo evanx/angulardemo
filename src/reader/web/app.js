@@ -177,16 +177,17 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
         $scope.addThisVisible = false;
         $scope.galleryStyle = "";
         $scope.setStyle = function() {
+            $scope.galleryStyle = {};
             if ($scope.article.maxHeight) {
-                var height = $scope.article.maxHeight;
+                var height = $scope.article.maxHeight;                
                 if ($window.innerWidth < $scope.article.maxWidth) {
-                    height = ($scope.article.maxHeight * $window.innerWidth / $scope.article.maxWidth);
+                    height = 1 + ($scope.article.maxHeight * $window.innerWidth / $scope.article.maxWidth);
+                    $scope.galleryStyle["width"] = "100%";
+                } else {
+                    $scope.galleryStyle["width"] = "" + $scope.article.maxWidth + "px";
+                    $scope.galleryStyle["margin-left"] = "1em";
                 }
-                $scope.galleryStyle = { 
-                    "display": "inline-block",
-                    "overflow": "hidden",
-                    "min-height": "" + height + "px"
-                };
+                $scope.galleryStyle["min-height"] = "" + height + "px";
             }
             console.log("galleryStyle", $scope.galleryStyle);
         };

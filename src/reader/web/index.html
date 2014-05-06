@@ -76,6 +76,8 @@
       .carousel-indicators li {
         margin: 0 1px 0 0;
       }
+      .carousel {      
+      }
       .carousel-caption {
         padding: 0;
         bottom: -.9em;
@@ -124,7 +126,7 @@
 
     <body ng-controller="appController">
 
-      <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="navbar navbar-fixed-top navbar-inverse" role="navigation" style="width: 100%">
         <div class="container">
           <div class="navbar-header">
             <a class="navbar-brand hidden-xs" href="#/sections">My Independent</a>
@@ -136,9 +138,9 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button-->
-            <div class="navbar-text hidden" ng-show="personalize()">
+            <!--div class="navbar-text hidden" ng-show="personalize()">
               <a href="#/personalize/{{personalize()}}"><span class="glyphicon glyphicon-user"></span></a>
-            </div>
+            </div-->
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -146,12 +148,12 @@
               <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
               <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
               <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
-              <li ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">Tech</a></li>
+              <li ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">SciTech</a></li>
               <li ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
               <li ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
-              <li class="visible-lg" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
-              <li class="visible-lg" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-              <li class="visible-lg" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
+              <li class="invisible-lg" ng-hide="true" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
+              <li class="invisible-lg" ng-hide="true" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
+              <li class="invisible-lg" ng-hide="true" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
               <li class="visible-lg" ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
               <li class="visible-lg" ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
             </ul>
@@ -212,19 +214,19 @@
       <!--script src="/mirror/offcanvas.js"></script-->
       <script src="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
-        var sections = {};
-        var addthis_config = {"data_track_addressbar": true};
-        var addthis_share = {
-          url_transforms: {
-            shorten: {
-              twitter: 'bitly',
-              facebook: 'bitly'
-            }
-          },
-          shorteners: {
-            bitly: {} 
-          }
-        };
+                      var sections = {};
+                      var addthis_config = {"data_track_addressbar": true};
+                      var addthis_share = {
+                        url_transforms: {
+                          shorten: {
+                            twitter: 'bitly',
+                            facebook: 'bitly'
+                          }
+                        },
+                        shorteners: {
+                          bitly: {}
+                        }
+                      };
       </script>
       <script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script> 
       <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-536345d469c5d52f"></script-->    
