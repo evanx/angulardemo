@@ -29,19 +29,23 @@
       .video-container iframe,
       .video-container object,
       .video-container embed {
-        position: absolute;
+        position: absolute;        
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
       }
+      .test {
+        color:red
+      }
       </style>
   </head>
   <body ng-controller="testController">
-      <div class="video-container" ng-show="article.youtubeList.length > 0" ng-repeat="youtube in article.youtubeList">
+    <h1 class="test">test</h1>
+      <!--div class="video-container" ng-show="article.youtubeList.length > 0" ng-repeat="youtube in article.youtubeList">
         <iframe width="{{youtube.width}}" height="{{youtube.height}}" 
                 ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
-      </div>    
+      </div-->    
     <!--iframe width="560" height="315" src="//www.youtube.com/embed/eH_WMLxmfA8" frameborder="0" allowfullscreen></iframe-->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.5/angular-sanitize.min.js"></script>
