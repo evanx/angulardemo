@@ -24,6 +24,9 @@ import vellum.util.Streams;
 public class ContentStorage {
     Logger logger = LoggerFactory.getLogger(ContentStorage.class);
     final String prefetchLinkPattern = "<!--link-->\n";                
+    final String[] sections = {
+        "top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel", "multimedia", "videos"
+    };
     
     Map<String, byte[]> map = new HashMap();
     Map<String, JMap> jsonMap = new HashMap();
@@ -31,7 +34,7 @@ public class ContentStorage {
     public String contentUrl;
     public String storageDir;
     public String appDir;
-    public boolean isCaching;
+    public boolean caching;
     public boolean refresh;
     public String defaultHtml;
     public final String defaultPath = "index.html";
@@ -43,19 +46,24 @@ public class ContentStorage {
     boolean evict = false;
 
     public ContentStorage(JMap properties) {
+        logger.info("properties {}", properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
         storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
-        isCaching = properties.getBoolean("storage.caching", false);
-        refresh = properties.getBoolean("storage.refresh", false);        
+        caching = properties.getBoolean("caching", false);
+        refresh = properties.getBoolean("refresh", false);
     }
     
     public void init() throws IOException {        
         prefetchFile = new File(storageDir, prefetchPath);
         prefetchFile.delete();
         this.defaultHtml = Streams.readString(new File(appDir, defaultPath));
-        loadContent("top/articles.json");
-        loadContent("news/articles.json");
+        for (String section : sections) {
+            String path = String.format("%s/articles.json", section);
+            logger.info("section {} {}", section, path);
+            loadContent(path);
+            linkSet.add(path);
+        }
         buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {
             @Override
@@ -74,7 +82,7 @@ public class ContentStorage {
     }
     
     public synchronized void put(String key, byte[] value) {
-        if (isCaching || key.endsWith(".json")) {
+        if (caching || key.endsWith(".json")) {
             map.put(key, value);
         }        
     }
@@ -85,7 +93,7 @@ public class ContentStorage {
             map.clear();
             return null;
         }
-        if (isCaching) {
+        if (caching) {
             return map.get(key);
         }
         return null;

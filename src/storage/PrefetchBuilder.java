@@ -1,6 +1,5 @@
 package storage;
 
-import storage.ContentStorage;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class PrefetchBuilder {
 
     ContentStorage storage;
     StringBuilder contentBuilder = new StringBuilder();
-    String[] sections = {"top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel"};
     int sectionLimit = 1;
     
     public PrefetchBuilder() {
@@ -29,7 +27,7 @@ public class PrefetchBuilder {
         }
         contentBuilder.append("<script>\n");
         int sectionCount = 0;
-        for (String section : sections) {
+        for (String section : storage.sections) {
             String key = String.format("%s/articles.json", section);
             byte[] content = storage.map.get(key);
             if (content != null) {
@@ -50,6 +48,7 @@ public class PrefetchBuilder {
     }
 
     private String formatPrefetchLinks() {
+        logger.info("formatPrefetchLinks {}", storage.linkSet.size());
         StringBuilder linkBuilder = new StringBuilder();
         for (String link : storage.linkSet) {
             linkBuilder.append(String.format("<link rel='prefetch' href='%s'>\n", link));

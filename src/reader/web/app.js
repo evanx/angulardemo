@@ -68,7 +68,7 @@ function putArticles(articles) {
 }
 
 function putSectionArticles(section, articles) {
-    sections[section] = {articles: data};
+    sections[section] = {articles: articles};
     putArticle(articles);
 }
 
@@ -89,11 +89,20 @@ app.filter('sliceFrom', function() {
     };
 });
 
-app.factory("appService", ["$http", function($http) {
+app.factory("appService", ["$q", "$http", function($q, $http) {
+        var defer = $q.defer();
         return {
             load: function(url, successHandler, errorHandler) {
                 console.log("load", url);
                 $http.get(url).success(successHandler).error(errorHandler);
+            },
+            loadSection: function(section) {
+                var jsonPath = section + "/articles.json";
+                $http.get(jsonPath).success(function(data) { 
+                    console.log("loadSection", jsonPath, data.length);
+                    defer.resolve(data);
+                });
+                return defer.promise;
             }
         }
     }]);
@@ -122,6 +131,14 @@ app.controller("appController", ["$scope", "$location", "appService",
             }
             return null;
         };
+        if (false) {
+            for (var i = 0; i < sectionList.length; i++) {
+                var section = sectionList[i].name.toLowerCase();
+                appService.loadSection(section).then(function(data) {
+                    putSectionArticles(section, data);
+                });
+            }
+        }
     }]);
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
@@ -170,21 +187,7 @@ var sectionController = app.controller("sectionController", [
 sectionController.resolve = [
     '$routeParams', 'appService',
     function($routeParams, appService) {
-        if ($routeParams.section) {
-            var section = $routeParams.section.toLowerCase();
-            var jsonPath = section + "/articles.json";
-            console.log("resolve", $routeParams, section, jsonPath);
-            if (!isSectionArticles(section)) {
-                appService.load(jsonPath, function(data) {
-                    console.log("resolve result", data);
-                    if (data && data.length) {
-                        putSectionArticles(section, data);
-                    }
-                }, function() {
-                    console.log("resolve error");
-                });
-            }
-        }
+        console.log("resolve", $routeParams.section);
     }];
         
 app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {

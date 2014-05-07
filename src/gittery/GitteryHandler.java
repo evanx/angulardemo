@@ -56,11 +56,11 @@ public class GitteryHandler implements HttpHandler {
         logger.trace("path [{}]", path);
         try {
             if (path.equals("/") || path.equals("/prefetch")) {
-               logger.info("app");
-                path = context.storage.defaultPath;                  
-                if (context.storage.isCaching && context.storage.prefetchContent != null) {
-                    if (requestHeaderMatches("Accept-Encoding", "gzip") &&
-                            context.storage.prefetchGzippedContent != null) {
+                logger.info("app {} {}", context.storage.caching, context.storage.prefetchContent.length);
+                path = context.storage.defaultPath;
+                if (context.storage.caching && context.storage.prefetchContent != null) {
+                    if (requestHeaderMatches("Accept-Encoding", "gzip")
+                            && context.storage.prefetchGzippedContent != null) {
                         writeGzipped(context.storage.prefetchGzippedContent);
                     } else {
                         write(context.storage.prefetchContent);
