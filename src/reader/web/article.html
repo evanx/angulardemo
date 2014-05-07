@@ -21,7 +21,7 @@
       </carousel>    
     </div>
   </div>
-  <div class="col-lg-6">
+  <div class="col-lg-7">
     <div style="margin: 1em; float: right; max-width: 100%" 
          ng-hide="!article.imagePath || article.imageList.length > 1">
       <img ng-src="{{article.imagePath}}" 
@@ -31,7 +31,7 @@
         {{article.imageCaption}}
       </div>
     </div>
-    <h4 style="display: inline-block; min-width: 200px; font-weight: bold;">
+    <h4 style="display: inline-block; min-width: 150px; font-weight: bold;">
       <a href="{{article.link}}">{{article.title}}</a>
     </h4>
     <h6 ng-show="article.link">{{article.pubDate}} <a href="{{article.link}}">IOL.co.za</a></h6>
@@ -42,7 +42,7 @@
   </div>
 </div>
 <div class="row" ng-cloak>
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <div style="" 
          ng-show="article.relatedArticleList">
       <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
@@ -55,7 +55,7 @@
   </div>
 </div>
 <div class="row" ng-cloak style="min-height: 20px; margin-top: .5em; margin-bottom: .5em;">
-  <div class="col-lg-8" style="">
+  <div class="col-lg-6" style="">
     <div class="addthis_toolbox addthis_default_style" ng-show="addThisVisible"
          style=""
          addthis:title="{{article.title}}" addthis:url="{{article.link}}">
@@ -66,7 +66,7 @@
   </div>
 </div>
 <div class="row" ng-cloak>
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <div class="view-footer" ng-show="article.link">
       <p>Read on <a href="{{article.link}}">IOL.co.za</a></p>
     </div>
