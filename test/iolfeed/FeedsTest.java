@@ -81,6 +81,11 @@ public class FeedsTest {
         Assert.assertEquals("April 29 2014 at 11:13am", 
                 matcher.group(1));
     }
+
+    @Test
+    public void cleanText() throws ParseException {
+        Assert.assertTrue(FeedsUtil.cleanText(".").isEmpty());
+    }
     
     @Test
     public void fixAccent() {

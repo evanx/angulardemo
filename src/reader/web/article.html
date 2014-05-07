@@ -25,7 +25,7 @@
        ng-hide="!article.imagePath || article.imageList.length > 1">
     <img ng-src="{{article.imagePath}}"/>
     <br>
-    <div ng-show="article.imageCaption">
+    <div ng-show="article.imageCaption.length">
       {{article.imageCaption}}
     </div>
   </div>

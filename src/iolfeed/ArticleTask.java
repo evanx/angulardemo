@@ -378,6 +378,10 @@ public class ArticleTask implements Runnable {
         if (matcher.find()) {
             String paragraph = FeedsUtil.cleanParagraph(matcher.group(1));
             if (!paragraph.isEmpty()) {
+                if (paragraphs.size() == 1 && paragraphs.get(0).endsWith(" -")) {
+                    paragraph = paragraphs.get(0) + " " + paragraph;
+                    paragraphs.clear();
+                }
                 paragraphs.add(paragraph);
             }
             return true;

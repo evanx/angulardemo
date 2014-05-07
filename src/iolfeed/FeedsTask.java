@@ -36,7 +36,7 @@ public class FeedsTask implements Runnable {
         for (FeedEntity entity : context.feedEntityList) {
             try {
                 perform(entity.getId());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.warn("run", e);
             }
         }
@@ -49,7 +49,7 @@ public class FeedsTask implements Runnable {
         public void run() {
             try {
                 perform(section);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.warn("run: " + section, e);
             }
         }

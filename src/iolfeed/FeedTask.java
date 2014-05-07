@@ -52,6 +52,9 @@ public class FeedTask extends Thread {
     public void run() {
         try {
             perform();
+        } catch (RuntimeException e) {
+            logger.warn("run: " + e.getMessage(), e);
+            this.exception = e;
         } catch (Exception e) {
             logger.warn(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             this.exception = e;

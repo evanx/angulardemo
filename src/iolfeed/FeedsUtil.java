@@ -108,8 +108,8 @@ public class FeedsUtil {
             text = text.replaceAll(String.format("&#%d;", (int) ch), "" + ch);
         }
         text = text.trim();
-        if (!text.matches("\\w")) {
-            return null;
+        if (!text.matches(".*\\w.*")) {
+            return "";
         }
         return text;
     }
