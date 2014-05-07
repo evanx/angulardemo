@@ -91,7 +91,7 @@ public final class FeedsContext {
     public void init() throws Exception {
         maxDepth = properties.getInt("maxDepth", maxDepth);
         String first = properties.getString("first", null);
-        if (first != null) {
+        if (first != null && !first.equals("none")) {
             logger.info("first", first);
             FeedTask feedTask = new FeedTask(this);
             feedTask.start(first, feedMap.get(first), articleCount);

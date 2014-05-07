@@ -62,7 +62,9 @@ public class ContentStorage {
             String path = String.format("%s/articles.json", section);
             logger.info("section {} {}", section, path);
             loadContent(path);
-            linkSet.add(path);
+            if (false) {
+                linkSet.add(path);
+            }
         }
         buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {

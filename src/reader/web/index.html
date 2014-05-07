@@ -217,9 +217,9 @@
               <li class="hidden-sm" ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">SciTech</a></li>
               <li class="hidden-sm" ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
               <li class="hidden-sm" ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
-              <li class="hidden-md" ng-hide="true" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
-              <li class="hidden-md" ng-hide="true" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-              <li class="hidden-md" ng-hide="true" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
+              <li class="hidden" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
+              <li class="hidden" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
+              <li class="hidden" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
               <li class="hidden-md" ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
               <li class="hidden-md" ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
             </ul>
@@ -297,6 +297,17 @@
       <script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script> 
       <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-536345d469c5d52f"></script-->    
       <script src="app.js"></script>    
+      <link rel='prefetch' href='top/articles.json'>
+      <link rel='prefetch' href='news/articles.json'>
+      <link rel='prefetch' href='sport/articles.json'>
+      <link rel='prefetch' href='business/articles.json'>
+      <link rel='prefetch' href='motoring/articles.json'>
+      <link rel='prefetch' href='lifestyle/articles.json'>
+      <link rel='prefetch' href='scitech/articles.json'>
+      <link rel='prefetch' href='tonight/articles.json'>
+      <link rel='prefetch' href='travel/articles.json'>
+      <link rel='prefetch' href='multimedia/articles.json'>
+      <link rel='prefetch' href='videos/articles.json'>
       <!--link-->
     </body>
   </html>
