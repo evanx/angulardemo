@@ -179,12 +179,18 @@ public class GitteryHandler implements HttpHandler {
         he.getResponseBody().close();
     }        
 
+    final static long CACHE_MIRROR_MILLIS = Millis.fromDays(28);
+    final static long CACHE_IMAGE_MILLIS = Millis.fromDays(3);
+    final static long CACHE_ARTICLES_MILLIS = Millis.fromDays(3);
+    
     private void setContentType() {
         he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
         if (path.startsWith("mirror/")) {
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(Millis.fromDays(28)));
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_MIRROR_MILLIS));
         } else if (Streams.getContentType(path).startsWith("image/")) {
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(Millis.fromDays(3)));
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
+        } else if (path.endsWith("/articles.json")) {
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }
     
