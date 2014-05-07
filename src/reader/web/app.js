@@ -67,6 +67,15 @@ function putArticles(articles) {
     }
 }
 
+function putSectionArticles(section, articles) {
+    sections[section] = {articles: data};
+    putArticle(articles);
+}
+
+function isSectionArticles(section) {
+    return sections[section] && sections[section].articles && sections[section].articles.length;
+}
+
 function putArticle(article) {
     articles[article.articleId] = article;
 }
@@ -115,24 +124,6 @@ app.controller("appController", ["$scope", "$location", "appService",
         };
     }]);
 
-app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
-        $locationProvider.html5Mode(false);
-        $routeProvider.
-                when("/sections", {
-                    templateUrl: "sections.html",
-                    controller: "sectionsController"}).
-                when("/section/:section", {
-                    templateUrl: "section.html",
-                    controller: "sectionController"}).
-                when(":date/article/:articleId", {
-                    templateUrl: "article.html",
-                    controller: "articleController"}).
-                when("/article/:articleId", {
-                    templateUrl: "article.html",
-                    controller: "articleController"}).
-                otherwise({redirectTo: "/section/Top"});
-    }]);
-
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
     function($scope, $location, $window, appService) {
         $scope.state.title = "My Independent";
@@ -143,7 +134,8 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
         };
     }]);
 
-app.controller("sectionController", ["$scope", "$location", "$routeParams", "$window", "appService",
+var sectionController = app.controller("sectionController", [
+    "$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
         $scope.section = $routeParams.section.toLowerCase();
         console.log("sectionController", $scope.section);
@@ -153,7 +145,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
             $scope.statusMessage = undefined;
             $scope.articles = data;
             if (data && data.length > 0) {
-                sections[$scope.section] = { articles: data };
+                sections[$scope.section] = {articles: data};
                 putArticles($scope.articles);
             }
         };
@@ -161,7 +153,7 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
             $scope.statusMessage = undefined;
         };
         console.log("sections", sections, sections[$scope.section]);
-        if (sections[$scope.section] && sections[$scope.section].articles && 
+        if (sections[$scope.section] && sections[$scope.section].articles &&
                 sections[$scope.section].articles.length) {
             $scope.articles = sections[$scope.section].articles;
             putArticles($scope.articles);
@@ -173,6 +165,45 @@ app.controller("sectionController", ["$scope", "$location", "$routeParams", "$wi
             console.log("selected", article.articleId);
             $location.path("article/" + article.articleId);
         };
+    }]);
+
+sectionController.resolve = [
+    '$routeParams', 'appService',
+    function($routeParams, appService) {
+        if ($routeParams.section) {
+            var section = $routeParams.section.toLowerCase();
+            var jsonPath = section + "/articles.json";
+            console.log("resolve", $routeParams, section, jsonPath);
+            if (!isSectionArticles(section)) {
+                appService.load(jsonPath, function(data) {
+                    console.log("resolve result", data);
+                    if (data && data.length) {
+                        putSectionArticles(section, data);
+                    }
+                }, function() {
+                    console.log("resolve error");
+                });
+            }
+        }
+    }];
+        
+app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
+        $locationProvider.html5Mode(false);
+        $routeProvider.
+                when("/sections", {
+                    templateUrl: "sections.html",
+                    controller: "sectionsController"}).
+                when("/section/:section", {
+                    templateUrl: "section.html",
+                    controller: "sectionController",
+                    resolve: sectionController.resolve}).
+                when(":date/article/:articleId", {
+                    templateUrl: "article.html",
+                    controller: "articleController"}).
+                when("/article/:articleId", {
+                    templateUrl: "article.html",
+                    controller: "articleController"}).
+                otherwise({redirectTo: "/section/Top"});
     }]);
 
 app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
