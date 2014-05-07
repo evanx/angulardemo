@@ -98,7 +98,7 @@ public class FeedsUtil {
             text = text.replaceAll("<", "&lt;");
             text = text.replaceAll(">", "&gt;");
         }
-        return accentHtmlToUnicode(text).trim();
+        return accentHtmlToUnicode(text);
     }
 
     public static String accentHtmlToUnicode(String text) {
@@ -106,6 +106,10 @@ public class FeedsUtil {
             String htmlName = unicodeHtmlMap.get(ch);
             text = text.replaceAll(String.format("&%s;", htmlName), "" + ch);
             text = text.replaceAll(String.format("&#%d;", (int) ch), "" + ch);
+        }
+        text = text.trim();
+        if (!text.matches("\\w")) {
+            return null;
         }
         return text;
     }
