@@ -21,14 +21,8 @@
       </carousel>    
     </div>
   </div>
-  <div class="article-image hidden" 
-       ng-hide="!article.imagePath || article.imageList.length > 1">
-    <img ng-src="{{article.imagePath}}"/>
-    <br>
-    <div ng-show="article.imageCaption.length">
-      {{article.imageCaption}}
-    </div>
-  </div>
+</div>
+<div class="row" ng-cloak>
   <div class="col-lg-6 article-content">
     <h4 class="hidden-xs">
       <a href="{{article.link}}">{{article.title}}</a>
