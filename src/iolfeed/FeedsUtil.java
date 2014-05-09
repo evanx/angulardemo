@@ -72,7 +72,6 @@ public class FeedsUtil {
         text = text.replaceAll("&rdquo;", "\"");
         text = text.replaceAll("&lsquo;", "'");
         text = text.replaceAll("&rsquo;", "'");
-        text = text.replaceAll("&#8211;", "-");
         text = text.replaceAll("&ndash;", "-");
         text = text.replaceAll("&mdash;", "-");
         text = text.replaceAll("`", "'"); // backtick
@@ -88,8 +87,11 @@ public class FeedsUtil {
         //text = text.replaceAll("\\u0026#8217;", "'");
         text = text.replaceAll("\u8220;", "\"");
         text = text.replaceAll("\u8221;", "\"");
-        text = text.replaceAll("&#8220;", "\"");
+        text = text.replaceAll("\u8220;", "...");
+        text = text.replaceAll("&#8230;", "...");
         text = text.replaceAll("&#8221;", "\"");
+        text = text.replaceAll("&#8211;", "-");
+        text = text.replaceAll("&#8230;", "...");
         //text = text.replaceAll("\\u0026#8220;", "\"");
         //text = text.replaceAll("\\u0026#8221;", "\"");
         if (false) {
