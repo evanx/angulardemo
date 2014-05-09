@@ -155,6 +155,7 @@ var sectionController = app.controller("sectionController", [
     "$scope", "$location", "$routeParams", "$window", "appService",
     function($scope, $location, $routeParams, $window, appService) {
         $scope.section = $routeParams.section.toLowerCase();
+        $scope.state.section = $scope.section;
         console.log("sectionController", $scope.section);
         $scope.state.title = getSectionLabel($routeParams.section);
         var jsonPath = $scope.section + "/articles.json";
