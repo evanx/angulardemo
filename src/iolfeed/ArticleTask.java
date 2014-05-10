@@ -329,6 +329,7 @@ public class ArticleTask implements Runnable {
             String id = matcher.group(1);
             youtubeItem.url = String.format("http://www.youtube.com/embed/%s", id);
             youtubeItem.thumbnail = String.format("http://i1.ytimg.com/vi/%s/default.jpg", id);
+            youtubeItem.image = String.format("http://i1.ytimg.com/vi/%s/hq1.jpg", id);
             youtubeList.add(youtubeItem);
             youtubeItem = null;
             return true;
