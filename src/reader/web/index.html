@@ -186,50 +186,60 @@
       }
       .article-link-image-youtube img {
       }
-      .article-image {
-        margin: 1em; 
-        float: right; 
-        max-width: 100%;
+      @media screen and (max-width: 560px) {
+        .article-image-embed {
+          margin: .25em auto;
+          max-width: 100%;
+        }
       }
-      .article-image img {
-        max-width: 320px; 
-        border: 1px solid black;      
-        //<div style="font-size: 80%; width: 302px; border-bottom: 1px solid lightgray;" 
-      }
-      .article-image div {
-        font-size: 80%; 
-        width: 302px; 
-        border-bottom: 1px solid lightgray;        
-      }
-      .article-image-embed {
-        margin: 0em 1em; 
-        float: right; 
-        width: 302px; 
-        max-width: 100%;
+      @media screen and (min-width: 560px) {
+        .article-image-embed {
+          margin: 0em 1em; 
+          float: right; 
+          width: 300px; 
+        }
       }
       .article-image-embed img {
+        max-width: 300px; 
         max-width: 100%;
-        border: gray solid 1px;
+        border-top: gray solid 1px;
+        margin-bottom: 4px;
       }
       .article-image-embed p {
         font-size: 80%;
         display: inline-table;
-        margin-top: 4px;
         border-bottom: lightgray solid 1px;
       }
+      .article-ad-embed {
+        display: inline-block; 
+        padding: 1em;    
+      }
       @media screen and (max-width: 560px) {
-        .article-image-embed {
+        .article-ad-embed {
+          display: inline-block; 
+          padding: 0;
+          margin: .75em auto;
         }
-        .article-image {
-          width: 100%;
-          margin: 1em; 
-          float: none; 
+      }
+      @media screen and (min-width: 560px) {
+        .article-ad-embed {
+          float: right; 
         }
       }
       .article-lead {
       }
       .article-content {
         margin: .5em;
+      }
+      @media screen and (max-width: 560px) {
+        .article-content {
+          margin: 0em;
+        }
+      }
+      @media screen and (min-width: 560px) {
+        .article-content {
+          margin: .5em;
+        }
       }
       .article-content h4 {
         margin-bottom: 0em;
@@ -378,6 +388,9 @@
       <div class="container ng-cloak" ui-view="pagecontent" autoscroll="true" ng-view ng-cloak>
         <div class="row visible-xs">
           <div class="col-lg-10">
+            
+            
+            
             <table class="table table-striped" style="width: 300px">
               <tbody>
                 <tr ng-click="selected('top')">
