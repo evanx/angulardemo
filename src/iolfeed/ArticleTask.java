@@ -29,7 +29,7 @@ public class ArticleTask implements Runnable {
     Logger logger = LoggerFactory.getLogger(ArticleTask.class);
 
     static final Pattern linkPattern
-            = Pattern.compile("http://www.iol.co.za/(.*)/(.*)/");
+            = Pattern.compile("http://www.iol.co.za/([^/]*)/([^/]*)");
     static final Pattern bylinePattern
             = Pattern.compile("^\\s*<p class=\"byline\">");
     static final Pattern bylineTimestampPattern
@@ -105,16 +105,6 @@ public class ArticleTask implements Runnable {
         articleId = parseArticleId(sourceArticleUrl);
         logger = LoggerFactory.getLogger(String.format("ArticleTask.%s", articleId));
         articlePath = formatArticlePath(articleId);
-        parseLink();
-    }
-
-    private void parseLink() {
-        Matcher matcher = linkPattern.matcher(sourceArticleUrl);
-        if (matcher.find()) {
-            section = matcher.group(1);
-            topic = matcher.group(2);
-            logger.info("parseLink", section, topic);
-        }
     }
 
     private static String formatArticlePath(String id) {
@@ -214,6 +204,7 @@ public class ArticleTask implements Runnable {
         connection.setDoOutput(false);
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()))) {
+            parseLink(connection.getURL().toString());           
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {
@@ -264,6 +255,16 @@ public class ArticleTask implements Runnable {
         logger.info("parseArticle {} {}", depth, relatedArticleList.size());
     }
 
+    private void parseLink(String link) {
+        sourceArticleUrl = link;
+        Matcher matcher = linkPattern.matcher(link);
+        if (matcher.find()) {
+            section = matcher.group(1);
+            topic = matcher.group(2);
+            logger.info("parseLink {} {}", section, topic);
+        }
+    }
+    
     private boolean matchTimestamp(Matcher matcher) {
         if (matcher.find()) {
             String string = matcher.group(1);

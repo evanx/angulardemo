@@ -47,8 +47,8 @@ public class FeedsTest {
     @Test
     public void parseLink() throws ParseException {
         Pattern linkPattern
-            = Pattern.compile("http://www.iol.co.za/(.*)/(.*)/");
-        String line = "http://www.iol.co.za/sport/rugby/shark";
+            = Pattern.compile("http://www.iol.co.za/([^/]*)/([^/]*)");
+        String line = "http://www.iol.co.za/sport/rugby/sharks/article";
         Matcher matcher = linkPattern.matcher(line);
         Assert.assertTrue(matcher.find());
         Assert.assertEquals("sport", matcher.group(1));
