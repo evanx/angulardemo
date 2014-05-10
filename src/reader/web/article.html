@@ -40,8 +40,7 @@
       </div>
       <p ng-repeat="paragraph in article.paragraphs track by $index" 
          ng-if="$index >= 1 && $index < 8 && $index < article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
-      <img style="display: inline-block; float: right; padding: 1em;"           
-           src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
+      <img class="article-ad-embed" src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
       <p ng-repeat="paragraph in article.paragraphs track by $index" 
          ng-if="$index >= 8 && $index >= article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
     </div>

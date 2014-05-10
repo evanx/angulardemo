@@ -8,6 +8,7 @@ import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import org.apache.log4j.BasicConfigurator;
 import vellum.jx.JMap;
+import vellum.jx.JMaps;
 import vellum.provider.VellumProvider;
 
 /**
@@ -19,10 +20,10 @@ public class ReaderMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            ContentStorage contentStorage = new ContentStorage(new JMap("storage", System.getProperties()));
+            ContentStorage contentStorage = new ContentStorage(JMaps.map("storage", System.getProperties()));
             contentStorage.init();
             TaskManager taskManager = new TaskManager();
-            JMap feedsProperties = new JMap("feeds", System.getProperties());
+            JMap feedsProperties = JMaps.map("feeds", System.getProperties());
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/src/reader/web");

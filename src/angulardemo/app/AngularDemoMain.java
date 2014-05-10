@@ -10,6 +10,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.jx.JMaps;
 
 /**
  *
@@ -25,12 +26,12 @@ public class AngularDemoMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            ContentStorage storage = new ContentStorage(new JMap("storage", System.getProperties()));
+            ContentStorage storage = new ContentStorage(JMaps.map("storage", System.getProperties()));
             new GitteryServer().start(new GitteryContext(storage,
                     "angulardemo/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web"));
             new FeedsTask().start(new FeedsContext(new TaskManager(), storage,
-                    new JMap("feeds", System.getProperties())));
+                    JMaps.map("feeds", System.getProperties())));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
