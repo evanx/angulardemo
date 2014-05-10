@@ -23,15 +23,15 @@
   
 </div>
 <div class="row" ng-if="articles.length > 0" style="margin-bottom: 1em;">  
-  <div ng-show="articles[0].youtubeList.length > 0">
+  <div class="section-first-youtube" ng-show="articles[0].youtubeList.length > 0">
     <div class="video-container">
       <div ng-repeat="youtube in articles[0].youtubeList">
         <iframe width="560" height="315"
                 ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
       </div>
     </div>  
-    <h4 style="font-weight: bold;"><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
-    <div ng-show="articles[0].youtubeList.length > 0" style="margin: 0 .5em; max-width: 550px">
+    <h4><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
+    <div class="section-first-youtube-description" ng-show="articles[0].youtubeList.length > 0">
       <p>{{articles[0].description}}</p>
     </div>
   </div>

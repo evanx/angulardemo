@@ -37,6 +37,16 @@
         padding-right: 1em; 
         float: right;
       }
+      .sections table {        
+      }
+      @media screen and (min-width: 560px) {
+        .sections {
+          width: 100%;
+        }
+        .sections table {        
+          width: 100%;
+        }
+      }
       .section-heading {
         display: inline-table;
         color: gray;
@@ -133,6 +143,14 @@
           border-left: transparent solid 8px;
         }
       }      
+      .section-first-youtube h4 {
+        margin-left: .5em;
+        font-weight: bold;
+      }
+      .section-first-youtube-description {
+        margin: 0 .5em; 
+        max-width: 550px;
+      }
       .section-table {
         margin: 0;
       }
@@ -305,8 +323,9 @@
 
     <body ng-controller="appController">
 
-      <div id="fb-root"></div>
-      <script>(function(d, s, id) {
+      <!--div id="fb-root"></div>
+      <script>
+        (function(d, s, id) {
               var js, fjs = d.getElementsByTagName(s)[0];
               if (d.getElementById(id))
                 return;
@@ -314,7 +333,8 @@
               js.id = id;
               js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=666550030060564&version=v2.0";
               fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));</script>
+            }(document, 'script', 'facebook-jssdk'));
+      </script-->
 
       <div class="navbar navbar-fixed-top navbar-inverse" role="navigation" style="width: 100%">
         <div class="container">
@@ -411,7 +431,9 @@
       <script src="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
                       var sections = {};
-                      var addthis_config = {"data_track_addressbar": true};
+                      var addthis_config = {
+                        "data_track_addressbar": false
+                      };
                       var addthis_share = {
                         url_transforms: {
                           shorten: {
@@ -424,8 +446,7 @@
                         }
                       };
       </script>
-      <script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script> 
-      <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-536345d469c5d52f"></script-->    
+      <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script--> 
       <script src="app.js"></script>    
       <link rel='prefetch' href='top/articles.json'>
       <link rel='prefetch' href='news/articles.json'>
