@@ -29,8 +29,13 @@
         font-size: 10pt; 
         font-weight: bold;
         margin-bottom: 8px; 
-        padding-top: 4px; 
+        padding-top: 2px; 
         border-top: 1px solid lightgray;
+        width: 100%;
+      }
+      .view-footer p {
+        padding-right: 1em; 
+        float: right;
       }
       .section-heading {
         display: inline-table;
@@ -43,7 +48,8 @@
         font-weight: bold;
       }
       .section-first {
-        min-height: 200px; 
+        padding: 0;
+        min-height: 230px; 
         overflow: hidden; 
         position: relative;        
       }
@@ -54,6 +60,7 @@
         left: 0;
         background: rgba(0, 0, 0, .7); 
         z-index: 10;
+        min-height: 230px; 
       }
       .section-first-text p {
         font-weight: normal;
@@ -63,9 +70,10 @@
         font-weight: bold; 
         color: white;
         text-decoration: none;
+        font-size: 12pt;
       }
       .section-first-text-heading {
-        font-size: 16pt;
+        font-size: 18pt;
       }
       .section-first-image {        
         display: inline-block;
@@ -76,13 +84,17 @@
       }
       @media screen and (min-width: 560px) {
         .section-first-text {
-          padding: .5em 2.5em;
+          padding: .5em 1.5em;
           text-decoration: none;
         }
-        .section-first-image {        
+        .section-first-image {
+          margin: 0;
+          padding: 0;
+          border: 0;
         }
         .section-first-image img {
           border: lightgray solid 1px;
+          max-width: 300px;
         }
       }
       @media screen and (max-width: 560px) {
@@ -119,6 +131,19 @@
       @media screen and (min-width: 560px) {
         .section-first-ad {
           border-left: transparent solid 8px;
+        }
+      }      
+      .section-table {
+        margin: 0;
+      }
+      .section-ad-embed {
+        padding: 0;
+      }      
+      .section-ad-embed img {
+        width: 100%;
+      }
+      @media screen and (min-width: 560px) {
+        .section-ad-embed img {
         }
       }
       .article-link {
@@ -166,6 +191,7 @@
       }
       .article-image-embed img {
         max-width: 100%;
+        border: gray solid 1px;
       }
       .article-image-embed p {
         font-size: 80%;

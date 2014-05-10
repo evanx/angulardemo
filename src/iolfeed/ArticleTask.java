@@ -27,10 +27,12 @@ import vellum.util.Streams;
 public class ArticleTask implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(ArticleTask.class);
-    
+
+    static final Pattern linkPattern
+            = Pattern.compile("http://www.iol.co.za/(.*)/(.*)/");
     static final Pattern bylinePattern
             = Pattern.compile("^\\s*<p class=\"byline\">");
-    static final Pattern bylineTimestampPattern 
+    static final Pattern bylineTimestampPattern
             = Pattern.compile("^\\s*(.* 20.* at .*\\w)\\s*<br/>");
     static final Pattern relatedArticlePattern
             = Pattern.compile("^\\s*<li><a class=\"related_articles\" href=\"(.*)\">(.*)</a>");
@@ -69,6 +71,8 @@ public class ArticleTask implements Runnable {
     String originalSection;
     String multimediaCaption;
     String multimediaTimestamp;
+    String section;
+    String topic;
     Integer maxWidth;
     Integer maxHeight;
     FeedsContext context = FeedsProvider.getContext();
@@ -84,7 +88,7 @@ public class ArticleTask implements Runnable {
     int depth = 0;
     Thread currentThread;
     boolean byline;
-    
+
     ArticleTask(JMap map) {
         this.map = map;
     }
@@ -95,19 +99,28 @@ public class ArticleTask implements Runnable {
         map.put("link", storyItem.source);
         map.put("title", storyItem.title);
     }
-    
+
     public void init() throws JMapException, FeedException {
         sourceArticleUrl = map.getString("link");
         articleId = parseArticleId(sourceArticleUrl);
         logger = LoggerFactory.getLogger(String.format("ArticleTask.%s", articleId));
         articlePath = formatArticlePath(articleId);
-        // todo category from source link
+        parseLink();
+    }
+
+    private void parseLink() {
+        Matcher matcher = linkPattern.matcher(sourceArticleUrl);
+        if (matcher.find()) {
+            section = matcher.group(1);
+            topic = matcher.group(2);
+            logger.info("parseLink", section, topic);
+        }
     }
 
     private static String formatArticlePath(String id) {
         return String.format("article/%s.json", id);
     }
-    
+
     private static String parseArticleId(String source) throws FeedException {
         int index = source.lastIndexOf("/");
         if (index > 0) {
@@ -135,7 +148,7 @@ public class ArticleTask implements Runnable {
         youtubeList.clear();
         relatedArticleList.clear();
     }
-    
+
     @Override
     public void run() {
         if (currentThread != null) {
@@ -195,7 +208,7 @@ public class ArticleTask implements Runnable {
         relatedArticleList.clear();
         relatedArticleList.addAll(parsedRelatedArticleList);
     }
-    
+
     private void parseArticle() throws Exception {
         URLConnection connection = new URL(sourceArticleUrl).openConnection();
         connection.setDoOutput(false);
@@ -210,7 +223,7 @@ public class ArticleTask implements Runnable {
                     byline = false;
                     if (matchTimestamp(bylineTimestampPattern.matcher(line))) {
                         continue;
-                    }                    
+                    }
                 }
                 if (bylinePattern.matcher(line).matches()) {
                     byline = true;
@@ -262,18 +275,18 @@ public class ArticleTask implements Runnable {
         }
         return false;
     }
-    
+
     private boolean matchRelatedArticle(Matcher matcher) {
         if (matcher.find()) {
-            RelatedArticleItem relatedArticle = new RelatedArticleItem(matcher.group(1), 
+            RelatedArticleItem relatedArticle = new RelatedArticleItem(matcher.group(1),
                     FeedsUtil.cleanText(matcher.group(2)));
-            relatedArticleList.add(relatedArticle);        
+            relatedArticleList.add(relatedArticle);
             logger.info("relatedArticle: {}", relatedArticle);
             return true;
         }
         return false;
     }
-    
+
     private boolean matchMultimediaCaption(Matcher matcher) {
         if (matcher.find()) {
             multimediaCaption = FeedsUtil.cleanText(matcher.group(1));
@@ -416,6 +429,12 @@ public class ArticleTask implements Runnable {
         }
         if (multimediaTimestamp != null) {
             map.put("multimediaTimetamp", multimediaTimestamp);
+        }
+        if (section != null) {
+            map.put("section", section);
+        }
+        if (topic != null) {
+            map.put("topic", topic);
         }
         context.storage.putJson(articlePath, map);
     }

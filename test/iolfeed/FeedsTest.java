@@ -45,6 +45,17 @@ public class FeedsTest {
     }
 
     @Test
+    public void parseLink() throws ParseException {
+        Pattern linkPattern
+            = Pattern.compile("http://www.iol.co.za/(.*)/(.*)/");
+        String line = "http://www.iol.co.za/sport/rugby/shark";
+        Matcher matcher = linkPattern.matcher(line);
+        Assert.assertTrue(matcher.find());
+        Assert.assertEquals("sport", matcher.group(1));
+        Assert.assertEquals("rugby", matcher.group(2));
+    }        
+    
+    @Test
     public void parseGallery() throws ParseException {
         String line = "\t <a href=\"/polopoly_fs/iol-mot-apr20-audi-tt-concept-a-1.1678226!/image/449629179.jpg_gen/derivatives/landscape_600/449629179.jpg\">";
         Assert.assertTrue(ArticleTask.galleryImageLinkPattern.matcher(line).find());

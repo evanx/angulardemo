@@ -12,12 +12,17 @@
       <p>{{articles[0].description}}</p>
     </a>
   </div>
-  <div class="col-md-6 section-first-ad" ng-if="section === 'lifestyle'">
+  <div class="col-md-6 section-first-ad hidden-xs" ng-if="section === 'lifestyle'">
     <img src="http://aka-cdn-ns.adtech.de/images/458/Ad8927690St1Sz170Sq104123649V0Id2.jpg"
          style="max-width: 100%">
   </div>
+  <div class="col-md-6 section-first-ad hidden-xs" ng-if="section === 'news'">
+    <img src="http://aka-cdn-ns.adtech.de/images/219/Ad10582235St1Sz170Sq106080606V0Id6.gif"
+         style="max-width: 100%">
+  </div>
+  
 </div>
-<div class="row" ng-show="articles.length > 0" style="margin-bottom: 1em;">  
+<div class="row" ng-if="articles.length > 0" style="margin-bottom: 1em;">  
   <div ng-show="articles[0].youtubeList.length > 0">
     <div class="video-container">
       <div ng-repeat="youtube in articles[0].youtubeList">
@@ -33,7 +38,7 @@
 </div>
 <div class="row" ng-show="articles.length > 0" style="margin: 0; padding: 0;">  
   <div class="col-lg-6" ng-show="articles.length > 1" style="margin: 0; padding: 0;">
-    <table class="table table-striped table-condensed">
+    <table class="table table-striped table-condensed section-table">
       <tbody>
         <tr ng-repeat="article in articles track by $index" ng-click="selected(article)"
             ng-if="$index > 0">
@@ -52,18 +57,17 @@
           </td>
         </tr>
         <tr>
-          <td style="">
-            <img style="display: inline-block; float: right; padding: 1em;"           
-           src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
+          <td class="section-ad-embed">
+            <img ng-app=""src="http://s0.2mdn.net/viewad/983626/4-gen10_728x90.gif"/>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="view-footer" ng-show="section !== 'top'">
-      <span>Read <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a></span>
+      <span>More on <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a></span>
     </div>
     <div class="view-footer" ng-show="section == 'top'">
-      <span>Read <a href="http://www.iol.co.za">IOL.co.za</a></span>
+      <span>More on <a href="http://www.iol.co.za">IOL.co.za</a></span>
     </div>
   </div>
 </div>
