@@ -85,6 +85,7 @@ public class ArticleTask implements Runnable {
     boolean retry = false;
     String galleryCaption;
     YoutubeItem youtubeItem;
+    ImageItem articleImage;
     int depth = 0;
     Thread currentThread;
     boolean byline;
@@ -438,6 +439,9 @@ public class ArticleTask implements Runnable {
         if (topic != null) {
             map.put("topic", topic);
         }
+        if (articleImage != null) {
+            map.put("articleImage", articleImage);
+        }
         context.storage.putJson(articlePath, map);
     }
 
@@ -457,7 +461,8 @@ public class ArticleTask implements Runnable {
             imagePath = imageList.get(0).path;
             imageCaption = imageList.get(0).text;
         } else if (sourceImageUrl != null) {
-            imagePath = loadImage(new ImageItem(sourceImageUrl));
+            articleImage = new ImageItem(sourceImageUrl);
+            imagePath = loadImage(articleImage);
         }
     }
 
