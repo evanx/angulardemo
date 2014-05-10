@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vellum.jx.JMap;
+import vellum.jx.JMaps;
 
 /**
  *
@@ -22,8 +22,8 @@ import vellum.jx.JMap;
 public class FeedsTest {
 
     FeedsContext context = new FeedsContext(new TaskManager(), new ContentStorage(
-            new JMap("storage", System.getProperties())), 
-            new JMap("feeds", System.getProperties()));
+            JMaps.map("storage", System.getProperties())), 
+            JMaps.map("feeds", System.getProperties()));
 
     public FeedsTest() {
     }

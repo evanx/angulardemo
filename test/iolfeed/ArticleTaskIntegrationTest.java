@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.jx.JMaps;
 import vellum.provider.VellumProvider;
 
 /**
@@ -23,7 +24,7 @@ import vellum.provider.VellumProvider;
 public class ArticleTaskIntegrationTest {
 
     Logger logger = LoggerFactory.getLogger(ArticleTaskIntegrationTest.class);
-    ContentStorage contentStorage = new ContentStorage(new JMap("storage", System.getProperties()));
+    ContentStorage contentStorage = new ContentStorage(JMaps.map("storage", System.getProperties()));
     TaskManager taskManager = new TaskManager();
     JMap feedsProperties = new JMap();
     FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
