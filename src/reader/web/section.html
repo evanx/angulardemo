@@ -7,6 +7,7 @@
     <a class="section-first-image" href="#/article/{{articles[0].articleId}}"
        ><img ng-src="{{articles[0].imagePath}}"></a>
     <a class="section-first-text" href="#/article/{{articles[0].articleId}}">
+      <h1 class="section-heading">{{sectionLabel}}</h1>
       <h4 class="section-first-text-heading">{{articles[0].title}}</h4>
       <p>{{articles[0].description}}</p>
     </a>
@@ -48,6 +49,12 @@
               <img width="125" ng-src="{{article.youtubeList[0].thumbnail}}">
             </div>
             <p class="article-lead">{{article.description}}</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <img style="display: inline-block; float: right; padding: 1em;"           
+           src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
           </td>
         </tr>
       </tbody>

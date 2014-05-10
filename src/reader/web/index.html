@@ -32,6 +32,10 @@
         padding-top: 4px; 
         border-top: 1px solid lightgray;
       }
+      .section-heading {
+        display: inline-table;
+        color: gray;
+      }
       .section-link {
         font-size: 16pt;
         font-weight: bold;
@@ -48,6 +52,9 @@
         left: 0;
         background: rgba(0, 0, 0, .7); 
         z-index: 10;
+      }
+      .section-first-text p {
+        font-weight: normal;
       }
       .section-first-text,
       a.section-first-text:hover {
@@ -153,12 +160,18 @@
         width: 302px; 
         max-width: 100%;
       }
+      .article-image-embed img {
+        max-width: 100%;
+      }
       .article-image-embed p {
         font-size: 80%;
         display: inline-table;
+        margin-top: 4px;
         border-bottom: lightgray solid 1px;
       }
       @media screen and (max-width: 560px) {
+        .article-image-embed {
+        }
         .article-image {
           width: 100%;
           margin: 1em; 
