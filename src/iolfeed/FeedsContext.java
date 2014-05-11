@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
 import vellum.jx.JMap;
+import vellum.provider.VellumProvider;
 
 /**
  *
@@ -23,9 +24,9 @@ public final class FeedsContext {
     String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
     String numericDateFormatString = "yyyyMMdd";
     long topInitialDelay = Millis.fromSeconds(1);
-    long topPeriod = Millis.fromMinutes(5);
+    long topPeriod = Millis.fromMinutes(2);
     long initialDelay = Millis.fromSeconds(15);
-    long period = Millis.fromMinutes(60);
+    long period = Millis.fromMinutes(30);
     int maxDepth = 6;
     long articleTaskTimeoutSeconds = 3600;
     int articleTaskThreadPoolSize = 4;
@@ -91,6 +92,7 @@ public final class FeedsContext {
     public void init() throws Exception {
         maxDepth = properties.getInt("maxDepth", maxDepth);
         String first = properties.getString("first", null);
+        VellumProvider.provider.put(this);
         if (first != null && !first.equals("none")) {
             logger.info("first", first);
             FeedTask feedTask = new FeedTask(this);
