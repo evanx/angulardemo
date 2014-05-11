@@ -10,6 +10,7 @@ public class LongAggregate {
     long max;
     long min = Long.MIN_VALUE;
     long count;
+    ByteArrayDistribution series = new ByteArrayDistribution(10);
     
     public LongAggregate(String type) {
         this.type = type;
@@ -19,14 +20,14 @@ public class LongAggregate {
         return type;
     }
     
-    void ingest(long value) {
+    public void ingest(long value) {
         if (value < min) min = value;
         if (value > max) max = value;
         sum += value;
         count++;
     }
 
-    void ingest(LongAggregate agg) {
+    public void ingest(LongAggregate agg) {
         count += agg.count;
         sum += agg.sum;
         if (agg.min < min) min = agg.min;
@@ -44,5 +45,5 @@ public class LongAggregate {
         } else {
             return String.format("count %d, sum %d, avg %d", count, sum, sum/count);
         }
-    }        
+    }
 }

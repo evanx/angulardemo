@@ -26,10 +26,10 @@ import java.util.TreeMap;
  *
  * @author evan.summers
  */
-public class TxAggregateMap extends TreeMap<String, LongAggregate> {
+public class LongAggregateMap extends TreeMap<String, LongAggregate> {
     LongAggregate all = new LongAggregate("all");
     
-    public TxAggregateMap() {
+    public LongAggregateMap() {
     }
 
     public LongAggregate get(String type) {
@@ -41,10 +41,14 @@ public class TxAggregateMap extends TreeMap<String, LongAggregate> {
         return aggregate;
     }
     
-    void ingest(TimestampedTransaction tx) {
+    void ingest(Tx tx) {
         LongAggregate agg = get(tx.getType());
         agg.ingest(tx.getDuration());
         all.ingest(tx.getDuration());        
     }
-    
+
+    @Override
+    public String toString() {
+        return String.format("agg %d, %s %s}", size(), all, super.toString());
+    }
 }

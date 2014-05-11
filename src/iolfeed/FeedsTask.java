@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vellum.provider.VellumProvider;
+import vellum.monitor.Tx;
 
 /**
  *
@@ -34,11 +34,13 @@ public class FeedsTask implements Runnable {
     
     @Override
     public void run() {
+        Tx tx = context.monitor.begin("FeedsTask");
         for (FeedEntity entity : context.feedEntityList) {
             try {
                 perform(entity.getId());
-            } catch (Throwable e) {
-                logger.warn("run", e);
+                tx.ok();
+            } catch (Exception e) {
+                tx.error(e);
             }
         }
     }
@@ -57,8 +59,6 @@ public class FeedsTask implements Runnable {
     };
             
     private void perform(String section) throws Exception {
-        context.monitor.begin("section", section);
         new FeedTask(context).start(section, context.feedMap.get(section), context.articleCount);
-        context.monitor.end("section", section);
     }
 }

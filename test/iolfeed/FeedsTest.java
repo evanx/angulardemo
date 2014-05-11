@@ -3,7 +3,6 @@
 
 package iolfeed;
 
-import storage.ContentStorage;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vellum.jx.JMaps;
 
 /**
  *
@@ -21,9 +19,7 @@ import vellum.jx.JMaps;
  */
 public class FeedsTest {
 
-    FeedsContext context = new FeedsContext(new TaskManager(), new ContentStorage(
-            JMaps.map("storage", System.getProperties())), 
-            JMaps.map("feeds", System.getProperties()));
+    FeedsContext feedsContext = TestFeedContexts.newFeedContext();
 
     public FeedsTest() {
     }

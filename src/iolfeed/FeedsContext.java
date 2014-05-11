@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
 import vellum.jx.JMap;
+import vellum.monitor.Tx;
 import vellum.provider.VellumProvider;
 
 /**
@@ -21,30 +22,52 @@ public final class FeedsContext {
     static Logger logger = LoggerFactory.getLogger(FeedsContext.class);
 
     String defaultHtml;
-    String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
-    String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
-    String numericDateFormatString = "yyyyMMdd";
+    final String isoDateTimeFormatString = "yyyy-MM-dd HH:mm";
+    final String displayDateTimeFormatString = "MMMM dd, yyyy 'at' hh:mma";
+    final String numericDateFormatString = "yyyyMMdd";
     long topInitialDelay = Millis.fromSeconds(1);
     long topPeriod = Millis.fromMinutes(2);
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
-    long articleTaskTimeoutSeconds = 3600;
-    int articleTaskThreadPoolSize = 4;
-    int retryCount = 4;
-    boolean once = false;
-    int articleCount = 99;
-    Map<String, String> feedMap = new HashMap();
-    List<FeedEntity> feedEntityList = new ArrayList();
-    ContentStorage storage;
-    TaskManager taskManager;
-    JMap properties;
-    TimestampedMonitor monitor;
+    final long articleTaskTimeoutSeconds = 3600;
+    final int articleTaskThreadPoolSize = 4;
+    final int retryCount = 4;
+    final boolean once = false;
+    final int articleCount = 99;
+    final Map<String, String> feedMap = new HashMap();
+    final List<FeedEntity> feedEntityList = new ArrayList();
+    final ContentStorage storage;
+    final TaskManager taskManager;
+    final JMap properties;
+    final TimestampedMonitor monitor;
     
-    public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
+    public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) throws Exception {
         this.storage = storage;
         this.properties = properties;
+        this.taskManager = taskManager;
+        monitor = new TimestampedMonitor(properties.getMap("monitor"));
+        maxDepth = properties.getInt("maxDepth", maxDepth);
+        topPeriod = properties.getMillis("topPeriod", topPeriod);
+        period = properties.getMillis("period", period);
         putFeed();
+    }
+
+    public void initCore() throws Exception {
+    }
+    
+    public void init() throws Exception {
+        monitor.init();
+        String first = properties.getString("first", null);        
+        Tx tx = monitor.begin("first");
+        VellumProvider.provider.put(this);
+        if (first != null && !first.equals("none")) {
+            logger.info("first", first);
+            FeedTask feedTask = new FeedTask(this);
+            feedTask.start(first, feedMap.get(first), articleCount);
+            feedTask.join();
+        }
+        tx.ok();
     }
     
     private void putFeed() {
@@ -91,16 +114,9 @@ public final class FeedsContext {
         feedMap.put(id, url);
     }
 
-    public void init() throws Exception {
-        monitor = new TimestampedMonitor(properties.getMap("monitor"));
-        maxDepth = properties.getInt("maxDepth", maxDepth);
-        String first = properties.getString("first", null);
-        VellumProvider.provider.put(this);
-        if (first != null && !first.equals("none")) {
-            logger.info("first", first);
-            FeedTask feedTask = new FeedTask(this);
-            feedTask.start(first, feedMap.get(first), articleCount);
-            feedTask.join();
-        }
-    }
+    public TimestampedMonitor getMonitor() {
+        return monitor;
+    }        
 }
+
+

@@ -46,18 +46,22 @@ public class ContentStorage {
     boolean evict = false;
 
     public ContentStorage(JMap properties) {
-        logger.info("properties {}", properties);
+        logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
         storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
     }
+
+    public void initCore() throws IOException {        
+        defaultHtml = Streams.readString(new File(appDir, defaultPath));
+    }
     
     public void init() throws IOException {        
+        initCore();
         prefetchFile = new File(storageDir, prefetchPath);
         prefetchFile.delete();
-        this.defaultHtml = Streams.readString(new File(appDir, defaultPath));
         for (String section : sections) {
             String path = String.format("%s/articles.json", section);
             logger.info("section {} {}", section, path);

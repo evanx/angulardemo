@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
+import vellum.monitor.Tx;
 import vellum.provider.VellumProvider;
 import vellum.util.Streams;
 
@@ -149,14 +150,17 @@ public class ArticleTask implements Runnable {
             logger.error("currentThread: " + currentThread.getName());
         }
         currentThread = Thread.currentThread();
+        Tx tx = context.getMonitor().begin("run", articleId);
         try {
             if (!context.storage.refresh && context.storage.containsKey(articlePath)) {
                 logger.info("containsKey {}", articlePath);
                 map = context.storage.getMap(articlePath);
             } else {
                 clear();
+                tx.sub("parseArticle");
                 parseArticle();
                 if (relatedArticleList.size() > 0 && depth < context.maxDepth) {
+                    tx.sub("parseRelatedArticle");
                     parseRelatedArticle();
                 } else {
                     relatedArticleList.clear();
@@ -164,19 +168,16 @@ public class ArticleTask implements Runnable {
                 store();
             }
             completed = true;
-        } catch (FeedException e) {
-            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
-        } catch (FileNotFoundException e) {
-            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
+            tx.ok();
+        } catch (FeedException | FileNotFoundException e) {
+            tx.warn(e);
         } catch (IOException e) {
-            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             retry = true;
-        } catch (NullPointerException e) {
-            logger.error("run", e);
-        } catch (Throwable e) {
-            logger.error(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()), e);
-            exception = e;
+            tx.warn(e);
+        } catch (Exception e) {
+            tx.error(e);
         }
+        exception = tx.getException();
         currentThread = null;
     }
 

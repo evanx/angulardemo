@@ -28,8 +28,9 @@ public class ReaderMain {
             JsonObjectDelegate object = new JsonObjectDelegate(new File("config.json"));
             logger.info("storage {}", object.getMap("storage"));
             logger.info("feeds {}", object.getMap("feeds"));
-            logger.info("webServer {}", object.getMap("webServer"));
-            ContentStorage contentStorage = new ContentStorage(JMaps.map("storage", System.getProperties()));
+            logger.info("webServer {}", object.getMap("webServer"));            
+            JMap properties = object.getMap();
+            ContentStorage contentStorage = new ContentStorage(properties.getMap("storage"));
             contentStorage.init();
             VellumProvider.provider.put(contentStorage);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html", null);
@@ -37,8 +38,8 @@ public class ReaderMain {
             VellumProvider.provider.put(gitteryContext);
             new GitteryServer().start(gitteryContext);
             TaskManager taskManager = new TaskManager();
-            JMap feedsProperties = JMaps.map("feeds", System.getProperties());
-            FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, feedsProperties);
+            FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, 
+                properties.getMap("feeds"));
             feedsContext.init();
             VellumProvider.provider.put(feedsContext);
             new FeedsTask().start(feedsContext);

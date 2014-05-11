@@ -1,8 +1,6 @@
 package vellum.monitor;
 
 import java.util.Deque;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,9 +18,8 @@ import vellum.jx.JMapException;
  */
 public class TimestampedMonitor implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(TimestampedMonitor.class);
-    private final Map<String, TimestampedTransaction> map = new ConcurrentHashMap();
-    private final Deque<TimestampedTransaction> activeDeque = new ConcurrentLinkedDeque();
-    private final Deque<TimestampedTransaction> completedDeque = new ConcurrentLinkedDeque();
+    private final Deque<Tx> activeDeque = new ConcurrentLinkedDeque();
+    private final Deque<Tx> completedDeque = new ConcurrentLinkedDeque();
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final long limitDuration;
     private final long period;
@@ -33,43 +30,43 @@ public class TimestampedMonitor implements Runnable {
         this.period = properties.getMillis("period", 0);
     }
     
-    public void init() {
+    public void init() {        
         if (period > 0) {
             future = executorService.scheduleAtFixedRate(this, period, period, TimeUnit.MILLISECONDS);        
         } else {
             logger.warn("no period");
-        }
-    }
-
-    public void begin(String type, Object id) {
-        begin(type, id, System.currentTimeMillis());
+        }        
     }
     
-    public void begin(String type, Object id, long time) {
-        TimestampedTransaction tx = new TimestampedTransaction(type, id, time);
-        map.put(tx.getKey(), tx);
+    public void shutdown() {
+        executorService.shutdown();
+    }
+
+    public Tx begin(String type, Object... id) {
+        return begin(System.currentTimeMillis(), type, id);
+    }
+    
+    public Tx begin(long timestamp, String type, Object... id) {
+        Tx tx = new Tx(timestamp, this, type, id);
         activeDeque.add(tx);
+        Tx.threadLocal.set(tx);
+        logger.info("begin {}", tx);
+        return tx;
     }
 
-    public boolean end(String type, Object id) {
-        return end(type, id, 0);
-    }
-    
-    public boolean end(String type, Object id, long duration) {
-        String key = TimestampedTransaction.newKey(type, id);
-        TimestampedTransaction tx = map.remove(key);
-        if (tx == null) {
-            logger.warn("end: tx not found: {}", key);
-            return false;
-        }
-        tx.end(duration);
+    public void finish(Tx tx) {
+        logger.info("finish {}", tx);
         completedDeque.add(tx);
-        logger.info("end: {} {}", key, tx.getDuration());
-        return true;
-    }
-
-    TxAggregateMap completedMap;
-    TxAggregateMap expiredMap;
+        for (Tx sub : tx.subs) {
+            if (!sub.isCompleted()) {
+                sub.duration(0);
+            }
+        }
+        tx.subs.clear();
+}
+    
+    LongAggregateMap completedMap;
+    LongAggregateMap expiredMap;
     
     @Override
     public void run() {
@@ -80,27 +77,27 @@ public class TimestampedMonitor implements Runnable {
         }
     }
 
-    void run(long time) {
-        completedMap = new TxAggregateMap();
-        expiredMap = new TxAggregateMap();
+    void run(long timestamp) {
+        completedMap = new LongAggregateMap();
+        expiredMap = new LongAggregateMap();
         logger.info("run before {}",
-                String.format("map %d, active %d, completed %d", map.size(), activeDeque.size(), completedDeque.size()));
+                String.format("active %d, completed %d", activeDeque.size(), completedDeque.size()));
         handleCompleted();
-        handleExpired(time);
+        handleExpired(timestamp);
         logger.info("run after {}",
-                String.format("map %d, active %d, completed %d", map.size(), activeDeque.size(), completedDeque.size()));
-        logger.info("run expired {}", expiredMap.size());
-        logger.info("run completed {} {}", completedMap.size(), completedMap.all);
+                String.format("active %d, completed %d", activeDeque.size(), completedDeque.size()));
+        logger.info("run expired {}", expiredMap);
+        logger.info("run completed {}", completedMap);
     }
     
-    private void handleExpired(long time) {
+    private void handleExpired(long timestamp) {
         while (!activeDeque.isEmpty()) {
-            TimestampedTransaction tx = activeDeque.peek();
+            Tx tx = activeDeque.peek();
             if (tx != null) {
                 if (tx.getDuration() == 0) {
-                    long duration = time - tx.getTimestamp();
+                    long duration = timestamp - tx.getTimestamp();
                     if (duration >= limitDuration) {
-                        logger.warn("expired {} {}", tx.getKey(), duration);
+                        logger.warn("expired {}", tx);
                         expiredMap.ingest(tx);
                         activeDeque.remove();
                         continue;
@@ -116,7 +113,7 @@ public class TimestampedMonitor implements Runnable {
     
     private void handleCompleted() {
         while (!completedDeque.isEmpty()) {
-            TimestampedTransaction tx = completedDeque.pop();
+            Tx tx = completedDeque.pop();
             completedMap.ingest(tx);
         }
     }    

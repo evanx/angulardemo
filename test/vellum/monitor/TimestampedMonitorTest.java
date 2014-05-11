@@ -15,9 +15,13 @@ import vellum.jx.JMaps;
  *
  * @author evanx
  */
-public class TxAggregateTest {
-    
-    public TxAggregateTest() {
+public class TimestampedMonitorTest {
+
+    JMap properties = new JMap();
+    long futureTimestamp = System.currentTimeMillis() + 9999;
+
+    public TimestampedMonitorTest() {
+        properties.put("limit", "5000");
     }
     
     @BeforeClass
@@ -39,7 +43,6 @@ public class TxAggregateTest {
 
     @Test
     public void testProperties() throws Exception {
-        JMap properties = new JMap();
         properties.put("limit", "2s");
         properties = JMaps.parse(properties.toJson());
         Assert.assertEquals(2000, properties.getMillis("limit"));
@@ -47,15 +50,15 @@ public class TxAggregateTest {
     
     @Test
     public void testSingleTransaction() throws Exception {
-        JMap properties = new JMap();
         properties.put("limit", "10");
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
-        monitor.begin("tx1", 1);
-        monitor.end("tx1", 1, 1);
-        monitor.begin("tx1", 2);        
-        monitor.end("tx1", 2, 20);        
-        monitor.begin("tx1", 3);        
-        monitor.end("tx1", 3, 5);
+        Tx tx;
+        tx = monitor.begin("tx1", 1);
+        tx.duration(1);
+        tx = monitor.begin("tx1", 2);        
+        tx.duration(20);        
+        tx = monitor.begin("tx1", 3);        
+        tx.duration(5);
         monitor.run();
         Assert.assertEquals(0, monitor.expiredMap.size());
         Assert.assertEquals(1, monitor.completedMap.size());
@@ -65,16 +68,15 @@ public class TxAggregateTest {
     
     @Test
     public void testSingleExpired() throws Exception {
-        JMap properties = new JMap();
         properties.put("limit", "10");
-        long start = System.currentTimeMillis();
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
-        monitor.begin("tx1", 1, start);
-        monitor.end("tx1", 1, 1);
-        monitor.begin("tx1", 2, start + 1);        
-        monitor.end("tx1", 2, 20);        
-        monitor.begin("tx1", 3, start + 2);        
-        monitor.run(start + 12);
+        Tx tx;
+        tx = monitor.begin("tx1", 1);
+        tx.duration(1);
+        tx = monitor.begin("tx1", 2);
+        tx.duration(20);        
+        monitor.begin("tx1", 3);
+        monitor.run(futureTimestamp);
         Assert.assertEquals(1, monitor.expiredMap.size());
         Assert.assertEquals(1, monitor.completedMap.size());
         Assert.assertEquals(1, monitor.expiredMap.all.count);
@@ -83,14 +85,13 @@ public class TxAggregateTest {
 
     @Test
     public void testExpired() throws Exception {
-        JMap properties = new JMap();
-        properties.put("limit", "10");
-        long start = System.currentTimeMillis();
+        properties.put("limit", "5000");
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
-        monitor.begin("tx1", 1, start);
-        monitor.end("tx1", 1, 1);
-        monitor.begin("tx2", 1, start + 1);        
-        monitor.run(start + 12);
+        Tx tx;
+        tx = monitor.begin("tx1", 1);
+        tx.duration(1);
+        monitor.begin("tx2", 1);
+        monitor.run(futureTimestamp);
         Assert.assertEquals(1, monitor.expiredMap.size());
         Assert.assertEquals(1, monitor.completedMap.size());
         Assert.assertEquals(1, monitor.expiredMap.all.count);
@@ -99,26 +100,39 @@ public class TxAggregateTest {
  
    @Test
     public void testTransactions() throws Exception {
-        JMap properties = new JMap();
-        properties.put("limit", "10");
-        long start = System.currentTimeMillis();
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
-        monitor.begin("tx1", 1, start);
-        monitor.end("tx1", 1, 2);
-        monitor.begin("tx1", 2, start);
-        monitor.end("tx1", 2, 4);
-        monitor.begin("tx2", 1, start);
-        monitor.end("tx2", 1, 2);        
-        monitor.begin("tx2", 2, start);
-        monitor.end("tx2", 2, 6);        
-        monitor.begin("tx1", 0, start);
-        monitor.begin("tx2", 0, start);
-        monitor.begin("tx3", 0, start);
-        monitor.run(start + 12);
+        Tx tx;
+        tx = monitor.begin("tx1", 1);
+        tx.duration(2);
+        tx = monitor.begin("tx1", 2);
+        tx.duration(4);
+        tx = monitor.begin("tx2", 1);
+        tx.duration(2);        
+        tx = monitor.begin("tx2", 2);
+        tx.duration(6);        
+        monitor.begin("tx1", 0);
+        monitor.begin("tx2", 0);
+        monitor.begin("tx3", 0);
+        monitor.run(futureTimestamp);
         Assert.assertEquals(3, monitor.expiredMap.size());
         Assert.assertEquals(2, monitor.completedMap.size());
         Assert.assertEquals(3, monitor.expiredMap.all.count);
         Assert.assertEquals(4, monitor.completedMap.all.count);
     }
-     
+
+   @Test
+    public void testSub() throws Exception {
+        TimestampedMonitor monitor = new TimestampedMonitor(properties);
+        Tx tx;
+        tx = monitor.begin("tx", 1);
+        Tx sub = tx.sub("sub", 1);
+        sub.duration(2);
+        tx.duration(4);
+        monitor.run(futureTimestamp);
+        Assert.assertEquals(0, monitor.expiredMap.size());
+        Assert.assertEquals(0, monitor.expiredMap.all.count);
+        Assert.assertEquals(2, monitor.completedMap.size());
+        Assert.assertEquals(2, monitor.completedMap.all.count);
+    }
+    
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.monitor.Tx;
 
 /**
  *
@@ -50,14 +51,18 @@ public class FeedTask extends Thread {
     
     @Override
     public void run() {
+        Tx tx = context.monitor.begin("section", section);
         try {
             perform();
+            tx.ok();
         } catch (RuntimeException e) {
             logger.warn("run: " + e.getMessage(), e);
             this.exception = e;
+            tx.error(e);
         } catch (Exception e) {
             logger.warn(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             this.exception = e;
+            tx.error(e);
         }
     }
     
