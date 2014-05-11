@@ -1,5 +1,6 @@
 package iolfeed;
 
+import vellum.monitor.TimestampedMonitor;
 import storage.ContentStorage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public final class FeedsContext {
     ContentStorage storage;
     TaskManager taskManager;
     JMap properties;
+    TimestampedMonitor monitor;
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) {
         this.storage = storage;
@@ -90,6 +92,7 @@ public final class FeedsContext {
     }
 
     public void init() throws Exception {
+        monitor = new TimestampedMonitor(properties.getMap("monitor"));
         maxDepth = properties.getInt("maxDepth", maxDepth);
         String first = properties.getString("first", null);
         VellumProvider.provider.put(this);

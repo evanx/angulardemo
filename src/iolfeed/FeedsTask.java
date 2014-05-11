@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.provider.VellumProvider;
 
 /**
  *
@@ -56,6 +57,8 @@ public class FeedsTask implements Runnable {
     };
             
     private void perform(String section) throws Exception {
+        context.monitor.begin("section", section);
         new FeedTask(context).start(section, context.feedMap.get(section), context.articleCount);
+        context.monitor.end("section", section);
     }
 }
