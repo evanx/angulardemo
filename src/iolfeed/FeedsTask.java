@@ -36,7 +36,9 @@ public class FeedsTask implements Runnable {
     public void run() {
         for (FeedEntity entity : context.feedEntityList) {
             try {
-                start(entity.getId());
+                if (!entity.getId().equals("top")) {
+                    start(entity.getId());
+                }
             } catch (Exception e) {
                 logger.warn("run: " + entity, e);
             }

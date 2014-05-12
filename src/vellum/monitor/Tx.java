@@ -132,10 +132,12 @@ public class Tx implements Timestamped {
         String idString = builder.toString();
         if (error != null) {
             return String.format("%s%s:(%s)", type, idString, error.toString());
-        } else if (duration > 0) {
-            return String.format("%s%s:%sms", type, idString, duration);
-        } else {
+        } else if (duration == 0) {
             return String.format("%s%s", type, idString);
+        } else if (!subs.isEmpty()) {
+            return String.format("%s%s:%d:%sms", type, idString, subs.size(), duration);
+        } else {
+            return String.format("%s%s:%sms", type, idString, duration);
         }
     }
 }

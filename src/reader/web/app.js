@@ -159,6 +159,7 @@ var sectionController = app.controller("sectionController", [
       $scope.sectionLabel = getSectionLabel($routeParams.section);
       $scope.section = $routeParams.section.toLowerCase();
       $scope.state.section = $scope.section;
+      $scope.state.mobile = ($window.innerWidth < 560);
       console.log("sectionController", $scope.section);
       $scope.state.title = getSectionLabel($routeParams.section);
       var jsonPath = $scope.section + "/articles.json";
@@ -217,6 +218,7 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
       var jsonPath = "article/" + $routeParams.articleId + ".json";
       //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
+      $scope.state.mobile = ($window.innerWidth < 560);
       $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
       console.log("article", $window);
       $scope.addThisVisible = false;

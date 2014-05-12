@@ -83,14 +83,14 @@ public final class FeedsContext {
         putFeed("travel", "Travel", "http://www.iol.co.za/cmlink/1.875733");
         putFeed("tonight", "Tonight", "http://www.iol.co.za/cmlink/1.891206");
         putFeed("multimedia", "Multimedia", "http://www.iol.co.za/cmlink/1.738");
-        putFeed("backpage", "News Back Page", "http://www.iol.co.za/cmlink/news-back-page-extended-1.628990");
+        putFeed("backpage", "News back page", "http://www.iol.co.za/cmlink/news-back-page-extended-1.628990");
+        putFeed("mostcommented", "Most Commmented", "http://www.iol.co.za/cmlink/most-commmented-stories-1.1625");
+        putFeed("mostviewed", "Most Viewed", "http://www.iol.co.za/cmlink/most-viewed-stories-1.1624");
+        putFeed("editorspick", "Editors Pick", "http://www.iol.co.za/cmlink/editors-pick-extended-rss-1.1137157");
         if (false) {
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-rss-1.1538217");
             putFeed("home", "Home Page", "http://www.iol.co.za/cmlink/home-page-extended-1.628986");
             putFeed("top", "Top stories", "http://www.iol.co.za/cmlink/tv-box-teaser-rss-1.1537631");
-            putFeed("mostcommented", "Most Commmented", "http://www.iol.co.za/cmlink/most-commmented-stories-1.1625");
-            putFeed("mostviewed", "Most Viewed", "http://www.iol.co.za/cmlink/most-viewed-stories-1.1624");
-            putFeed("editorspick", "Editors Pick", "http://www.iol.co.za/cmlink/editors-pick-extended-rss-1.1137157");
             putFeed("news/videos", "News Videos", "http://www.iol.co.za/cmlink/news-rss-multimedia-videos-feed-1.1152520");
             putFeed("news/galleries", "News Galleries", "http://www.iol.co.za/cmlink/news-rss-multimedia-galleries-feed-1.1149195");
             putFeed("news/africa", "News Africa", "http://www.iol.co.za/cmlink/news-africa-extended-1.679216");
