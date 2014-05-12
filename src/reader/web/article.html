@@ -40,9 +40,9 @@
       </div>
       <p ng-repeat="paragraph in article.paragraphs track by $index" 
          ng-if="$index >= 1 && $index < 8 && $index < article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
-      <img class="article-ad-embed" src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
       <p ng-repeat="paragraph in article.paragraphs track by $index" 
          ng-if="$index >= 8 && $index >= article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
+      <img class="article-ad-embed invisible" src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
     </div>
   </div>
 </div>
@@ -52,7 +52,7 @@
     <div ng-show="article.relatedArticleList">
       <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
       <div ng-repeat="relatedArticle in article.relatedArticleList track by $index" 
-           style="margin-bottom: .5em">
+           style="margin-bottom: .75em">
         <a href="#/{{relatedArticle.path}}" 
            style="font-weight: bold;">{{relatedArticle.title}}</a>
       </div>
@@ -72,6 +72,10 @@
 </div-->
 <div class="row" ng-cloak>
   <div class="col-lg-6">
+      <img class="article-ad-bottom visible-xs" 
+           src="http://aka-cdn-ns.adtech.de/images/341/Ad10398037St1Sz3055Sq105982172V0Id2.jpg"/>
+      <img class="article-ad-bottom invisible-xs"
+            src="http://aka-cdn-ns.adtech.de/images/387/Ad10409347St1Sz225Sq106007817V0Id6.gif"/>
     <div class="view-footer" ng-show="article.link">
       <p>More on <a href="{{article.link}}">IOL.co.za</a></p>
     </div>

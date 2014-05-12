@@ -34,13 +34,11 @@ public class FeedsTask implements Runnable {
     
     @Override
     public void run() {
-        Tx tx = context.monitor.begin("feeds");
         for (FeedEntity entity : context.feedEntityList) {
             try {
-                perform(entity.getId());
-                tx.ok();
+                start(entity.getId());
             } catch (Exception e) {
-                tx.error(e);
+                logger.warn("run: " + entity, e);
             }
         }
     }
@@ -51,14 +49,14 @@ public class FeedsTask implements Runnable {
         @Override
         public void run() {
             try {
-                perform(section);
-            } catch (Throwable e) {
+                start(section);
+            } catch (Exception e) {
                 logger.warn("run: " + section, e);
             }
         }
     };
             
-    private void perform(String section) throws Exception {
+    private void start(String section) throws Exception {
         new FeedTask(context).start(section, context.feedMap.get(section), context.articleCount);
     }
 }

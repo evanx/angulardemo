@@ -150,6 +150,7 @@ public class ArticleTask implements Runnable {
             logger.error("currentThread: " + currentThread.getName());
         }
         currentThread = Thread.currentThread();
+        retry = false;
         Tx tx = context.getMonitor().begin("article", articleId);
         try {
             if (!context.storage.refresh && context.storage.containsKey(articlePath)) {

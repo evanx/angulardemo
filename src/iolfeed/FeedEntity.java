@@ -19,6 +19,9 @@ public class FeedEntity {
     public String getId() {
         return id;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return id;
+    }    
 }
