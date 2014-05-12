@@ -139,7 +139,7 @@ app.controller("appController", ["$scope", "$location", "appService",
                   putSectionArticles(section, data);
                });
             }
-         }, 1000);
+         }, 2000);
       }
    }]);
 

@@ -158,7 +158,6 @@ public class ArticleTask implements Runnable {
                 map = context.storage.getMap(articlePath);
             } else {
                 clear();
-                tx.sub("fetch");
                 parseArticle();
                 if (relatedArticleList.size() > 0 && depth < context.maxDepth) {
                     tx.sub("related");
