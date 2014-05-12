@@ -43,7 +43,7 @@ public class LongAggregate {
         if (count == 0) {
             return "empty";
         } else {
-            return String.format("count %d, sum %d, avg %d", count, sum, sum/count);
+            return String.format("{%s: %d, sum %d, avg %d}", type, count, sum, sum/count);
         }
     }
 }

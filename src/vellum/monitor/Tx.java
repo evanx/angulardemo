@@ -53,7 +53,7 @@ public class Tx implements Timestamped {
         subType = String.format("%s.%s", toString(), subType);
         Tx sub = new Tx(monitor, subType, subId);
         subs.add(sub);
-        logger.info("checkpoint {}", sub);
+        logger.info("sub {}", sub);
         return sub;
     }
 

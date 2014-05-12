@@ -17,7 +17,7 @@ import vellum.jx.JMapException;
  * @author evanx
  */
 public class TimestampedMonitor implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(TimestampedMonitor.class);
+    private final Logger logger = LoggerFactory.getLogger("tx");
     private final Deque<Tx> activeDeque = new ConcurrentLinkedDeque();
     private final Deque<Tx> completedDeque = new ConcurrentLinkedDeque();
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -87,7 +87,9 @@ public class TimestampedMonitor implements Runnable {
         logger.info("run after {}",
                 String.format("active %d, completed %d", activeDeque.size(), completedDeque.size()));
         logger.info("run expired {}", expiredMap);
+        expiredMap.println(System.out);
         logger.info("run completed {}", completedMap);
+        completedMap.println(System.out);
     }
     
     private void handleExpired(long timestamp) {

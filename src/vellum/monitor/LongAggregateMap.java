@@ -20,6 +20,7 @@
  */
 package vellum.monitor;
 
+import java.io.PrintStream;
 import java.util.TreeMap;
 
 /**
@@ -49,6 +50,15 @@ public class LongAggregateMap extends TreeMap<String, LongAggregate> {
 
     @Override
     public String toString() {
-        return String.format("agg %d, %s %s}", size(), all, super.toString());
+        return String.format("agg %d, all %s", size(), all);
     }
+
+    public void println(PrintStream stream) {
+        stream.println(toString());
+        for (LongAggregate agg : values()) {
+            stream.printf("+ %s\n", agg);
+        }
+    }
+    
+    
 }

@@ -150,7 +150,7 @@ public class ArticleTask implements Runnable {
             logger.error("currentThread: " + currentThread.getName());
         }
         currentThread = Thread.currentThread();
-        Tx tx = context.getMonitor().begin("run", articleId);
+        Tx tx = context.getMonitor().begin("article", articleId);
         try {
             if (!context.storage.refresh && context.storage.containsKey(articlePath)) {
                 logger.info("containsKey {}", articlePath);
@@ -160,8 +160,8 @@ public class ArticleTask implements Runnable {
                 tx.sub("parseArticle");
                 parseArticle();
                 if (relatedArticleList.size() > 0 && depth < context.maxDepth) {
-                    tx.sub("parseRelatedArticle");
-                    parseRelatedArticle();
+                    tx.sub("parseRelatedArticles");
+                    parseRelatedArticles();
                 } else {
                     relatedArticleList.clear();
                 }
@@ -181,7 +181,7 @@ public class ArticleTask implements Runnable {
         currentThread = null;
     }
 
-    private void parseRelatedArticle() throws Exception {
+    private void parseRelatedArticles() throws Exception {
         List<RelatedArticleItem> parsedRelatedArticleList = new ArrayList();
         for (RelatedArticleItem item : relatedArticleList) {
             String id = parseArticleId(item.source);

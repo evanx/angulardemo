@@ -8,6 +8,8 @@ import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import java.io.File;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.json.JsonObjectDelegate;
@@ -23,7 +25,9 @@ public class ReaderMain {
 
     public static void main(String[] args) throws Exception {
         try {
-            BasicConfigurator.configure();
+            org.apache.log4j.Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+            org.apache.log4j.Logger.getRootLogger().addAppender(new ConsoleAppender(
+                    new PatternLayout("%d{ISO8601} %p [%c{1}] %m%n")));
             Logger logger = LoggerFactory.getLogger(ReaderMain.class);
             JsonObjectDelegate object = new JsonObjectDelegate(new File("config.json"));
             logger.info("storage {}", object.getMap("storage"));
