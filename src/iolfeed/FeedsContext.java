@@ -30,8 +30,8 @@ public final class FeedsContext {
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
-    final long articleTaskTimeoutSeconds = 3600;
-    final int articleTaskThreadPoolSize = 4;
+    long articleTaskTimeout = Millis.fromMinutes(20);
+    int articleTaskThreadPoolSize = 8;
     final int retryCount = 4;
     final boolean once = false;
     final int articleCount = 99;
@@ -50,6 +50,9 @@ public final class FeedsContext {
         maxDepth = properties.getInt("maxDepth", maxDepth);
         topPeriod = properties.getMillis("topPeriod", topPeriod);
         period = properties.getMillis("period", period);
+        articleTaskTimeout = properties.getMillis("articleTaskTimeout", articleTaskTimeout);
+        articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);
+        
         putFeed();
     }
 

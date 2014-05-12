@@ -136,8 +136,8 @@ public class FeedTask extends Thread {
         }
         executorService.shutdown();
         try {
-            while (!executorService.awaitTermination(context.articleTaskTimeoutSeconds, TimeUnit.SECONDS)) {
-                logger.warn("executor awaitTermination {}s", context.articleTaskTimeoutSeconds);
+            while (!executorService.awaitTermination(context.articleTaskTimeout, TimeUnit.MILLISECONDS)) {
+                logger.warn("executor awaitTermination {}s", context.articleTaskTimeout);
             }
             return true;
         } catch (InterruptedException e) {
