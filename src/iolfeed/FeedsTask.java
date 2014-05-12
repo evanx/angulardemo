@@ -34,7 +34,7 @@ public class FeedsTask implements Runnable {
     
     @Override
     public void run() {
-        Tx tx = context.monitor.begin("FeedsTask");
+        Tx tx = context.monitor.begin("feeds");
         for (FeedEntity entity : context.feedEntityList) {
             try {
                 perform(entity.getId());

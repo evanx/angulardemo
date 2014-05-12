@@ -157,10 +157,10 @@ public class ArticleTask implements Runnable {
                 map = context.storage.getMap(articlePath);
             } else {
                 clear();
-                tx.sub("parseArticle");
+                tx.sub("fetch");
                 parseArticle();
                 if (relatedArticleList.size() > 0 && depth < context.maxDepth) {
-                    tx.sub("parseRelatedArticles");
+                    tx.sub("related");
                     parseRelatedArticles();
                 } else {
                     relatedArticleList.clear();

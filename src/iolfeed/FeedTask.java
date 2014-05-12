@@ -51,16 +51,14 @@ public class FeedTask extends Thread {
     
     @Override
     public void run() {
-        Tx tx = context.monitor.begin("section", section);
+        Tx tx = context.monitor.begin("feed", section);
         try {
             perform();
             tx.ok();
         } catch (RuntimeException e) {
-            logger.warn("run: " + e.getMessage(), e);
             this.exception = e;
             tx.error(e);
         } catch (Exception e) {
-            logger.warn(String.format("run %s: %s", e.getClass().getSimpleName(), e.getMessage()));
             this.exception = e;
             tx.error(e);
         }

@@ -56,7 +56,7 @@ public class LongAggregateMap extends TreeMap<String, LongAggregate> {
     public void println(PrintStream stream) {
         stream.println(toString());
         for (LongAggregate agg : values()) {
-            stream.printf("+ %s\n", agg);
+            stream.printf("+%s\n", agg);
         }
     }
     
