@@ -36,6 +36,7 @@ public class ContentStorage {
     public String appDir;
     public boolean caching;
     public boolean refresh;
+    public boolean prefetching = false;
     public String defaultHtml;
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
@@ -107,14 +108,16 @@ public class ContentStorage {
 
     public synchronized void buildPrefetchContent() throws IOException {
         logger.info("buildPrefetchContent {}", linkSet.size());
-        defaultHtml = Streams.readString(new File(appDir, defaultPath));
-        prefetchContent = new PrefetchBuilder().build(this);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStream stream = new GZIPOutputStream(baos)) {
-            stream.write(prefetchContent);
+        if (prefetching) {
+            defaultHtml = Streams.readString(new File(appDir, defaultPath));
+            prefetchContent = new PrefetchBuilder().build(this);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (OutputStream stream = new GZIPOutputStream(baos)) {
+                stream.write(prefetchContent);
+            }
+            prefetchGzippedContent = baos.toByteArray();
+            Streams.write(prefetchContent, prefetchFile);
         }
-        prefetchGzippedContent = baos.toByteArray();
-        Streams.write(prefetchContent, prefetchFile);
     }
 
     public void addLink(String section, String path) {
