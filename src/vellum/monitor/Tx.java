@@ -50,7 +50,7 @@ public class Tx implements Timestamped {
     }
 
     public Tx sub(String subType, Object... subId) {
-        subType = String.format("%s.%s", type, subType);
+        subType = String.format("%s.%s", toString(), subType);
         Tx sub = new Tx(monitor, subType, subId);
         subs.add(sub);
         logger.info("checkpoint {}", sub);
@@ -126,9 +126,11 @@ public class Tx implements Timestamped {
     public String toString() {
         String idString = Arrays.toString(id);
         if (error != null) {
-            return String.format("%s#%s:%sms:(%s)", type, idString, duration, error.toString());
+            return String.format("%s.%s:(%s)", type, idString, error.toString());
+        } else if (duration > 0) {
+            return String.format("%s.%s:%sms", type, idString, duration);
         } else {
-            return String.format("%s#%s:%sms", type, idString, duration);
+            return String.format("%s.%s", type, idString);
         }
     }
 }
