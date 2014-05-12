@@ -51,7 +51,7 @@ public class FeedTask extends Thread {
     
     @Override
     public void run() {
-        Tx tx = context.monitor.begin("feed", section);
+        Tx tx = context.monitor.begin("FeedTask", section);
         try {
             perform();
             tx.ok();
