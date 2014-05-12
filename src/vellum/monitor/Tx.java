@@ -89,7 +89,7 @@ public class Tx implements Timestamped {
         duration(0);
     }
 
-    public void expire() {        
+    public void expire() {
     }
 
     boolean isCompleted() {
@@ -124,7 +124,14 @@ public class Tx implements Timestamped {
 
     @Override
     public String toString() {
-        String idString = Arrays.toString(id);
+        StringBuilder builder = new StringBuilder();
+        for (Object item : id) {
+            if (builder.length() > 0) {
+                builder.append(".");
+            }
+            builder.append(item.toString());
+        }
+        String idString = builder.toString();
         if (error != null) {
             return String.format("%s.%s:(%s)", type, idString, error.toString());
         } else if (duration > 0) {
