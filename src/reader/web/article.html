@@ -33,7 +33,7 @@
     <div class="article-body" ng-hide="article.youtubeList.length > 0 && article.paragraphs.length === 1">
       <p ng-bind-html="article.paragraphs[0]">         
       <div class="article-image-embed" 
-           ng-hide="article.imageList.length > 0 || article.youtubeList.length > 0">
+           ng-hide="!article.imagePath || article.imageList.length > 0 || article.youtubeList.length > 0">
         <img ng-src="{{article.imagePath}}"/>
         <br>
         <p ng-show="article.imageCaption">{{article.imageCaption}}</p>

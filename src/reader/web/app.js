@@ -99,7 +99,7 @@ app.factory("appService", ["$q", "$http", function($q, $http) {
          loadSection: function(section) {
             var jsonPath = section + "/articles.json";
             $http.get(jsonPath).success(function(data) {
-               console.log("loadSection", jsonPath, data.length);
+               console.log("loadSection", jsonPath);
                defer.resolve(data);
             });
             return defer.promise;

@@ -48,11 +48,12 @@ public final class FeedsContext {
         this.taskManager = taskManager;
         monitor = new TimestampedMonitor(properties.getMap("monitor"));
         maxDepth = properties.getInt("maxDepth", maxDepth);
+        initialDelay = properties.getMillis("initialDelay", initialDelay);
+        topInitialDelay = properties.getMillis("topInitialDelay", topInitialDelay);
         topPeriod = properties.getMillis("topPeriod", topPeriod);
         period = properties.getMillis("period", period);
         articleTaskTimeout = properties.getMillis("articleTaskTimeout", articleTaskTimeout);
-        articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);
-        
+        articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);        
         putFeed();
     }
 
