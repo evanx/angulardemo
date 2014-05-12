@@ -126,18 +126,16 @@ public class Tx implements Timestamped {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (Object item : id) {
-            if (builder.length() > 0) {
-                builder.append(".");
-            }
+            builder.append(".");
             builder.append(item.toString());
         }
         String idString = builder.toString();
         if (error != null) {
-            return String.format("%s.%s:(%s)", type, idString, error.toString());
+            return String.format("%s%s:(%s)", type, idString, error.toString());
         } else if (duration > 0) {
-            return String.format("%s.%s:%sms", type, idString, duration);
+            return String.format("%s%s:%sms", type, idString, duration);
         } else {
-            return String.format("%s.%s", type, idString);
+            return String.format("%s%s", type, idString);
         }
     }
 }
