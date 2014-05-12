@@ -31,7 +31,7 @@ public final class FeedsContext {
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
     long articleTaskTimeout = Millis.fromMinutes(20);
-    int articleTaskThreadPoolSize = 8;
+    int articleTaskThreadPoolSize = 4;
     final int retryCount = 4;
     final boolean once = false;
     final int articleCount = 99;
