@@ -20,18 +20,28 @@ public class LongAggregate {
         return type;
     }
     
-    public void ingest(long value) {
-        if (value < min) min = value;
-        if (value > max) max = value;
+    public boolean ingest(long value) {
         sum += value;
         count++;
+        if (value < min) min = value;
+        if (value > max) {
+            max = value;
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void ingest(LongAggregate agg) {
+    public boolean ingest(LongAggregate agg) {
         count += agg.count;
         sum += agg.sum;
         if (agg.min < min) min = agg.min;
-        if (agg.max > max) max = agg.max;
+        if (agg.max > max) {
+            max = agg.max;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     long avg() {

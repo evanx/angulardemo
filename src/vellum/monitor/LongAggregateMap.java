@@ -29,6 +29,7 @@ import java.util.TreeMap;
  */
 public class LongAggregateMap extends TreeMap<String, LongAggregate> {
     LongAggregate all = new LongAggregate("all");
+    Tx max;
     
     public LongAggregateMap() {
     }
@@ -45,18 +46,20 @@ public class LongAggregateMap extends TreeMap<String, LongAggregate> {
     void ingest(Tx tx) {
         LongAggregate agg = get(tx.getType());
         agg.ingest(tx.getDuration());
-        all.ingest(tx.getDuration());        
+        if (all.ingest(tx.getDuration())) {
+            max = tx;
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("agg %d, all %s", size(), all);
+        return String.format("agg %d, all %s, max %s", size(), all, max);
     }
 
     public void println(PrintStream stream) {
         stream.println(toString());
         for (LongAggregate agg : values()) {
-            stream.printf("+%s\n", agg);
+            stream.printf("+ %s\n", agg);
         }
     }
     
