@@ -5,16 +5,28 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpClientProvider;
+import vellum.data.Millis;
+import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
+import vellum.jx.JMapException;
+import vellum.system.NullConsole;
 import vellum.util.Streams;
 
 /**
@@ -28,8 +40,8 @@ public class ContentStorage {
         "top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel", "multimedia", "videos"
     };
     
-    Map<String, byte[]> map = new HashMap();
-    Map<String, JMap> jsonMap = new HashMap();
+    Map<String, byte[]> map = new ConcurrentHashMap();
+    Map<String, JMap> jsonMap = new ConcurrentHashMap();
     
     public String contentUrl;
     public String storageDir;
@@ -45,21 +57,24 @@ public class ContentStorage {
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
-
-    public ContentStorage(JMap properties) {
+    Deque<StorageItem> deque = new ArrayDeque();
+    FtpSync ftpSync;
+            
+    public ContentStorage(JMap properties) throws JMapException {
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
         storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
+        ftpSync = new FtpSync(JConsoleMap.map(properties, "ftpClient"), deque);        
     }
 
     public void initCore() throws IOException {        
         defaultHtml = Streams.readString(new File(appDir, defaultPath));
     }
     
-    public void init() throws IOException {        
+    public void init() throws Exception {
         initCore();
         prefetchFile = new File(storageDir, prefetchPath);
         prefetchFile.delete();
@@ -79,6 +94,7 @@ public class ContentStorage {
                 evict = true;
             }
         });
+        ftpSync.init();
     }
     
     private void loadContent(String path) throws IOException {
@@ -132,7 +148,9 @@ public class ContentStorage {
     
     public void putJson(String path, JMap map) throws IOException {
         jsonMap.put(path, map);
-        putContent(path, map.toJson().getBytes());
+        byte[] content = map.toJson().getBytes();
+        putContent(path, content);
+        deque.add(new StorageItem(path, content));        
     }
     
     public void putJson(String path, String json) throws IOException {
@@ -165,6 +183,5 @@ public class ContentStorage {
         Streams.postHttp(content, new URL(localImageUrl));
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);
-    }    
-    
+    }
 }

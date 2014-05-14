@@ -5,7 +5,7 @@
        ng-hide="article.youtubeList.length > 0"
        >
     <a class="section-first-image" href="#/article/{{articles[0].articleId}}"
-       ><img ng-src="{{articles[0].imagePath}}"></a>
+       ><img ng-src="{{articles[0].articleImage.source}}"></a>
     <a class="section-first-text" href="#/article/{{articles[0].articleId}}">
       <h1 class="section-heading">{{sectionLabel}}</h1>
       <h4 class="section-first-text-heading">{{articles[0].title}}</h4>
@@ -46,7 +46,7 @@
               <a href="#/article/{{article.articleId}}">{{article.title}}</a>
             </div>
             <div ng-show="article.imagePath" class="article-link-image">
-              <img width="125" ng-src="{{article.imagePath}}">
+              <img width="125" ng-src="{{article.articleImage.source}}">
             </div>
             <div class="article-link-image-youtube" 
                  ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
