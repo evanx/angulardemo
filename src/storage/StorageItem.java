@@ -12,4 +12,11 @@ public class StorageItem {
         this.path = path;
         this.content = content;
     }
+
+    @Override
+    public String toString() {
+        return path;
+    }
+    
+    
 }
