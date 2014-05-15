@@ -109,7 +109,7 @@ public class FtpSync implements Runnable {
             try {
                 ftpClient.makeDirectory(storageDir + '/' + dir);
             } catch (IOException | FtpProtocolException e) {
-                if (!e.getMessage().endsWith("already exists.")) {
+                if (!e.getMessage().contains("exists")) {
                     logger.warn("makeDirectory {} {}", dir, e.getMessage());
                 }
             }
