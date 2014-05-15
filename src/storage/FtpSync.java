@@ -63,6 +63,7 @@ public class FtpSync implements Runnable {
         if (enabled) {
             login();
             list();
+            ftpClient.close();
             logger.info("schedule {} {}", initialDelay, delay);
             executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
         }
@@ -78,9 +79,13 @@ public class FtpSync implements Runnable {
     @Override
     public void run() {
         try {
+            login();
             while (!deque.isEmpty()) {
-                upload(deque.poll());
+                StorageItem item = deque.peek();
+                upload(item);
+                deque.remove(item);
             }
+            ftpClient.close();
         } catch (Exception e) {
             logger.warn("run", e);
         }
