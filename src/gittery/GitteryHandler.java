@@ -181,7 +181,7 @@ public class GitteryHandler implements HttpHandler {
 
     final static long CACHE_MIRROR_MILLIS = Millis.fromDays(28);
     final static long CACHE_IMAGE_MILLIS = Millis.fromDays(3);
-    final static long CACHE_ARTICLES_MILLIS = Millis.fromDays(3);
+    final static long CACHE_ARTICLES_MILLIS = Millis.fromMinutes(3);
     
     private void setContentType() {
         he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
@@ -190,6 +190,8 @@ public class GitteryHandler implements HttpHandler {
         } else if (Streams.getContentType(path).startsWith("image/")) {
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
         } else if (path.endsWith("/articles.json")) {
+            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
+        } else if (path.endsWith(".json")) {
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }

@@ -1,0 +1,85 @@
+<div class="row" ng-cloak>
+  <div class="">
+    <div class="video-container" ng-show="article.youtubeList.length > 0">
+      <div ng-repeat="youtube in article.youtubeList">
+        <iframe width="560" height="315"
+                ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+      </div>
+    </div>
+    <div ng-show="article.youtubeList.length > 0" style="margin: 0 .5em; max-width: 550px">
+      <p>{{article.description}}</p>
+    </div>
+    <div class="carousel" ng-show="article.imageList.length > 1" ng-style="galleryStyle" 
+         style="margin-bottom: .5em; float: left;">
+      <carousel interval="3000">
+        <slide ng-repeat="slide in article.imageList" active="slide.active">
+          <img ng-src="{{slide.path}}" class="carousel">
+          <div class="carousel-caption">
+            <p>{{slide.text}}</p>
+          </div>
+        </slide>
+      </carousel>    
+    </div>
+  </div>
+</div>
+<div class="row" ng-cloak>
+  <div class="col-lg-6 article-content">
+    <h4 class="hidden-xs">
+      <a href="{{article.link}}">{{article.title}}</a>
+    </h4>
+    <h5 ng-show="article.link">
+      <span>{{article.pubDate}} <a href="{{article.link}}">IOL.co.za</a></span>
+    </h5>
+    <div class="article-body" ng-hide="article.youtubeList.length > 0 && article.paragraphs.length === 1">
+      <p ng-bind-html="article.paragraphs[0]">         
+      <div class="article-image-embed" 
+           ng-hide="!article.imagePath || article.imageList.length > 0 || article.youtubeList.length > 0">
+        <img ng-src="{{article.imagePath}}"/>
+        <br>
+        <p ng-show="article.imageCaption">{{article.imageCaption}}</p>
+      </div>
+      <p ng-repeat="paragraph in article.paragraphs track by $index" 
+         ng-if="$index >= 1 && $index < 8 && $index < article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
+      <p ng-repeat="paragraph in article.paragraphs track by $index" 
+         ng-if="$index >= 8 && $index >= article.paragraphs.length - 4" ng-bind-html="paragraph"></p>
+      <img class="article-ad-embed invisible" src="http://aka-cdn-ns.adtech.de/images/59/Ad10538555St1Sz170Sq106029100V0Id1.jpg"/>
+    </div>
+  </div>
+</div>
+</div>
+<div class="row" ng-cloak>
+  <div class="col-lg-6">
+    <div ng-show="article.relatedArticleList">
+      <h4 style="border-top: 1px solid lightgray; padding-top: 4px;">Related stories</h4>
+      <div ng-repeat="relatedArticle in article.relatedArticleList track by $index" 
+           style="margin-bottom: .75em">
+        <a href="#/{{relatedArticle.path}}" 
+           style="font-weight: bold;">{{relatedArticle.title}}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!--div class="row" ng-cloak style="min-height: 20px; margin-top: .5em; margin-bottom: .5em;">
+  <div class="col-lg-6" style="">
+    <div class="addthis_toolbox addthis_default_style" ng-show="addThisVisible"
+         style=""
+         addthis:title="{{article.title}}" addthis:url="{{article.link}}">
+      <a class="addthis_counter addthis_pill_style"></a>
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+      <a class="addthis_button_tweet"></a>
+    </div>
+  </div>
+</div-->
+<div class="row" ng-cloak>
+  <div class="col-lg-6">
+    <img class="article-ad-bottom" 
+         ng-show="state.mobile" 
+         src="http://pagead2.googlesyndication.com/simgad/7343791524619017411"/>
+    <img class="article-ad-bottom"
+         ng-hide="state.mobile"
+         src="http://aka-cdn-ns.adtech.de/images/387/Ad10409347St1Sz225Sq106007817V0Id6.gif"/>
+    <div class="view-footer" ng-show="article.link">
+      <p>More on <a href="{{article.link}}">IOL.co.za</a></p>
+    </div>
+  </div>
+</div>
