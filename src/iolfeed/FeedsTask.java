@@ -1,5 +1,6 @@
 package iolfeed;
 
+import java.util.concurrent.ExecutorService;
 import storage.ContentStorage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,18 +17,20 @@ public class FeedsTask implements Runnable {
     static Logger logger = LoggerFactory.getLogger(FeedsTask.class);
     
     ScheduledExecutorService elapsedExecutorService = Executors.newSingleThreadScheduledExecutor();
+    ExecutorService taskExecutorService;
     FeedsContext context;
     ContentStorage storage;
     
     public void start(FeedsContext context) throws Exception {
         this.context = context;
+        taskExecutorService = Executors.newFixedThreadPool(context.feedTaskThreadPoolSize);
         if (context.once) {
             run();
         } else {
-            elapsedExecutorService.scheduleAtFixedRate(this, context.initialDelay, 
-                    context.period, TimeUnit.MILLISECONDS);
             elapsedExecutorService.scheduleAtFixedRate(topTask, context.topInitialDelay,
                     context.topPeriod, TimeUnit.MILLISECONDS);
+            elapsedExecutorService.scheduleAtFixedRate(this, context.initialDelay, 
+                    context.period, TimeUnit.MILLISECONDS);
         }
     }
     
@@ -36,7 +39,7 @@ public class FeedsTask implements Runnable {
         for (FeedEntity entity : context.feedEntityList) {
             try {
                 if (!entity.getId().equals("top")) {
-                    start(entity.getId());
+                    submit(entity.getId());
                 }
             } catch (Exception e) {
                 logger.warn("run: " + entity, e);
@@ -50,14 +53,14 @@ public class FeedsTask implements Runnable {
         @Override
         public void run() {
             try {
-                start(section);
+                submit(section);
             } catch (Exception e) {
                 logger.warn("run: " + section, e);
             }
         }
     };
             
-    private void start(String section) throws Exception {
-        new FeedTask(context).start(section, context.feedMap.get(section), context.articleCount);
+    private void submit(String section) throws Exception {
+        taskExecutorService.submit(new FeedTask(context, section));
     }
 }

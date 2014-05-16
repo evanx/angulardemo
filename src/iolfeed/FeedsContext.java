@@ -31,6 +31,7 @@ public final class FeedsContext {
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
     long articleTaskTimeout = Millis.fromMinutes(20);
+    int feedTaskThreadPoolSize = 4;
     int articleTaskThreadPoolSize = 4;
     final int retryCount = 4;
     final boolean once = false;
@@ -67,9 +68,8 @@ public final class FeedsContext {
         VellumProvider.provider.put(this);
         if (first != null && !first.equals("none")) {
             logger.info("first", first);
-            FeedTask feedTask = new FeedTask(this);
-            feedTask.start(first, feedMap.get(first), articleCount);
-            feedTask.join();
+            FeedTask feedTask = new FeedTask(this, first);
+            feedTask.run();
         }
         tx.ok();
     }

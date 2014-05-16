@@ -24,29 +24,23 @@ import vellum.monitor.Tx;
  *
  * @author evanx
  */
-public class FeedTask extends Thread {
+public class FeedTask implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(FeedTask.class);
 
-    FeedsContext context;     
-    List<ArticleTask> articleTaskList = new ArrayList();
-
-    String section;
+    final FeedsContext context;     
+    final String section;
+    final String feedUrl;
     int articleCount;
-    String feedUrl;
     Exception exception;
-    boolean refresh;
+    final List<ArticleTask> articleTaskList = new ArrayList();
     
-    public FeedTask(FeedsContext context) {
-        this.context = context;
-    }
-
-    public void start(String section, String feedUrl, int articleCount) throws Exception {
+    public FeedTask(FeedsContext context, String section) throws Exception {
         logger = LoggerFactory.getLogger("FeedTask." + section);
+        this.context = context;
         this.section = section;
-        this.feedUrl = feedUrl;
-        this.articleCount = articleCount;
-        start();
+        feedUrl = context.feedMap.get(section);
+        articleCount = context.articleCount;
     }
     
     @Override
