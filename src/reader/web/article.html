@@ -13,7 +13,7 @@
          style="margin-bottom: .5em; float: left;">
       <carousel interval="3000">
         <slide ng-repeat="slide in article.imageList" active="slide.active">
-          <img ng-src="{{slide.path}}" class="carousel">
+          <img ng-src="{{slide.source}}" class="carousel">
           <div class="carousel-caption">
             <p>{{slide.text}}</p>
           </div>

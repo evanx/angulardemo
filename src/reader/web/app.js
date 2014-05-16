@@ -245,6 +245,13 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
             $scope.addThisVisible = true;
          }, 200);
       };
+      $scope.processArticle = function(article) {
+         if (article.imageList) {
+            for (var i = 0; i < article.imageList.length; i++) {
+            }
+         }
+         return article;
+      };
       $scope.resultHandler = function(data) {
          console.log("articleResult", data);
          $scope.statusMessage = undefined;
