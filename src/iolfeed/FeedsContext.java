@@ -70,9 +70,8 @@ public final class FeedsContext {
             Tx tx = monitor.begin("first");
             FeedTask feedTask = new FeedTask(this, first);
             feedTask.run();
-            tx.ok();
             storage.sync();
-            throw new Exception("first task");
+            tx.ok();
         }
     }
     
