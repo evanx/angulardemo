@@ -5,28 +5,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
-import sun.net.ftp.FtpClient;
-import sun.net.ftp.FtpClientProvider;
-import vellum.data.Millis;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
-import vellum.system.NullConsole;
 import vellum.util.Streams;
 
 /**
@@ -57,8 +48,7 @@ public class ContentStorage {
     File prefetchFile;
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
-    Deque<StorageItem> deque = new ArrayDeque();
-    Deque<StorageItem> syncDeque = new ArrayDeque();
+    Deque<StorageItem> deque;
     FtpSync ftpSync;
             
     public ContentStorage(JMap properties) throws JMapException {
@@ -68,7 +58,7 @@ public class ContentStorage {
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
-        ftpSync = new FtpSync(JConsoleMap.map(properties, "ftpClient"), deque, syncDeque);
+        ftpSync = new FtpSync(JConsoleMap.map(properties, "ftpClient"));
     }
 
     public void initCore() throws IOException {        
@@ -95,7 +85,10 @@ public class ContentStorage {
                 evict = true;
             }
         });
-        ftpSync.init();
+        if (ftpSync.isEnabled()) {
+            ftpSync.init();
+            deque = ftpSync.getDeque();
+        }
     }
     
     private void loadContent(String path) throws IOException {
@@ -151,7 +144,9 @@ public class ContentStorage {
         jsonMap.put(path, map);
         byte[] content = map.toJson().getBytes();
         putContent(path, content);
-        deque.add(new StorageItem(path, content));        
+        if (deque != null) {
+            deque.add(new StorageItem(path, content));        
+        }
     }
     
     public void putJson(String path, String json) throws IOException {

@@ -41,35 +41,42 @@ public class FtpSync implements Runnable {
     String hostname;
     String username;
     char[] password;
-    Deque<StorageItem> deque;
-    Deque<StorageItem> syncDeque;
+    Deque<StorageItem> deque = new ArrayDeque();
+    Deque<StorageItem> syncDeque = new ArrayDeque();
     boolean cancelled = false;
     String storageDir;
     FtpClient ftpClient;
     boolean enabled;
     Set<String> articleIdSet = new HashSet();
+    Set<String> existingDirs = new HashSet();
     
-    public FtpSync(JConsoleMap properties, Deque<StorageItem> deque,
-            Deque<StorageItem> syncDeque) throws JMapException {
-        this.deque = deque;
+    public FtpSync(JConsoleMap properties) throws JMapException {
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
-        port = properties.getInt("port", port);
-        hostname = properties.getString("hostname");
-        username = properties.getString("username");
-        password = properties.getPassword("password");
-        storageDir = properties.getString("storageDir");
-        logger.info("{} {}", username, storageDir);
+        if (enabled) {
+            port = properties.getInt("port", port);
+            hostname = properties.getString("hostname");
+            username = properties.getString("username");
+            password = properties.getPassword("password");
+            storageDir = properties.getString("storageDir");
+            logger.info("{} {}", username, storageDir);
+        }
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Deque<StorageItem> getDeque() {
+        return deque;
+    }
+    
     public void init() throws Exception {
-        if (enabled) {
-            login();
-            list();
-            ftpClient.close();
-            logger.info("schedule {} {}", initialDelay, delay);
-            executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
-        }
+        login();
+        list();
+        ftpClient.close();
+        logger.info("schedule {} {}", initialDelay, delay);
+        executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
     }
 
     private void login() throws Exception {
@@ -100,20 +107,21 @@ public class FtpSync implements Runnable {
     }
 
     void ensureDirectory(final String path) throws Exception {
-        logger.info("ensureDirectory {}", path);
         try {
-            ftpClient.makeDirectory(path);
+            if (!existingDirs.contains(path)) {
+                logger.info("ensureDirectory check {}", path);
+                ftpClient.makeDirectory(path);
+                logger.info("ensureDirectory created {}", path);
+                existingDirs.add(path);
+            }
         } catch (IOException | FtpProtocolException e) {
-            if (!e.getMessage().contains("exists")) {
+            if (e.getMessage().contains("exists")) {
+                logger.info("ensureDirectory exists {}", path);
+                existingDirs.add(path);
+            } else {
                 logger.warn("ensureDirectory {} {}", path, e.getMessage());
             }
         }
-        try {
-            logger.info("dir {} {}", path, ftpClient.getLastModified(path));
-        } catch (IOException | FtpProtocolException e) {
-            logger.warn("ensureDirectory getLastModified {} {}", path, e.getMessage());
-        }
-        
     }
     
     void ensureDirectoryPath(final String path) throws Exception {
