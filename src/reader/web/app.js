@@ -1,84 +1,55 @@
 
-var articles = {};
-
-var sectionList = [
-   {
-      name: "Top",
-      label: "Frontpage"
-   },
-   {
-      name: "News",
-      label: "News"
-   },
-   {
-      name: "Sport",
-      label: "Sport"
-   },
-   {
-      name: "Business",
-      label: "Business"
-   },
-   {
-      name: "SciTech",
-      label: "Science & Technology"
-   },
-   {
-      name: "Motoring",
-      label: "Motoring"
-   },
-   {
-      name: "Lifestyle",
-      label: "Lifestyle"
-   },
-   {
-      name: "Tonight",
-      label: "Tonight"
-   },
-   {
-      name: "Travel",
-      label: "Travel"
-   },
-   {
-      name: "Backpage",
-      label: "Backpage"
-   },
-   {
-      name: "Multimedia",
-      label: "Galleries"
-   },
-   {
-      name: "Videos",
-      label: "Videos"
-   }
-];
-
-function getSectionLabel(name) {
-   for (var i = 0; i < sectionList.length; i++) {
-      if (sectionList[i].name === name) {
-         return sectionList[i].label;
+var appData = {
+   sectionList: [
+      {
+         name: "Top",
+         label: "Frontpage"
+      },
+      {
+         name: "News",
+         label: "News"
+      },
+      {
+         name: "Sport",
+         label: "Sport"
+      },
+      {
+         name: "Business",
+         label: "Business"
+      },
+      {
+         name: "SciTech",
+         label: "Science & Technology"
+      },
+      {
+         name: "Motoring",
+         label: "Motoring"
+      },
+      {
+         name: "Lifestyle",
+         label: "Lifestyle"
+      },
+      {
+         name: "Tonight",
+         label: "Tonight"
+      },
+      {
+         name: "Travel",
+         label: "Travel"
+      },
+      {
+         name: "Backpage",
+         label: "Backpage"
+      },
+      {
+         name: "Multimedia",
+         label: "Galleries"
+      },
+      {
+         name: "Videos",
+         label: "Videos"
       }
-      return name;
-   }
-}
-
-function putArticles(articles) {
-   for (var i = 0; i < articles.length; i++) {
-      putArticle(articles[i]);
-   }
-}
-
-function putSectionArticles(section, articles) {
-   sections[section] = {articles: articles};
-   putArticle(articles);
-}
-
-function isSectionArticles(section) {
-   return sections[section] && sections[section].articles && sections[section].articles.length;
-}
-
-function putArticle(article) {
-   articles[article.articleId] = article;
-}
+   ]};
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
@@ -91,7 +62,73 @@ app.filter('sliceFrom', function() {
 
 app.factory("appService", ["$q", "$http", function($q, $http) {
       var defer = $q.defer();
-      return {
+      var sectionList = appData.sectionList;
+      var articleMap = {};
+      var sectionArticleList = {};
+      var service = {
+         getSectionList: function() {
+            return sectionList;
+         },
+         putArticle: function(article) {
+            articleMap[article.articleId] = article;
+         },
+         putArticles: function(articles) {
+            for (var i = 0; i < articles.length; i++) {
+               service.putArticle(articles[i]);
+            }
+         },
+         isArticle: function(articleId) {
+            return articleMap[articleId] !== undefined;
+         },
+         getArticle: function(articleId) {
+            return articleMap[articleId];
+         },
+         putSectionArticles: function(section, articles) {
+            console.log("putSectionArticles", section, articles);
+            if (!sectionArticleList[section]) {
+               sectionArticleList[section] = [];
+            }
+            if (!articles || articles.length === 0) {
+               console.warn("empty articles", section);
+            } else if (section === 'multimedia') {
+               sectionArticleList[section] = [];
+               for (var i = 0; i < articles.length; i++) {
+                  if (articles[i].imageList && articles[i].imageList.length > 0) {
+                     sectionArticleList[section].push(articles[i]);
+                     service.putArticle(articles[i]);
+                  }
+               }
+            } else if (section === 'videos') {
+               sectionArticleList[section] = [];
+               for (var i = 0; i < articles.length; i++) {
+                  if (articles[i].youtubeList && articles[i].youtubeList.length > 0) {
+                     sectionArticleList[section].push(articles[i]);
+                     service.putArticle(articles[i]);
+                  }
+               }
+            } else {
+               sectionArticleList[section] = articles;
+               service.putArticles(articles);
+            }
+            return sectionArticleList[section];
+         },
+         isSectionArticles: function(section) {
+            return sectionArticleList[section] && sectionArticleList[section].length;
+         },
+         getSectionArticles: function(section) {
+            if (!sectionArticleList[section]) {
+               sectionArticleList[section] = [];
+            }
+            return sectionArticleList[section];
+         },
+         getSectionLabel: function(name) {
+            for (var i = 0; i < sectionList.length; i++) {
+               if (sectionList[i].name === name) {
+                  return sectionList[i].label;
+               }
+               return name;
+            }
+         },
          load: function(url, successHandler, errorHandler) {
             console.log("load", url);
             $http.get(url).success(successHandler).error(errorHandler);
@@ -103,8 +140,17 @@ app.factory("appService", ["$q", "$http", function($q, $http) {
                defer.resolve(data);
             });
             return defer.promise;
+         },
+         init: function() {
+            for (var i = 0; i < sectionList.length; i++) {
+               var section = sectionList[i].name.toLowerCase();
+               service.loadSection(section).then(function(data) {
+                  service.putSectionArticles(section, data);
+               });
+            }
          }
-      }
+      };
+      return service;
    }]);
 
 app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
@@ -133,12 +179,7 @@ app.controller("appController", ["$scope", "$location", "appService",
       };
       if (true) {
          setTimeout(function() {
-            for (var i = 0; i < sectionList.length; i++) {
-               var section = sectionList[i].name.toLowerCase();
-               appService.loadSection(section).then(function(data) {
-                  putSectionArticles(section, data);
-               });
-            }
+            appService.init();
          }, 2000);
       }
    }]);
@@ -146,7 +187,7 @@ app.controller("appController", ["$scope", "$location", "appService",
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
    function($scope, $location, $window, appService) {
       $scope.state.title = "My Independent";
-      $scope.sections = sectionList;
+      $scope.sections = appService.getSectionList();
       $scope.selected = function(section) {
          console.log("selected", section);
          $location.path("section/" + section);
@@ -156,29 +197,22 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
 var sectionController = app.controller("sectionController", [
    "$scope", "$location", "$routeParams", "$window", "appService",
    function($scope, $location, $routeParams, $window, appService) {
-      $scope.sectionLabel = getSectionLabel($routeParams.section);
+      $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
       $scope.section = $routeParams.section.toLowerCase();
       $scope.state.section = $scope.section;
       $scope.state.mobile = ($window.innerWidth < 560);
       console.log("sectionController", $scope.section);
-      $scope.state.title = getSectionLabel($routeParams.section);
+      $scope.state.title = appService.getSectionLabel($routeParams.section);
       var jsonPath = $scope.section + "/articles.json";
       $scope.resultHandler = function(data) {
-         $scope.statusMessage = undefined;
-         $scope.articles = data;
-         if (data && data.length > 0) {
-            sections[$scope.section] = {articles: data};
-            putArticles($scope.articles);
-         }
+         $scope.statusMessage = "Loaded";
+         $scope.articles = appService.putSectionArticles($scope.section, data);
       };
       $scope.errorHandler = function() {
-         $scope.statusMessage = undefined;
+         $scope.statusMessage = "Failed";
       };
-      console.log("sections", sections, sections[$scope.section]);
-      if (sections[$scope.section] && sections[$scope.section].articles &&
-              sections[$scope.section].articles.length) {
-         $scope.articles = sections[$scope.section].articles;
-         putArticles($scope.articles);
+      if (appService.isSectionArticles($scope.section)) {
+         $scope.articles = appService.getSectionArticles($scope.section);
       } else {
          $scope.statusMessage = "Loading " + jsonPath;
          appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
@@ -239,11 +273,13 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
          console.log("galleryStyle", $scope.galleryStyle);
       };
       $scope.scheduleAddThis = function() {
-         $timeout(function() {
-            console.log("addthis", addthis);
-            addthis.toolbox(".addthis_toolbox");
-            $scope.addThisVisible = true;
-         }, 200);
+         if (typeof addthis !== 'undefined') {
+            $timeout(function() {
+               console.log("addthis", addthis);
+               addthis.toolbox(".addthis_toolbox");
+               $scope.addThisVisible = true;
+            }, 200);
+         }
       };
       $scope.processArticle = function(article) {
          if (article.imageList) {
@@ -254,19 +290,19 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
       };
       $scope.resultHandler = function(data) {
          console.log("articleResult", data);
-         $scope.statusMessage = undefined;
+         $scope.statusMessage = "Loaded";
          $scope.article = data;
          $scope.setStyle();
          $scope.state.title = $scope.article.title;
-         putArticle($scope.article);
+         appService.putArticle($scope.article);
          $scope.scheduleAddThis();
       };
       $scope.errorHandler = function() {
-         $scope.statusMessage = undefined;
+         $scope.statusMessage = "Failed";
       };
       console.log("articleController", $routeParams.articleId, jsonPath);
-      if (articles[$routeParams.articleId]) {
-         $scope.article = articles[$routeParams.articleId];
+      if (appService.isArticle($routeParams.articleId)) {
+         $scope.article = appService.getArticle($routeParams.articleId);
          $scope.state.title = $scope.article.title;
          $scope.scheduleAddThis();
       } else {

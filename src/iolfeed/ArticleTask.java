@@ -424,7 +424,12 @@ public class ArticleTask implements Runnable {
             map.put("maxHeight", maxHeight);
         }
         map.put("imagePath", imagePath);
-        map.put("imageList", imageList);
+        if (!imageList.isEmpty()) {
+            map.put("imageList", imageList);
+        }
+        if (articleImage != null) {
+            map.put("articleImage", articleImage);
+        }
         if (!relatedArticleList.isEmpty()) {
             map.put("relatedArticleList", relatedArticleList);
         }
@@ -442,9 +447,6 @@ public class ArticleTask implements Runnable {
         }
         if (topic != null) {
             map.put("topic", topic);
-        }
-        if (articleImage != null) {
-            map.put("articleImage", articleImage);
         }
         context.storage.putJson(articlePath, map);
     }

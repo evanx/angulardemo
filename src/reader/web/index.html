@@ -90,11 +90,13 @@
       .section-first-text-heading {
         font-size: 18pt;
       }
-      .section-first-image {        
+      .section-first-image,
+      .section-first-image-gallery {        
         display: inline-block;
         width: 100%;
       }
-      .section-first-image img {
+      .section-first-image img,
+      .section-first-image-gallery img {
         float: right;
       }
       @media screen and (min-width: 560px) {
@@ -109,7 +111,11 @@
         }
         .section-first-image img {
           border: lightgray solid 1px;
-          max-width: 300px;
+          max-height: 225px;
+        }
+        .section-first-image-gallery img {
+          border: lightgray solid 1px;
+          max-height: 225px;
         }
       }
       @media screen and (max-width: 560px) {
@@ -464,7 +470,6 @@
       <!--script src="/mirror/offcanvas.js"></script-->
       <script src="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
-                      var sections = {};
                       var addthis_config = {
                         "data_track_addressbar": false
                       };
