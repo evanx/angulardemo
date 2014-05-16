@@ -4,9 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -42,12 +42,15 @@ public class FtpSync implements Runnable {
     String username;
     char[] password;
     Deque<StorageItem> deque;
+    Deque<StorageItem> syncDeque;
     boolean cancelled = false;
     String storageDir;
     FtpClient ftpClient;
     boolean enabled;
-
-    public FtpSync(JConsoleMap properties, Deque<StorageItem> deque) throws JMapException {
+    Set<String> articleIdSet = new HashSet();
+    
+    public FtpSync(JConsoleMap properties, Deque<StorageItem> deque,
+            Deque<StorageItem> syncDeque) throws JMapException {
         this.deque = deque;
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
@@ -85,36 +88,52 @@ public class FtpSync implements Runnable {
                 upload(item);
                 deque.remove(item);
             }
+            while (!syncDeque.isEmpty()) {
+                StorageItem item = syncDeque.peek();
+                sync(item);
+                deque.remove(item);
+            }
             ftpClient.close();
         } catch (Exception e) {
             logger.warn("run", e);
         }
     }
 
-    void upload(StorageItem item) throws Exception {
-        logger.info("upload {}", item);
-        Deque<String> parentDirList = new ArrayDeque();
-        String path = item.path;
-        while (true) {
-            int index = path.lastIndexOf('/');
+    void ensureDirectory(final String path) throws Exception {
+        logger.info("ensureDirectory {}", path);
+        try {
+            ftpClient.makeDirectory(path);
+        } catch (IOException | FtpProtocolException e) {
+            if (!e.getMessage().contains("exists")) {
+                logger.warn("ensureDirectory {} {}", path, e.getMessage());
+            }
+        }
+        try {
+            logger.info("dir {} {}", path, ftpClient.getLastModified(path));
+        } catch (IOException | FtpProtocolException e) {
+            logger.warn("ensureDirectory getLastModified {} {}", path, e.getMessage());
+        }
+        
+    }
+    
+    void ensureDirectoryPath(final String path) throws Exception {
+        int fromIndex = path.indexOf('/');
+        while (fromIndex > 0) {
+            int index = path.indexOf('/', fromIndex + 1);
             if (index > 0) {
-                path = path.substring(0, index);
-                parentDirList.add(path);
+                String dir = path.substring(0, index);
+                ensureDirectory(dir);
+                fromIndex = index;
             } else {
                 break;
             }
         }
-        while (!parentDirList.isEmpty()) {
-            String dir = parentDirList.removeLast();
-            try {
-                ftpClient.makeDirectory(storageDir + '/' + dir);
-            } catch (IOException | FtpProtocolException e) {
-                if (!e.getMessage().contains("exists")) {
-                    logger.warn("makeDirectory {} {}", dir, e.getMessage());
-                }
-            }
-        }
-        path = storageDir + '/' + item.path;
+    }
+    
+    void upload(StorageItem item) throws Exception {
+        logger.info("upload {}", item);
+        String path = storageDir + '/' + item.path;
+        ensureDirectoryPath(path);
         ftpClient.putFile(path, new ByteArrayInputStream(item.content));
     }
 
@@ -123,5 +142,16 @@ public class FtpSync implements Runnable {
         for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
             logger.info("entry {}", entry);
         }
+    }
+    
+    void sync(StorageItem item) throws Exception {
+        String path = storageDir + "/" + item.path;
+        long size = ftpClient.getSize(path);
+        if (size != item.content.length) {
+            logger.warn("sync {} {}", item, size);
+            ftpClient.putFile(path, new ByteArrayInputStream(item.content));
+        } else {
+            logger.info("sync {} {}", item, size);
+        }        
     }
 }

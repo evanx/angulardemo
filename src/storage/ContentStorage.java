@@ -58,6 +58,7 @@ public class ContentStorage {
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
     Deque<StorageItem> deque = new ArrayDeque();
+    Deque<StorageItem> syncDeque = new ArrayDeque();
     FtpSync ftpSync;
             
     public ContentStorage(JMap properties) throws JMapException {
@@ -67,7 +68,7 @@ public class ContentStorage {
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
-        ftpSync = new FtpSync(JConsoleMap.map(properties, "ftpClient"), deque);        
+        ftpSync = new FtpSync(JConsoleMap.map(properties, "ftpClient"), deque, syncDeque);
     }
 
     public void initCore() throws IOException {        

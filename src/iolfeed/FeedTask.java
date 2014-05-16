@@ -169,7 +169,7 @@ public class FeedTask extends Thread {
                     new Gson().toJson(completedArticleList));
             context.storage.buildPrefetchContent();
             return completed;
-        } catch (Throwable e) {
+        } catch (IOException e) {
             logger.error("write", e);
             return false;            
         }

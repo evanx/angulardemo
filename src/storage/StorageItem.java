@@ -15,7 +15,7 @@ public class StorageItem {
 
     @Override
     public String toString() {
-        return path;
+        return String.format("%s %d", path, content.length);
     }
     
     
