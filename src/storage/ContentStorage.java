@@ -91,6 +91,10 @@ public class ContentStorage {
         }
     }
     
+    public void sync() {
+        ftpSync.run();
+    }
+    
     private void loadContent(String path) throws IOException {
         File file = new File(storageDir, path);
         if (file.exists()) {
@@ -144,9 +148,6 @@ public class ContentStorage {
         jsonMap.put(path, map);
         byte[] content = map.toJson().getBytes();
         putContent(path, content);
-        if (deque != null) {
-            deque.add(new StorageItem(path, content));        
-        }
     }
     
     public void putJson(String path, String json) throws IOException {
@@ -163,6 +164,11 @@ public class ContentStorage {
         } else {
             Streams.write(content, file);        
         }
+        if (path.endsWith(".json")) {
+            if (deque != null) {
+                deque.add(new StorageItem(path, content));        
+            }
+        }        
     }
 
     public boolean containsKey(String path) {

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import vellum.exception.ParseException;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
+import vellum.util.Lists;
 
 /**
  *
@@ -90,6 +91,9 @@ public class TimestampedMonitor implements Runnable {
         expiredMap.println(System.out);
         logger.info("run completed {}", completedMap);
         completedMap.println(System.out);
+        for (Tx tx : Lists.list(activeDeque.iterator())) {
+            logger.info("- {}", tx);  
+        }
     }
     
     private void handleExpired(long timestamp) {

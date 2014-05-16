@@ -133,7 +133,8 @@ public class Tx implements Timestamped {
         if (error != null) {
             return String.format("%s%s:(%s)", type, idString, error.toString());
         } else if (duration == 0) {
-            return String.format("%s%s", type, idString);
+            long activeDuration = System.currentTimeMillis() - timestamp;
+            return String.format("%s%s:active:%d:+%sms", type, idString, subs.size(), activeDuration);
         } else if (!subs.isEmpty()) {
             return String.format("%s%s:%d:%sms", type, idString, subs.size(), duration);
         } else {
