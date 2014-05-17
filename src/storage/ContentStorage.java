@@ -54,7 +54,7 @@ public class ContentStorage {
     FtpSync ftpSync;
     TimestampedMonitor monitor;
     
-    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException {
+    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException {
         this.monitor = monitor;
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
@@ -63,15 +63,15 @@ public class ContentStorage {
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
         ftpSync = new FtpSync(monitor, JConsoleMap.map(properties, "ftpClient"));
-    }
-
-    public void initCore() throws IOException {
         defaultHtml = Streams.readString(new File(appDir, defaultPath));
+        prefetchFile = new File(storageDir, prefetchPath);
     }
 
-    public void init() throws Exception {
-        initCore();
-        prefetchFile = new File(storageDir, prefetchPath);
+    public void start() throws Exception {
+        if (ftpSync.isEnabled()) {
+            ftpSync.start();
+            deque = ftpSync.getDeque();
+        }
         prefetchFile.delete();
         for (String section : sections) {
             String path = String.format("%s/articles.json", section);
@@ -91,21 +91,10 @@ public class ContentStorage {
         });
     }
 
-    public void initSchedule() throws Exception {
-        if (ftpSync.isEnabled()) {
-            ftpSync.initSchedule();
-            deque = ftpSync.getDeque();
-        }
-    }
-
-    public TimestampedMonitor getMonitor() {
-        return monitor;
-    }
-        
     public void sync() {
         ftpSync.run();
     }
-
+            
     private void loadContent(String path) throws IOException {
         File file = new File(storageDir, path);
         if (file.exists()) {
@@ -180,7 +169,7 @@ public class ContentStorage {
                 deque.add(new StorageItem(path, content));
                 logger.info("Ftp deque {}", deque.size());
             } else {
-                logger.warn("null deque");
+                logger.warn("deque");
             }
         }
     }

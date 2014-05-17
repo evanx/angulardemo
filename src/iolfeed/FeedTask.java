@@ -49,6 +49,7 @@ public class FeedTask implements Runnable {
         try {
             perform();
             tx.ok();
+            context.storage.sync();
         } catch (RuntimeException e) {
             this.exception = e;
             tx.error(e);
@@ -92,8 +93,7 @@ public class FeedTask implements Runnable {
             map.put("numDate", numericDateFormat.format(entry.getPublishedDate()));
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM", "pm"));
             map.put("link", entry.getLink());
-            ArticleTask articleTask = new ArticleTask(map);
-            articleTask.init(context);
+            ArticleTask articleTask = new ArticleTask(context, map);
             articleTaskList.add(articleTask);
             if (articleCount > 0) {
                 articleCount--;

@@ -35,8 +35,8 @@ public class FtpSync implements Runnable {
 
     Deque<String> pathDeque = new ArrayDeque();
     ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    long initialDelay = Millis.fromSeconds(60);
-    long delay = Millis.fromSeconds(60);
+    long initialDelay = Millis.fromSeconds(30);
+    long delay = Millis.fromSeconds(15);
     ScheduledFuture future;
     JMap properties;
     int port = 21;
@@ -75,7 +75,7 @@ public class FtpSync implements Runnable {
         return deque;
     }
     
-    public void initSchedule() throws Exception {
+    public void start() throws Exception {
         logger.info("schedule {} {}", initialDelay, delay);
         executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
         try {
@@ -142,6 +142,7 @@ public class FtpSync implements Runnable {
     void ensureDirectoryPath(final String path) throws Exception {
         int fromIndex = path.indexOf('/');
         while (fromIndex > 0) {
+            logger.info("ensureDirectoryPath {} {}", path, fromIndex);
             int index = path.indexOf('/', fromIndex + 1);
             if (index > 0) {
                 String dir = path.substring(0, index);

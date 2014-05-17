@@ -110,8 +110,7 @@ public class VideoArticleTaskIntegrationTest {
         map.put("pubDate", "April 22 2014 at 07:08am");
         map.put("numDate", "20140423");
         map.put("link", link);
-        ArticleTask articleTask = new ArticleTask(map);
-        articleTask.init(feedsContext);
+        ArticleTask articleTask = new ArticleTask(feedsContext, map);
         articleTask.run();
         System.out.println(articleTask.map.toJson());
         Assert.assertTrue(articleTask.isCompleted());
@@ -131,8 +130,7 @@ public class VideoArticleTaskIntegrationTest {
         map.put("pubDate", pubDate);
         map.put("numDate", numDate);
         map.put("link", link);
-        ArticleTask articleTask = new ArticleTask(map);
-        articleTask.init(feedsContext);
+        ArticleTask articleTask = new ArticleTask(feedsContext, map);
         articleTask.run();
         System.out.println(articleTask.map.toJson());
         return articleTask;

@@ -16,9 +16,6 @@ public class GitteryContext {
         this.repo = repo;
     }
 
-    public void init() {
-    }
-    
     @Override
     public String toString() {
         return Args.format(port, repo);

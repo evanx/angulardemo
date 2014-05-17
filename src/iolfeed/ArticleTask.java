@@ -91,24 +91,24 @@ public class ArticleTask implements Runnable {
     Thread currentThread;
     boolean byline;
 
-    ArticleTask(JMap map) {
-        this.map = map;
-    }
-
-    ArticleTask(int depth, RelatedArticleItem storyItem) {
-        this.depth = depth;
-        this.map = new JMap();
-        map.put("link", storyItem.source);
-        map.put("title", storyItem.title);
-    }
-
-    public void init(FeedsContext context) throws JMapException, FeedException {
+    ArticleTask(FeedsContext context, JMap map) throws FeedException, JMapException {
         this.context = context;
-        this.storage = context.storage;
+        this.map = map;
         sourceArticleUrl = map.getString("link");
         articleId = parseArticleId(sourceArticleUrl);
         logger = LoggerFactory.getLogger(String.format("ArticleTask.%s", articleId));
         articlePath = formatArticlePath(articleId);
+    }
+
+    ArticleTask(FeedsContext context, RelatedArticleItem storyItem, int depth) 
+            throws FeedException, JMapException {
+        this(context, storyItem.map());
+        this.depth = depth;
+    }
+
+    public void init() throws JMapException, FeedException {
+        this.context = context;
+        this.storage = context.storage;
     }
 
     private static String formatArticlePath(String id) {
@@ -190,8 +190,7 @@ public class ArticleTask implements Runnable {
                 logger.info("relatedArticlePath exists {}", jsonPath);
                 parsedRelatedArticleList.add(item);
             } else {
-                ArticleTask task = new ArticleTask(depth + 1, item);
-                task.init(context);
+                ArticleTask task = new ArticleTask(context, item, depth + 1);
                 task.run();
                 if (task.isCompleted()) {
                     parsedRelatedArticleList.add(item);

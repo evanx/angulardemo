@@ -15,14 +15,12 @@ public class FeedsMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            JMap monitorProperties = new JMap();
-            TimestampedMonitor monitor = new TimestampedMonitor(monitorProperties);
-            ContentStorage storage = new ContentStorage(monitor, 
-                    JMaps.map("storage", System.getProperties()));
-            new FeedsTask().start(new FeedsContext(
-                    new TaskManager(), 
-                    storage,
-                    JMaps.map("feeds", System.getProperties())));
+            JMap properties = JMaps.map(System.getProperties());
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
+            TaskManager taskManager = new TaskManager();
+            ContentStorage storage = new ContentStorage(monitor, properties.getMap("storage"));
+            new FeedsTask().start(new FeedsContext(monitor, taskManager, storage,
+                    properties.getMap("feeds")));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

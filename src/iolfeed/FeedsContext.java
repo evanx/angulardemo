@@ -43,9 +43,9 @@ public final class FeedsContext {
     final JMap properties;
     final TimestampedMonitor monitor;
     
-    public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) throws Exception {
+    public FeedsContext(TimestampedMonitor monitor, TaskManager taskManager, ContentStorage storage, JMap properties) throws Exception {
         this.storage = storage;
-        this.monitor = storage.getMonitor();
+        this.monitor = monitor;
         this.properties = properties;
         this.taskManager = taskManager;
         maxDepth = properties.getInt("maxDepth", maxDepth);
@@ -58,13 +58,8 @@ public final class FeedsContext {
         putFeed();
     }
 
-    public void initCore() throws Exception {
-    }
-    
-    public void init() throws Exception {
-        monitor.init();
+    public void start() throws Exception {
         String first = properties.getString("first", null);        
-        VellumProvider.provider.put(this);
         if (first != null && !first.equals("none")) {
             logger.info("first", first);
             Tx tx = monitor.begin("first");
@@ -123,5 +118,3 @@ public final class FeedsContext {
         return monitor;
     }        
 }
-
-
