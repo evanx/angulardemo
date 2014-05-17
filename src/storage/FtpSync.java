@@ -34,7 +34,7 @@ public class FtpSync implements Runnable {
     Logger logger = LoggerFactory.getLogger(FtpSync.class);
 
     Deque<String> pathDeque = new ArrayDeque();
-    ScheduledExecutorService executorService = new VellumScheduledThreadPoolExecutor(1);
+    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     ScheduledFuture future;
     long initialDelay = Millis.fromSeconds(30);
     long delay = Millis.fromSeconds(15);
@@ -111,8 +111,6 @@ public class FtpSync implements Runnable {
             tx.ok();
         } catch (Exception e) {
             tx.error(e);            
-        } catch (Throwable t) {
-            tx.error(t);            
         } finally {
             tx.fin();
         }
@@ -171,9 +169,6 @@ public class FtpSync implements Runnable {
             } catch (IOException | FtpProtocolException ex) {
                 tx.error(ex);
             }
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-            tx.error(t);
         } finally {
             tx.fin();
         }
