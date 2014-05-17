@@ -4,16 +4,10 @@
 package iolfeed;
 
 import storage.ContentStorage;
-import org.apache.log4j.BasicConfigurator;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.monitor.TimestampedMonitor;
 import vellum.provider.VellumProvider;
 
 /**
@@ -26,8 +20,10 @@ public class TestFeedContexts {
 
     public static FeedsContext newFeedContext() {
         try {
+            JMap monitorProperties = new JMap();
+            TimestampedMonitor monitor = new TimestampedMonitor(monitorProperties);
             JMap storageProperties = new JMap();
-            ContentStorage contentStorage = new ContentStorage(storageProperties);
+            ContentStorage contentStorage = new ContentStorage(monitor, storageProperties);
             contentStorage.initCore();
             TaskManager taskManager = new TaskManager();
             VellumProvider.provider.put(contentStorage);

@@ -45,9 +45,9 @@ public final class FeedsContext {
     
     public FeedsContext(TaskManager taskManager, ContentStorage storage, JMap properties) throws Exception {
         this.storage = storage;
+        this.monitor = storage.getMonitor();
         this.properties = properties;
         this.taskManager = taskManager;
-        monitor = new TimestampedMonitor(properties.getMap("monitor"));
         maxDepth = properties.getInt("maxDepth", maxDepth);
         initialDelay = properties.getMillis("initialDelay", initialDelay);
         topInitialDelay = properties.getMillis("topInitialDelay", topInitialDelay);

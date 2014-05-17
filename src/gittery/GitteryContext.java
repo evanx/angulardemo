@@ -1,7 +1,6 @@
 package gittery;
 
 import storage.ContentStorage;
-import vellum.provider.VellumProvider;
 import vellum.util.Args;
 
 public class GitteryContext {

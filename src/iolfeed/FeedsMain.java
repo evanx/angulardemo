@@ -2,7 +2,9 @@ package iolfeed;
 
 import storage.ContentStorage;
 import org.apache.log4j.BasicConfigurator;
+import vellum.jx.JMap;
 import vellum.jx.JMaps;
+import vellum.monitor.TimestampedMonitor;
 
 /**
  *
@@ -13,7 +15,10 @@ public class FeedsMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            ContentStorage storage = new ContentStorage(JMaps.map("storage", System.getProperties()));
+            JMap monitorProperties = new JMap();
+            TimestampedMonitor monitor = new TimestampedMonitor(monitorProperties);
+            ContentStorage storage = new ContentStorage(monitor, 
+                    JMaps.map("storage", System.getProperties()));
             new FeedsTask().start(new FeedsContext(
                     new TaskManager(), 
                     storage,

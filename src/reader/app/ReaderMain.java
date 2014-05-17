@@ -7,14 +7,13 @@ import storage.ContentStorage;
 import iolfeed.FeedsContext;
 import iolfeed.TaskManager;
 import java.io.File;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.json.JsonObjectDelegate;
 import vellum.jx.JMap;
-import vellum.jx.JMaps;
+import vellum.monitor.TimestampedMonitor;
 import vellum.provider.VellumProvider;
 
 /**
@@ -34,7 +33,8 @@ public class ReaderMain {
             logger.info("feeds {}", object.getMap("feeds"));
             logger.info("webServer {}", object.getMap("webServer"));            
             JMap properties = object.getMap();
-            ContentStorage contentStorage = new ContentStorage(properties.getMap("storage"));
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
+            ContentStorage contentStorage = new ContentStorage(monitor, properties.getMap("storage"));
             contentStorage.init();
             VellumProvider.provider.put(contentStorage);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html", null);
@@ -45,6 +45,7 @@ public class ReaderMain {
             FeedsContext feedsContext = new FeedsContext(taskManager, contentStorage, 
                 properties.getMap("feeds"));
             feedsContext.init();
+            contentStorage.initSchedule();
             VellumProvider.provider.put(feedsContext);
             new FeedsTask().start(feedsContext);
         } catch (Exception e) {

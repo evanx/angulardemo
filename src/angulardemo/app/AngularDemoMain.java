@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
 import vellum.jx.JMaps;
+import vellum.monitor.TimestampedMonitor;
 
 /**
  *
@@ -26,7 +27,9 @@ public class AngularDemoMain {
     public static void main(String[] args) throws Exception {
         try {
             BasicConfigurator.configure();
-            ContentStorage storage = new ContentStorage(JMaps.map("storage", System.getProperties()));
+            JMap properties = JMaps.map(System.getProperties());
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
+            ContentStorage storage = new ContentStorage(monitor, properties.getMap("storage"));
             new GitteryServer().start(new GitteryContext(storage,
                     "angulardemo/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web"));

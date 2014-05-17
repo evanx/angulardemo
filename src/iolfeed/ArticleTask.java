@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
 import vellum.monitor.Tx;
-import vellum.provider.VellumProvider;
 import vellum.util.Streams;
 
 /**
@@ -103,9 +102,9 @@ public class ArticleTask implements Runnable {
         map.put("title", storyItem.title);
     }
 
-    public void init() throws JMapException, FeedException {
-        context = VellumProvider.provider.get(FeedsContext.class);
-        storage = VellumProvider.provider.get(ContentStorage.class);
+    public void init(FeedsContext context) throws JMapException, FeedException {
+        this.context = context;
+        this.storage = context.storage;
         sourceArticleUrl = map.getString("link");
         articleId = parseArticleId(sourceArticleUrl);
         logger = LoggerFactory.getLogger(String.format("ArticleTask.%s", articleId));
@@ -192,7 +191,7 @@ public class ArticleTask implements Runnable {
                 parsedRelatedArticleList.add(item);
             } else {
                 ArticleTask task = new ArticleTask(depth + 1, item);
-                task.init();
+                task.init(context);
                 task.run();
                 if (task.isCompleted()) {
                     parsedRelatedArticleList.add(item);

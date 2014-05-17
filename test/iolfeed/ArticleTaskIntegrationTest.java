@@ -54,7 +54,7 @@ public class ArticleTaskIntegrationTest {
         map.put("numDate", "20140423");
         map.put("link", link);
         ArticleTask articleTask = new ArticleTask(map);
-        articleTask.init();
+        articleTask.init(feedsContext);
         articleTask.run();
         Assert.assertTrue(articleTask.isCompleted());
         Assert.assertTrue(articleTask.paragraphs.size() > 5);

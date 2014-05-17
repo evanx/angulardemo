@@ -93,7 +93,7 @@ public class FeedTask implements Runnable {
             map.put("pubDate", displayTimestampFormat.format(entry.getPublishedDate()).replace("AM", "am").replace("PM", "pm"));
             map.put("link", entry.getLink());
             ArticleTask articleTask = new ArticleTask(map);
-            articleTask.init();
+            articleTask.init(context);
             articleTaskList.add(articleTask);
             if (articleCount > 0) {
                 articleCount--;

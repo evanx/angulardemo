@@ -21,6 +21,8 @@ import vellum.data.Millis;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
+import vellum.monitor.TimestampedMonitor;
+import vellum.monitor.Tx;
 import vellum.util.Lists;
 
 /**
@@ -49,8 +51,10 @@ public class FtpSync implements Runnable {
     boolean enabled;
     Set<String> articleIdSet = new HashSet();
     Set<String> existingDirs = new HashSet();
+    TimestampedMonitor monitor; 
     
-    public FtpSync(JConsoleMap properties) throws JMapException {
+    public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException {
+        this.monitor = monitor;
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
@@ -71,12 +75,16 @@ public class FtpSync implements Runnable {
         return deque;
     }
     
-    public void init() throws Exception {
-        login();
-        list();
-        ftpClient.close();
+    public void initSchedule() throws Exception {
         logger.info("schedule {} {}", initialDelay, delay);
         executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
+        try {
+            login();
+            list();
+            ftpClient.close();
+        } catch (Exception e) {
+            logger.warn("initSchedule", e.getMessage());
+        }
     }
 
     private void login() throws Exception {
@@ -88,6 +96,7 @@ public class FtpSync implements Runnable {
 
     @Override
     public synchronized void run() {
+        Tx tx = monitor.begin("FtpSync");
         try {
             if (deque.isEmpty()) {
                 logger.info("empty");
@@ -97,6 +106,7 @@ public class FtpSync implements Runnable {
             while (!deque.isEmpty()) {
                 StorageItem item = deque.peek();
                 upload(item);
+                sync(item);
                 deque.remove(item);
             }
             while (!syncDeque.isEmpty()) {
@@ -105,8 +115,9 @@ public class FtpSync implements Runnable {
                 deque.remove(item);
             }
             ftpClient.close();
+            tx.ok();
         } catch (Exception e) {
-            logger.warn("run", e);
+            tx.error(e);
         }
     }
 
@@ -147,15 +158,9 @@ public class FtpSync implements Runnable {
         String path = storageDir + '/' + item.path;
         ensureDirectoryPath(path);
         ftpClient.putFile(path, new ByteArrayInputStream(item.content));
+        logger.info("uploaded {} {}", item, path);
     }
 
-    void list() throws Exception {
-        logger.info("list {} {}", username, storageDir);
-        for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
-            logger.info("entry {}", entry);
-        }
-    }
-    
     void sync(StorageItem item) throws Exception {
         String path = storageDir + "/" + item.path;
         long size = ftpClient.getSize(path);
@@ -166,4 +171,13 @@ public class FtpSync implements Runnable {
             logger.info("sync {} {}", item, size);
         }        
     }
+    
+    void list() throws Exception {
+        logger.info("list {} {}", username, storageDir);
+        for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
+            logger.info("entry {}", entry);
+        }
+    }
+    
+    
 }

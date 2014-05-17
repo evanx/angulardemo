@@ -40,6 +40,7 @@ public class TimestampedMonitor implements Runnable {
     }
     
     public void shutdown() {
+        future.cancel(true);
         executorService.shutdown();
     }
 
