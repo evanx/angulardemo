@@ -1,7 +1,6 @@
 package vellum.monitor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +138,12 @@ public class Tx implements Timestamped {
             return String.format("%s%s:%d:%sms", type, idString, subs.size(), duration);
         } else {
             return String.format("%s%s:%sms", type, idString, duration);
+        }
+    }
+
+    public void ensureFinally() {
+        if (duration == 0 && error == null) {
+            logger.error(toString());
         }
     }
 }

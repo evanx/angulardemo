@@ -118,6 +118,8 @@ public class FtpSync implements Runnable {
             tx.ok();
         } catch (Exception e) {
             tx.error(e);
+        } finally {
+            tx.ensureFinally();
         }
     }
 
