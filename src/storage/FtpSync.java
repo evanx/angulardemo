@@ -52,6 +52,7 @@ public class FtpSync implements Runnable {
     Set<String> articleIdSet = new HashSet();
     Set<String> existingDirs = new HashSet();
     TimestampedMonitor monitor; 
+    Tx tx;
     
     public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException {
         this.monitor = monitor;
@@ -96,7 +97,7 @@ public class FtpSync implements Runnable {
 
     @Override
     public synchronized void run() {
-        Tx tx = monitor.begin("FtpSync");
+        tx = monitor.begin("FtpSync");
         try {
             if (deque.isEmpty()) {
                 logger.info("empty");
@@ -105,7 +106,6 @@ public class FtpSync implements Runnable {
             login();
             while (!deque.isEmpty()) {
                 StorageItem item = deque.peek();
-                upload(item);
                 sync(item);
                 deque.remove(item);
             }
@@ -123,7 +123,7 @@ public class FtpSync implements Runnable {
         }
     }
 
-    void ensureDirectory(final String path) throws Exception {
+    void ensureDirectory(final String path) throws IOException, FtpProtocolException {
         try {
             if (!existingDirs.contains(path)) {
                 logger.info("ensureDirectory check {}", path);
@@ -136,12 +136,12 @@ public class FtpSync implements Runnable {
                 logger.info("ensureDirectory exists {}", path);
                 existingDirs.add(path);
             } else {
-                logger.warn("ensureDirectory {} {}", path, e.getMessage());
+                throw e;
             }
         }
     }
     
-    void ensureDirectoryPath(final String path) throws Exception {
+    void ensureDirectoryPath(final String path) throws IOException, FtpProtocolException {
         int fromIndex = path.indexOf('/');
         while (fromIndex > 0) {
             logger.info("ensureDirectoryPath {} {}", path, fromIndex);
@@ -156,23 +156,40 @@ public class FtpSync implements Runnable {
         }
     }
     
-    void upload(StorageItem item) throws Exception {
-        logger.info("upload {}", item);
-        String path = storageDir + '/' + item.path;
-        ensureDirectoryPath(path);
-        ftpClient.putFile(path, new ByteArrayInputStream(item.content));
-        logger.info("uploaded {} {}", item, path);
+    void sync(StorageItem item) {
+        String path = storageDir + "/" + item.path;
+        Tx sub = tx.sub("sync", item.path);
+        try {
+            long size = ftpClient.getSize(path);
+            if (size != item.content.length) {
+                logger.warn("sync {} {}", item, size);
+                ftpClient.putFile(path, new ByteArrayInputStream(item.content));
+            } else {
+                logger.info("sync {} {}", item, size);
+            }
+            sub.ok();
+        } catch (IOException | FtpProtocolException e) {
+            try {
+                ensureDirectoryPath(path);
+                ftpClient.putFile(path, new ByteArrayInputStream(item.content));
+                sub.ok();
+            } catch (IOException | FtpProtocolException ex) {
+                sub.error(ex);
+            }
+        } finally {
+            sub.fin();
+        }
     }
 
-    void sync(StorageItem item) throws Exception {
-        String path = storageDir + "/" + item.path;
-        long size = ftpClient.getSize(path);
-        if (size != item.content.length) {
-            logger.warn("sync {} {}", item, size);
+    void upload(Tx sub, StorageItem item) {
+        String path = storageDir + '/' + item.path;
+        try {
+            ensureDirectoryPath(path);
             ftpClient.putFile(path, new ByteArrayInputStream(item.content));
-        } else {
-            logger.info("sync {} {}", item, size);
-        }        
+            sub.ok();
+        } catch (IOException | FtpProtocolException e) {
+            sub.error(e);
+        }
     }
     
     void list() throws Exception {
