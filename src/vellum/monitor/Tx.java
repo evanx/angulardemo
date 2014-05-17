@@ -141,7 +141,7 @@ public class Tx implements Timestamped {
         }
     }
 
-    public void ensureFinally() {
+    public void fin() {
         if (duration == 0 && error == null) {
             logger.error(toString());
         }

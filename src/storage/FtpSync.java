@@ -119,7 +119,7 @@ public class FtpSync implements Runnable {
         } catch (Exception e) {
             tx.error(e);
         } finally {
-            tx.ensureFinally();
+            tx.fin();
         }
     }
 
