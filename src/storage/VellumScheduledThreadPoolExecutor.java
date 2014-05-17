@@ -19,6 +19,6 @@ public class VellumScheduledThreadPoolExecutor extends ScheduledThreadPoolExecut
     @Override
     protected void afterExecute(Runnable r, Throwable t) { 
         super.afterExecute(r, t);
-        logger.warn("", t);
+        logger.error("", t);
     }        
 }
