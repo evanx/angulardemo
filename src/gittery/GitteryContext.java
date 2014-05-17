@@ -6,7 +6,7 @@ import vellum.util.Args;
 public class GitteryContext {
     String webResourcePath;
     String repo;
-    int port = Integer.getInteger("gittery.port", 8888); 
+    final int port = 8888; 
     ContentStorage storage;
     
     public GitteryContext(ContentStorage storage, String webResourcePath, String defaultPath, 

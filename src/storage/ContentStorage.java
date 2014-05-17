@@ -1,5 +1,6 @@
 package storage;
 
+import com.google.gson.JsonSyntaxException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import sun.misc.SignalHandler;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
+import vellum.jx.JMaps;
 import vellum.monitor.TimestampedMonitor;
 import vellum.util.Streams;
 
@@ -30,7 +32,8 @@ public class ContentStorage {
     Logger logger = LoggerFactory.getLogger(ContentStorage.class);
     final String prefetchLinkPattern = "<!--link-->\n";
     final String[] sections = {
-        "top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel", "multimedia", "videos"
+        "top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel", 
+        "backpage", "multimedia", "videos"
     };
 
     Map<String, byte[]> map = new ConcurrentHashMap();
@@ -43,6 +46,7 @@ public class ContentStorage {
     public boolean refresh;
     public boolean prefetching = false;
     public String defaultHtml;
+    public final String storagePath = "storage";
     public final String defaultPath = "index.html";
     public final String prefetchPath = "prefetch.html";
     public byte[] prefetchContent;
@@ -76,7 +80,7 @@ public class ContentStorage {
         for (String section : sections) {
             String path = String.format("%s/articles.json", section);
             logger.info("section {} {}", section, path);
-            loadContent(path);
+            loadJson(path);
             if (false) {
                 linkSet.add(path);
             }
@@ -95,10 +99,16 @@ public class ContentStorage {
         ftpSync.run();
     }
             
-    private void loadContent(String path) throws IOException {
+    private void loadJson(String path) {
         File file = new File(storageDir, path);
         if (file.exists()) {
-            map.put(path, Streams.readBytes(file));
+            try {
+                byte[] bytes = Streams.readBytes(file);
+                map.put(path, bytes);
+                jsonMap.put(path, JMaps.parse(new String(bytes)));
+            } catch (JsonSyntaxException | IOException e) {
+                
+            }
         }
     }
 
