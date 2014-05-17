@@ -23,7 +23,8 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     Object error;
     Exception exception;
     List<Tx> subs = new ArrayList();
-
+    boolean expired;
+    
     Tx() {
         this(null, "none");
     }
@@ -67,22 +68,22 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
 
     public void warn(Object error) {
         this.error = error;
+        setDuration();
         if (error instanceof Exception) {
             exception = (Exception) error;
         }
         logger.warn(toString());
-        setDuration();
     }
 
     public void error(Object error) {
         this.error = error;
+        setDuration();
         if (error instanceof Exception) {
             exception = (Exception) error;
             logger.warn(toString(), exception);
         } else {
             logger.warn(toString());
         }
-        setDuration();
     }
 
     public void ok() {
@@ -90,6 +91,7 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     }
 
     public void expire() {
+        expired = true;
     }
 
     boolean isCompleted() {
@@ -127,7 +129,12 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         StringBuilder builder = new StringBuilder(type);
         for (Object item : id) {
             builder.append(":");
-            builder.append(item.toString());
+            if (item == null) {
+                builder.append("null");
+                logger.warn("buildLabel");
+            } else {
+                builder.append(item.toString());
+            }
         }
         return builder.toString();        
     }
@@ -148,9 +155,8 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     }
 
     public void fin() {
-        if (duration == 0 && error == null) {
+        if (duration == 0 && !expired) {
             logger.error("fin " + buildLabel());
-            new Exception().printStackTrace(System.err);
         }
     }
 

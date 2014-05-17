@@ -1,5 +1,6 @@
 package storage;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,13 @@ public class VellumScheduledThreadPoolExecutor extends ScheduledThreadPoolExecut
     @Override
     protected void afterExecute(Runnable r, Throwable t) { 
         super.afterExecute(r, t);
-        logger.error("", t);
+        if (t != null) {
+            logger.error("throwable", t);
+            t.printStackTrace(System.err);
+        }
+        if (t instanceof ExecutionException) {
+            ExecutionException ee = (ExecutionException) t;
+            logger.error("exception", ee.getCause());
+        }
     }        
 }
