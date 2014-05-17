@@ -125,6 +125,5 @@ public class TimestampedMonitor implements Runnable {
             Tx tx = completedDeque.pop();
             completedMap.ingest(tx);
         }
-    }    
-
+    }  
 }
