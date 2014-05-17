@@ -5,12 +5,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Timestamped;
+import vellum.util.Lists;
 
 /**
  *
  * @author evanx
  */
-public class Tx implements Timestamped {
+public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
 
     final static Logger logger = LoggerFactory.getLogger("tx");
     final static ThreadLocal<Tx> threadLocal = new ThreadLocal();
@@ -49,8 +50,8 @@ public class Tx implements Timestamped {
     }
 
     public Tx sub(String subType, Object... subId) {
-        subType = String.format("%s.%s", toString(), subType);
-        Tx sub = new Tx(monitor, subType, subId);
+        subType = String.format("%s.%s", type, subType);
+        Tx sub = new Tx(monitor, subType, Lists.concatenate(id, subId));
         subs.add(sub);
         logger.info("sub {}", sub);
         return sub;
@@ -70,7 +71,7 @@ public class Tx implements Timestamped {
             exception = (Exception) error;
         }
         logger.warn(toString());
-        duration(0);
+        setDuration();
     }
 
     public void error(Object error) {
@@ -81,11 +82,11 @@ public class Tx implements Timestamped {
         } else {
             logger.warn(toString());
         }
-        duration(0);
+        setDuration();
     }
 
     public void ok() {
-        duration(0);
+        setDuration();
     }
 
     public void expire() {
@@ -95,14 +96,15 @@ public class Tx implements Timestamped {
         return duration > 0;
     }
 
-    void duration(long duration) {
-        if (duration == 0) {
-            duration = System.currentTimeMillis() - timestamp;
-            if (duration == 0) {
-                duration = 1;
-            }
-        }
+    void setDuration() {
+        setDuration(System.currentTimeMillis() - timestamp);
+    }
+    
+    void setDuration(long duration) {
         this.duration = duration;
+        if (duration == 0) {
+            duration = 1;
+        }
         if (monitor != null) {
             monitor.finish(this);
         }
@@ -121,29 +123,39 @@ public class Tx implements Timestamped {
         return timestamp;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
+    String buildLabel() {
+        StringBuilder builder = new StringBuilder(type);
         for (Object item : id) {
-            builder.append(".");
+            builder.append(":");
             builder.append(item.toString());
         }
-        String idString = builder.toString();
+        return builder.toString();        
+    }
+    
+    @Override
+    public String toString() {
+        String label = buildLabel();
         if (error != null) {
-            return String.format("%s%s:(%s)", type, idString, error.toString());
+            return String.format("%s:(%s)", label, error.toString());
         } else if (duration == 0) {
             long activeDuration = System.currentTimeMillis() - timestamp;
-            return String.format("%s%s:active:%d:+%sms", type, idString, subs.size(), activeDuration);
+            return String.format("%s:%d:+%dms", label, subs.size(), activeDuration);
         } else if (!subs.isEmpty()) {
-            return String.format("%s%s:%d:%sms", type, idString, subs.size(), duration);
+            return String.format("%s:%d:%dms", label, subs.size(), duration);
         } else {
-            return String.format("%s%s:%sms", type, idString, duration);
+            return String.format("%s:%dms", label, duration);
         }
     }
 
     public void fin() {
         if (duration == 0 && error == null) {
-            logger.error(toString());
+            logger.error("fin " + buildLabel());
+            new Exception().printStackTrace(System.err);
         }
+    }
+
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        logger.error("uncaught " + buildLabel(), e);
     }
 }

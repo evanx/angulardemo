@@ -61,11 +61,13 @@ public class TimestampedMonitor implements Runnable {
         completedDeque.add(tx);
         for (Tx sub : tx.subs) {
             if (!sub.isCompleted()) {
-                sub.duration(0);
+                sub.setDuration();
             }
         }
-        tx.subs.clear();
-}
+        if (false) {
+            tx.subs.clear();
+        }
+    }
     
     LongAggregateMap completedMap;
     LongAggregateMap expiredMap;

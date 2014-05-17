@@ -34,17 +34,16 @@ public class FtpSync implements Runnable {
     Logger logger = LoggerFactory.getLogger(FtpSync.class);
 
     Deque<String> pathDeque = new ArrayDeque();
-    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    ScheduledExecutorService executorService = new VellumScheduledThreadPoolExecutor(1);
+    ScheduledFuture future;
     long initialDelay = Millis.fromSeconds(30);
     long delay = Millis.fromSeconds(15);
-    ScheduledFuture future;
     JMap properties;
     int port = 21;
     String hostname;
     String username;
     char[] password;
     Deque<StorageItem> deque = new ArrayDeque();
-    Deque<StorageItem> syncDeque = new ArrayDeque();
     boolean cancelled = false;
     String storageDir;
     FtpClient ftpClient;
@@ -52,7 +51,6 @@ public class FtpSync implements Runnable {
     Set<String> articleIdSet = new HashSet();
     Set<String> existingDirs = new HashSet();
     TimestampedMonitor monitor; 
-    Tx tx;
     
     public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException {
         this.monitor = monitor;
@@ -78,7 +76,7 @@ public class FtpSync implements Runnable {
     
     public void start() throws Exception {
         logger.info("schedule {} {}", initialDelay, delay);
-        executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
+        future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
         try {
             login();
             list();
@@ -96,8 +94,8 @@ public class FtpSync implements Runnable {
     }
 
     @Override
-    public synchronized void run() {
-        tx = monitor.begin("FtpSync");
+    public synchronized void run() {        
+        Tx tx = monitor.begin("FtpSync");
         try {
             if (deque.isEmpty()) {
                 logger.info("empty");
@@ -109,15 +107,12 @@ public class FtpSync implements Runnable {
                 sync(item);
                 deque.remove(item);
             }
-            while (!syncDeque.isEmpty()) {
-                StorageItem item = syncDeque.peek();
-                sync(item);
-                deque.remove(item);
-            }
             ftpClient.close();
             tx.ok();
         } catch (Exception e) {
-            tx.error(e);
+            tx.error(e);            
+        } catch (Throwable t) {
+            tx.error(t);            
         } finally {
             tx.fin();
         }
@@ -156,48 +151,38 @@ public class FtpSync implements Runnable {
         }
     }
     
-    void sync(StorageItem item) {
+    private void sync(StorageItem item) {
         String path = storageDir + "/" + item.path;
-        Tx sub = tx.sub("sync", item.path);
+        Tx tx = monitor.begin("sync", item.path);
         try {
             long size = ftpClient.getSize(path);
             if (size != item.content.length) {
-                logger.warn("sync {} {}", item, size);
+                logger.info("sync changed {} {}", item, size);
                 ftpClient.putFile(path, new ByteArrayInputStream(item.content));
             } else {
-                logger.info("sync {} {}", item, size);
+                logger.info("sync unchanged {} {}", item, size);
             }
-            sub.ok();
+            tx.ok();
         } catch (IOException | FtpProtocolException e) {
             try {
                 ensureDirectoryPath(path);
                 ftpClient.putFile(path, new ByteArrayInputStream(item.content));
-                sub.ok();
+                tx.ok();
             } catch (IOException | FtpProtocolException ex) {
-                sub.error(ex);
+                tx.error(ex);
             }
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
+            tx.error(t);
         } finally {
-            sub.fin();
+            tx.fin();
         }
     }
 
-    void upload(Tx sub, StorageItem item) {
-        String path = storageDir + '/' + item.path;
-        try {
-            ensureDirectoryPath(path);
-            ftpClient.putFile(path, new ByteArrayInputStream(item.content));
-            sub.ok();
-        } catch (IOException | FtpProtocolException e) {
-            sub.error(e);
-        }
-    }
-    
     void list() throws Exception {
         logger.info("list {} {}", username, storageDir);
         for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
             logger.info("entry {}", entry);
         }
-    }
-    
-    
+    }    
 }

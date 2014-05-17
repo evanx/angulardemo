@@ -54,11 +54,11 @@ public class TimestampedMonitorTest {
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
         Tx tx;
         tx = monitor.begin("tx1", 1);
-        tx.duration(1);
+        tx.setDuration(1);
         tx = monitor.begin("tx1", 2);        
-        tx.duration(20);        
+        setDurationion(20);        
         tx = monitor.begin("tx1", 3);        
-        tx.duration(5);
+     setDurationration(5);
         monitor.run();
         Assert.assertEquals(0, monitor.expiredMap.size());
         Assert.assertEquals(1, monitor.completedMap.size());
@@ -72,9 +72,8 @@ public class TimestampedMonitorTest {
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
         Tx tx;
         tx = monitor.begin("tx1", 1);
-        tx.duration(1);
-        tx = monitor.begin("tx1", 2);
-        tx.duration(20);        
+  setDuration.duration(1);
+        tx = monitor.begin("tx1", 2);setDuration tx.duration(20);        
         monitor.begin("tx1", 3);
         monitor.run(futureTimestamp);
         Assert.assertEquals(1, monitor.expiredMap.size());
@@ -88,8 +87,7 @@ public class TimestampedMonitorTest {
         properties.put("limit", "5000");
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
         Tx tx;
-        tx = monitor.begin("tx1", 1);
-        tx.duration(1);
+        tx = monitor.begin("tx1", setDuration    tx.duration(1);
         monitor.begin("tx2", 1);
         monitor.run(futureTimestamp);
         Assert.assertEquals(1, monitor.expiredMap.size());
@@ -102,13 +100,12 @@ public class TimestampedMonitorTest {
     public void testTransactions() throws Exception {
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
         Tx tx;
-        tx = monitor.begin("tx1", 1);
-        tx.duration(2);
-        tx = monitor.begin("tx1", 2);
+        tx = monitor.begin("tx1setDuration       tx.duration(2);
+        tx = monitor.begin("setDuration;
         tx.duration(4);
-        tx = monitor.begin("tx2", 1);
+        tx = monitor.begisetDuration 1);
         tx.duration(2);        
-        tx = monitor.begin("tx2", 2);
+        tx = monitor.bsetDuration2", 2);
         tx.duration(6);        
         monitor.begin("tx1", 0);
         monitor.begin("tx2", 0);
@@ -125,8 +122,8 @@ public class TimestampedMonitorTest {
         TimestampedMonitor monitor = new TimestampedMonitor(properties);
         Tx tx;
         tx = monitor.begin("tx", 1);
-        Tx sub = tx.sub("sub", 1);
-        sub.duration(2);
+        Tx sub = setDurationsub", 1);
+   setDuration.duration(2);
         tx.duration(4);
         monitor.run(futureTimestamp);
         Assert.assertEquals(0, monitor.expiredMap.size());
