@@ -95,12 +95,12 @@ public class FtpSync implements Runnable {
 
     @Override
     public synchronized void run() {        
+        if (deque.isEmpty()) {
+            logger.info("empty");
+            return;
+        }
         Tx tx = monitor.begin("FtpSync");
         try {
-            if (deque.isEmpty()) {
-                logger.info("empty");
-                return;
-            }
             login();
             while (!deque.isEmpty()) {
                 StorageItem item = deque.peek();

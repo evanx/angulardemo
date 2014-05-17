@@ -23,7 +23,6 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     Object error;
     Exception exception;
     List<Tx> subs = new ArrayList();
-    boolean expired;
     
     Tx() {
         this(null, "none");
@@ -90,10 +89,6 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         setDuration();
     }
 
-    public void expire() {
-        expired = true;
-    }
-
     boolean isCompleted() {
         return duration > 0;
     }
@@ -155,8 +150,8 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     }
 
     public void fin() {
-        if (duration == 0 && !expired) {
-            logger.error("fin " + buildLabel());
+        if (duration == 0) {
+            logger.error("fin {}", buildLabel());
         }
     }
 
@@ -164,4 +159,5 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         logger.error("uncaught " + buildLabel(), e);
     }
+
 }
