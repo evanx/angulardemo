@@ -150,7 +150,7 @@ public class ArticleTask implements Runnable {
         }
         currentThread = Thread.currentThread();
         retry = false;
-        Tx tx = context.getMonitor().begin("article", articleId);
+        Tx tx = context.getMonitor().begin("ArticleTask", articleId);
         try {
             if (!context.storage.refresh && context.storage.containsKey(articlePath)) {
                 logger.info("containsKey {}", articlePath);
@@ -169,12 +169,14 @@ public class ArticleTask implements Runnable {
             completed = true;
             tx.ok();
         } catch (FeedException | FileNotFoundException e) {
-            tx.warn(e);
+            tx.error(e);
         } catch (IOException e) {
             retry = true;
-            tx.warn(e);
+            tx.error(e);
         } catch (Exception e) {
             tx.error(e);
+        } finally {
+            tx.fin();
         }
         exception = tx.getException();
         currentThread = null;

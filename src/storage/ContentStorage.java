@@ -31,7 +31,7 @@ public class ContentStorage {
 
     Logger logger = LoggerFactory.getLogger(ContentStorage.class);
     final String prefetchLinkPattern = "<!--link-->\n";
-    final String[] sections = {
+    static final String[] sections = {
         "top", "news", "sport", "business", "scitech", "lifestyle", "motoring", "tonight", "travel", 
         "backpage", "multimedia", "videos"
     };
@@ -77,13 +77,17 @@ public class ContentStorage {
             deque = ftpSync.getDeque();
         }
         prefetchFile.delete();
-        for (String section : sections) {
-            String path = String.format("%s/articles.json", section);
-            logger.info("section {} {}", section, path);
-            loadJson(path);
-            if (false) {
-                linkSet.add(path);
+        try {
+            for (String section : sections) {
+                String path = String.format("%s/articles.json", section);
+                logger.info("section {} {}", section, path);
+                loadJson(path);
+                if (false) {
+                    linkSet.add(path);
+                }
             }
+        } catch (Exception e) {
+            logger.error("loadJson", e);
         }
         buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {
@@ -106,8 +110,12 @@ public class ContentStorage {
                 byte[] bytes = Streams.readBytes(file);
                 map.put(path, bytes);
                 jsonMap.put(path, JMaps.parse(new String(bytes)));
-            } catch (JsonSyntaxException | IOException e) {
-                
+            } catch (JsonSyntaxException | IOException | IllegalStateException e) {
+                String errorMessage = e.getMessage();
+                if (errorMessage.length() > 80) {
+                    errorMessage = errorMessage.substring(0, 80);
+                }
+                logger.warn("loadJson {} {}", path, errorMessage);
             }
         }
     }

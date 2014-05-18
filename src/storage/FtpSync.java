@@ -39,6 +39,7 @@ public class FtpSync implements Runnable {
     long initialDelay = Millis.fromSeconds(30);
     long delay = Millis.fromSeconds(15);
     JMap properties;
+    int warningSize = 100;
     int port = 21;
     String hostname;
     String username;
@@ -100,22 +101,41 @@ public class FtpSync implements Runnable {
             return;
         }
         Tx tx = monitor.begin("FtpSync");
+        if (deque.size() > warningSize) {
+            tx.warnf("size %d", deque.size());
+        }
         try {
             login();
             while (!deque.isEmpty()) {
                 StorageItem item = deque.peek();
-                sync(item);
-                deque.remove(item);
+                if (item == null) {
+                    logger.warn("queue inconsistency");
+                } else {
+                    if (item.path.endsWith("/articles.json")) {
+                        upload(item);
+                    } else {
+                        sync(item);                        
+                    }
+                    deque.remove(item);
+                }
             }
-            ftpClient.close();
             tx.ok();
         } catch (Exception e) {
             tx.error(e);            
         } finally {
             tx.fin();
+            close();
         }
     }
 
+    void close() {
+        try {
+            ftpClient.close();        
+        } catch (IOException e) {
+            logger.warn("close", e);
+        }
+    }
+    
     void ensureDirectory(final String path) throws IOException, FtpProtocolException {
         try {
             if (!existingDirs.contains(path)) {
@@ -135,18 +155,25 @@ public class FtpSync implements Runnable {
     }
     
     void ensureDirectoryPath(final String path) throws IOException, FtpProtocolException {
-        int fromIndex = path.indexOf('/');
-        while (fromIndex > 0) {
-            logger.info("ensureDirectoryPath {} {}", path, fromIndex);
-            int index = path.indexOf('/', fromIndex + 1);
-            if (index > 0) {
-                String dir = path.substring(0, index);
-                ensureDirectory(dir);
-                fromIndex = index;
-            } else {
-                break;
+        int index = path.lastIndexOf('/');
+        if (!existingDirs.contains(path.substring(0, index))) {
+            int fromIndex = path.indexOf('/');
+            while (fromIndex > 0) {
+                index = path.indexOf('/', fromIndex + 1);
+                if (index > 0) {
+                    String dir = path.substring(0, index);
+                    ensureDirectory(dir);
+                    fromIndex = index;
+                } else {
+                    break;
+                }
             }
         }
+    }
+
+    private void move(StorageItem item, String newPath) throws FtpProtocolException, IOException {
+        ensureDirectoryPath(newPath);
+        ftpClient.rename(item.path, newPath);
     }
     
     private void sync(StorageItem item) {
@@ -174,6 +201,20 @@ public class FtpSync implements Runnable {
         }
     }
 
+    private void upload(StorageItem item) {
+        String path = storageDir + "/" + item.path;
+        Tx tx = monitor.begin("upload", item.path);
+        try {
+            ensureDirectoryPath(path);
+            ftpClient.putFile(path, new ByteArrayInputStream(item.content));
+            tx.ok();
+        } catch (IOException | FtpProtocolException ex) {
+            tx.error(ex);
+        } finally {
+            tx.fin();
+        }
+    }
+    
     void list() throws Exception {
         logger.info("list {} {}", username, storageDir);
         for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {

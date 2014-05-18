@@ -31,7 +31,7 @@ public class TimestampedMonitor implements Runnable {
         this.period = properties.getMillis("period", 0);
     }
     
-    public void initSchedule() {        
+    public void start() {        
         if (period > 0) {
             future = executorService.scheduleAtFixedRate(this, period, period, TimeUnit.MILLISECONDS);        
         } else {

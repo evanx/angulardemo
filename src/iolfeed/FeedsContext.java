@@ -58,7 +58,7 @@ public final class FeedsContext {
         putFeed();
     }
 
-    public void start() throws Exception {
+    public boolean start() throws Exception {
         String first = properties.getString("first", null);        
         if (first != null && !first.equals("none")) {
             logger.info("first", first);
@@ -67,6 +67,9 @@ public final class FeedsContext {
             feedTask.run();
             storage.sync();
             tx.ok();
+            return false;
+        } else {
+            return true;
         }
     }
     

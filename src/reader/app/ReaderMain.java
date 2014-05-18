@@ -34,9 +34,8 @@ public class ReaderMain {
             logger.info("webServer {}", object.getMap("webServer"));            
             JMap properties = object.getMap();
             TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
-            monitor.initSchedule();
+            VellumProvider.provider.put(monitor);
             ContentStorage contentStorage = new ContentStorage(monitor, properties.getMap("storage"));
-            contentStorage.start();
             VellumProvider.provider.put(contentStorage);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html", null);
             VellumProvider.provider.put(gitteryContext);
@@ -44,9 +43,12 @@ public class ReaderMain {
             TaskManager taskManager = new TaskManager();
             FeedsContext feedsContext = new FeedsContext(monitor, taskManager, contentStorage, 
                 properties.getMap("feeds"));
-            feedsContext.start();
             VellumProvider.provider.put(feedsContext);
-            new FeedsTask().start(feedsContext);
+            if (feedsContext.start()) {
+                contentStorage.start();
+                monitor.start();
+                new FeedsTask().start(feedsContext);
+            }
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

@@ -23,7 +23,8 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     Object error;
     Exception exception;
     List<Tx> subs = new ArrayList();
-    
+    List warnings;
+
     Tx() {
         this(null, "none");
     }
@@ -65,11 +66,18 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         return exception;
     }
 
-    public void warn(Object error) {
-        this.error = error;
-        setDuration();
-        if (error instanceof Exception) {
-            exception = (Exception) error;
+    public void warnf(String format, Object... args) {
+        warn(String.format(format, args));
+    }
+
+    public void warn(Object warning) {
+        if (warnings == null) {
+            warnings = new ArrayList();
+        }
+        warnings.add(warning);
+        this.error = warning;
+        if (warning instanceof Exception) {
+            exception = (Exception) warning;
         }
         logger.warn(toString());
     }
@@ -79,9 +87,9 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         setDuration();
         if (error instanceof Exception) {
             exception = (Exception) error;
-            logger.warn(toString(), exception);
+            logger.error(toString(), exception);
         } else {
-            logger.warn(toString());
+            logger.error(toString());
         }
     }
 
@@ -96,7 +104,7 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     void setDuration() {
         setDuration(System.currentTimeMillis() - timestamp);
     }
-    
+
     void setDuration(long duration) {
         this.duration = duration;
         if (duration == 0) {
@@ -131,9 +139,9 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
                 builder.append(item.toString());
             }
         }
-        return builder.toString();        
+        return builder.toString();
     }
-    
+
     @Override
     public String toString() {
         String label = buildLabel();
@@ -151,7 +159,11 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
 
     public void fin() {
         if (duration == 0) {
-            logger.error("fin {}", buildLabel());
+            if (warnings != null) {
+                setDuration();
+            } else {
+                logger.error("fin {} {}", buildLabel(), error);
+            }
         }
     }
 
@@ -159,5 +171,4 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         logger.error("uncaught " + buildLabel(), e);
     }
-
 }
