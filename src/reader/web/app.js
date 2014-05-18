@@ -1,5 +1,11 @@
 
 var appData = {
+   servers: {
+      def: ["chronica.co", "za.chronica.co"],
+      za: ["za.chronica.co", "chronica.co"],
+      cors: [ "chronica.co"],
+      jsonp: [ "za.chronica.co"]
+   },
    sectionList: [
       {
          name: "Top",
@@ -60,12 +66,16 @@ app.filter('sliceFrom', function() {
    };
 });
 
+app.config(['$httpProvider', function($httpProvider) {
+    if (!$httpProvider.defaults.headers.get) {
+        $httpProvider.defaults.headers.get = {};    
+    }
+    $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
+}]);
+
 app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
       console.log("location", location);
-      var geo = { city: "jhb", country: 'za', servers: {
-         def: [ "chronica.co", "za.chronica.co" ],
-         za: [ "za.chronica.co", "chronica.co" ],
-      }};
+      var geo = { city: "jhb", country: 'za', servers: appData.servers };
       var sectionList = appData.sectionList;
       var articleMap = {};
       var sectionArticleList = {};
@@ -133,43 +143,53 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
                return name;
             }
          },
-         getUrl: function(jsonPath) {
-            if (false) {
-               return "http://" + geo.server + "/" + jsonPath;
-            } else {
-               return jsonPath;
-            }
-         },
-         load: function(jsonPath, successHandler, errorHandler) {
-            var url = service.getUrl(jsonPath);
+         getOrigin: function(jsonPath, successHandler) {
+            var url = jsonPath;
             console.log("load", url);
             $http.get(url).success(successHandler).error(function() {
-               console.log("load error", url);
+               console.warn("load error", url);
                service.changeServer();
-               $http.get(service.getUrl(jsonPath)).success(successHandler).error(errorHandler);               
             });
          },
-         loadSection: function(section) {
-            var defer = $q.defer();
-            var jsonPath = section + "/articles.json";
-            var url = service.getUrl(jsonPath);
-            $http.get(url).success(function(data) {
-               console.log("loadSection", url);
-               defer.resolve({section: section, data: data});
-            }).error(function(data, status, headers, config) {
-               console.log("loadSection error", url, data, status, headers, config);
+         getCors: function(jsonPath, successHandler) {
+            var url = "http://" + geo.server + "/" + jsonPath;
+            console.log("load", url);
+            $http.get(url).success(successHandler).error(function() {
+               console.warn("load error", url);
                service.changeServer();
-               $http.get(service.getUrl(jsonPath)).success(function(data) {
-                  defer.resolve({section: section, data: data});                  
-               });
             });
-            return defer.promise;
+         },
+         getJsonp: function(jsonPath, successHandler) {
+            var url = "http://" + geo.server + "/" + jsonPath + "p";
+            console.log("load", url);
+            $http.jsonp(url).success(successHandler).error(function() {
+               console.warn("load error", url);
+               service.changeServer();
+            });
+         },
+         load: function(jsonPath, successHandler) {
+            console.log("load", geo.serverType, jsonPath);
+            if (true) {
+               service.getOrigin(jsonPath, successHandler);
+            } else if (geo.serverType === 'jsonp') {
+               service.getJsonp(jsonPath, successHandler);
+            } else if (geo.serverType === 'cors') {
+               service.getCors(jsonPath, successHandler);
+            } else {
+               service.getOrigin(jsonPath, successHandler);
+            }
+         },
+         loadSection: function(section, sectionHandler) {
+            var jsonPath = section + "/articles.json";
+            service.load(jsonPath, function(data) {
+               sectionHandler(section, data);
+            });
          },
          initData: function() {
             for (var i = 0; i < sectionList.length; i++) {
                var section = sectionList[i].name.toLowerCase();
-               service.loadSection(section).then(function(result) {
-                  service.putSectionArticles(result.section, result.data);
+               service.loadSection(section, function(section, data) {
+                  service.putSectionArticles(section, data);
                });
             }
          },
@@ -190,7 +210,7 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
             });                       
          },
          init: function() {
-            service.initGeo();
+            service.initData();
          },
          resetGeo: function() {
             geo.serverIndex = 0;
@@ -202,10 +222,14 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
          },
          setServer: function() {
             geo.server = geo.servers[geo.serverKey][geo.serverIndex];
-            console.log("server", geo.server);
+            if (geo.server === "za.chronica.co") {
+               geo.serverType = "jsonp";               
+            } else {
+               geo.serverType = "cors";
+            }
+            console.log("server", geo.server, geo.serverType);
          },
          changeServer: function() {
-            console.log("changeServer");
             if (geo.serverIndex === 0) {
                geo.serverIndex = 1;
             } else {

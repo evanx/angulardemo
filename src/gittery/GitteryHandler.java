@@ -53,7 +53,7 @@ public class GitteryHandler implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         this.he = he;
         path = he.getRequestURI().getPath();
-        logger.trace("path [{}]", path);
+        logger.info("path [{}]", path);
         try {
             if (path.startsWith("/storage/")) {
                 path = path.substring(9);
@@ -195,7 +195,6 @@ public class GitteryHandler implements HttpHandler {
             he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         } else if (path.endsWith(".json")) {
-            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }

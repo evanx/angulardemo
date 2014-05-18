@@ -113,8 +113,10 @@ public class FtpSync implements Runnable {
                 } else {
                     if (item.path.endsWith("/articles.json")) {
                         upload(item);
+                        upload(buildJsonp(item));
                     } else {
                         sync(item);                        
+                        sync(buildJsonp(item));
                     }
                     deque.remove(item);
                 }
@@ -126,6 +128,15 @@ public class FtpSync implements Runnable {
             tx.fin();
             close();
         }
+    }
+
+    StorageItem buildJsonp(StorageItem item) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("jsonp_callback('%s', ", item.path));
+        builder.append(new String(item.content));
+        builder.append(");");
+        byte[] bytes = builder.toString().getBytes();
+        return new StorageItem(item.path + "p", bytes);
     }
 
     void close() {
