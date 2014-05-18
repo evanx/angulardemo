@@ -60,8 +60,12 @@ app.filter('sliceFrom', function() {
    };
 });
 
-app.factory("appService", ["$q", "$http", function($q, $http) {
-      var defer = $q.defer();
+app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
+      console.log("location", location);
+      var geo = { city: "jhb", country: 'za', servers: {
+         def: [ "chronica.co", "za.chronica.co" ],
+         za: [ "za.chronica.co", "chronica.co" ],
+      }};
       var sectionList = appData.sectionList;
       var articleMap = {};
       var sectionArticleList = {};
@@ -129,27 +133,88 @@ app.factory("appService", ["$q", "$http", function($q, $http) {
                return name;
             }
          },
-         load: function(url, successHandler, errorHandler) {
+         getUrl: function(jsonPath) {
+            if (false) {
+               return "http://" + geo.server + "/" + jsonPath;
+            } else {
+               return jsonPath;
+            }
+         },
+         load: function(jsonPath, successHandler, errorHandler) {
+            var url = service.getUrl(jsonPath);
             console.log("load", url);
-            $http.get(url).success(successHandler).error(errorHandler);
+            $http.get(url).success(successHandler).error(function() {
+               console.log("load error", url);
+               service.changeServer();
+               $http.get(service.getUrl(jsonPath)).success(successHandler).error(errorHandler);               
+            });
          },
          loadSection: function(section) {
+            var defer = $q.defer();
             var jsonPath = section + "/articles.json";
-            $http.get(jsonPath).success(function(data) {
-               console.log("loadSection", jsonPath);
-               defer.resolve(data);
+            var url = service.getUrl(jsonPath);
+            $http.get(url).success(function(data) {
+               console.log("loadSection", url);
+               defer.resolve({section: section, data: data});
+            }).error(function(data, status, headers, config) {
+               console.log("loadSection error", url, data, status, headers, config);
+               service.changeServer();
+               $http.get(service.getUrl(jsonPath)).success(function(data) {
+                  defer.resolve({section: section, data: data});                  
+               });
             });
             return defer.promise;
          },
-         init: function() {
+         initData: function() {
             for (var i = 0; i < sectionList.length; i++) {
                var section = sectionList[i].name.toLowerCase();
-               service.loadSection(section).then(function(data) {
-                  service.putSectionArticles(section, data);
+               service.loadSection(section).then(function(result) {
+                  service.putSectionArticles(result.section, result.data);
                });
             }
-         }
+         },
+         initGeo: function() {
+            $http.get("http://ipinfo.io/json").success(function(data) {
+               geo.ipinfo = data;
+               if (data.city === "Cape Town") {
+                  geo.city = "cpt";
+               }
+               if (data.country) {
+                  geo.country = data.country.toLowerCase();
+               }
+               console.log("geo", geo);
+               service.resetGeo();
+               service.initData();
+            }).error(function() {
+               service.initData();               
+            });                       
+         },
+         init: function() {
+            service.initGeo();
+         },
+         resetGeo: function() {
+            geo.serverIndex = 0;
+            geo.serverKey = "def";
+            if (geo.servers[geo.country]) {
+               geo.serverKey = geo.country;
+            }
+            service.setServer();
+         },
+         setServer: function() {
+            geo.server = geo.servers[geo.serverKey][geo.serverIndex];
+            console.log("server", geo.server);
+         },
+         changeServer: function() {
+            console.log("changeServer");
+            if (geo.serverIndex === 0) {
+               geo.serverIndex = 1;
+            } else {
+               geo.serverIndex = 0;
+            }
+            service.setServer();
+         }         
       };
+      service.resetGeo();
       return service;
    }]);
 

@@ -470,20 +470,29 @@
       <!--script src="/mirror/offcanvas.js"></script-->
       <script src="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
-                      var addthis_config = {
-                        "data_track_addressbar": false
-                      };
-                      var addthis_share = {
-                        url_transforms: {
-                          shorten: {
-                            twitter: 'bitly',
-                            facebook: 'bitly'
-                          }
-                        },
-                        shorteners: {
-                          bitly: {}
-                        }
-                      };
+          var addthis_config = {
+            "data_track_addressbar": false
+          };
+          var addthis_share = {
+            url_transforms: {
+              shorten: {
+                twitter: 'bitly',
+                facebook: 'bitly'
+              }
+            },
+            shorteners: {
+              bitly: {}
+            }
+          };
+          if (false && typeof(navigator.geolocation)) {
+            navigator.geolocation.getCurrentPosition(function(p) {
+              console.log("geo success", p);
+            }, function() {
+              console.log("geo error", p);
+            }, {enableHighAccuracy: true});
+          } else {
+            console.log("geo none");
+          }
       </script>
       <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script--> 
       <script src="app.js"></script>    

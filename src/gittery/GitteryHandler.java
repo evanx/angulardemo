@@ -192,8 +192,10 @@ public class GitteryHandler implements HttpHandler {
         } else if (Streams.getContentType(path).startsWith("image/")) {
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
         } else if (path.endsWith("/articles.json")) {
+            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         } else if (path.endsWith(".json")) {
+            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }
