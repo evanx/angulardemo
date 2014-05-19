@@ -18,6 +18,7 @@ import sun.net.ftp.FtpClientProvider;
 import sun.net.ftp.FtpDirEntry;
 import sun.net.ftp.FtpProtocolException;
 import vellum.data.Millis;
+import vellum.exception.ParseException;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
@@ -53,7 +54,7 @@ public class FtpSync implements Runnable {
     Set<String> existingDirs = new HashSet();
     TimestampedMonitor monitor; 
     
-    public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException {
+    public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException, ParseException {
         this.monitor = monitor;
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
@@ -64,6 +65,9 @@ public class FtpSync implements Runnable {
             password = properties.getPassword("password");
             storageDir = properties.getString("storageDir");
             logger.info("{} {}", username, storageDir);
+            ftpClient = FtpClientProvider.provider().createFtpClient();
+            ftpClient.setConnectTimeout((int) properties.getMillis("connectTimeout"));
+            ftpClient.setReadTimeout((int) properties.getMillis("readTimeout"));
         }
     }
 
@@ -76,8 +80,6 @@ public class FtpSync implements Runnable {
     }
     
     public void start() throws Exception {
-        logger.info("schedule {} {}", initialDelay, delay);
-        future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
         try {
             login();
             list();
@@ -85,11 +87,12 @@ public class FtpSync implements Runnable {
         } catch (Exception e) {
             logger.warn("initSchedule", e.getMessage());
         }
+        logger.info("schedule {} {}", initialDelay, delay);
+        future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
     }
 
     private void login() throws Exception {
         logger.info("login {} {}", username, storageDir);
-        ftpClient = FtpClientProvider.provider().createFtpClient();
         ftpClient.connect(new InetSocketAddress(hostname, port));
         ftpClient.login(username, password);
     }
