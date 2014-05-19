@@ -59,7 +59,7 @@ public final class FeedsContext {
 
     public boolean start() throws Exception {
         String first = properties.getString("first", null);        
-        if (first != null && !first.equals("none")) {
+        if (first != null && !first.isEmpty() && !first.equals("none")) {
             logger.info("first", first);
             Tx tx = monitor.begin("first");
             FeedTask feedTask = new FeedTask(this, first);
