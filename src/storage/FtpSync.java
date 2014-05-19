@@ -95,6 +95,10 @@ public class FtpSync implements Runnable {
 
     private void login() throws Exception {
         logger.info("login {} {}", username, storageDir);
+        if (ftpClient != null) {
+            logger.warn("login: ftpClient not null");
+        }
+        ftpClient = FtpClientProvider.provider().createFtpClient();
         ftpClient.connect(new InetSocketAddress(hostname, port));
         ftpClient.login(username, password);
     }
@@ -147,6 +151,7 @@ public class FtpSync implements Runnable {
                 logger.warn("close: ftpClient is null");                
             } else {
                 ftpClient.close();        
+                ftpClient = null;
             }
         } catch (IOException e) {
             logger.warn("close", e);

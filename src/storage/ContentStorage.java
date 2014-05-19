@@ -68,6 +68,9 @@ public class ContentStorage {
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
         ftpSync = new FtpSync(monitor, JConsoleMap.map(properties, "ftpClient"));
+        if (ftpSync.isEnabled()) {
+            deque = ftpSync.getDeque();
+        }
         defaultHtml = Streams.readString(new File(appDir, defaultPath));
         prefetchFile = new File(storageDir, prefetchPath);
     }
@@ -101,7 +104,9 @@ public class ContentStorage {
     }
 
     public void sync() {
-        ftpSync.run();
+        if (ftpSync.isEnabled()) {
+            ftpSync.run();
+        }
     }
             
     private void loadJson(String path) {
@@ -179,11 +184,13 @@ public class ContentStorage {
         writeContent(path, content);
         if (path.endsWith(".json")) {
             writeContent(path + "p", buildJsonp(path, content));
-            if (deque != null) {
-                deque.add(new StorageItem(path, content));
-                logger.info("Ftp deque {}", deque.size());
-            } else {
-                logger.warn("deque");
+            if (ftpSync.isEnabled()) {
+                if (deque == null) {
+                    logger.warn("putContent: deque is null");
+                } else {
+                    deque.add(new StorageItem(path, content));
+                    logger.info("putContent: Ftp deque {}", deque.size());
+                }
             }
         }
     }
