@@ -66,7 +66,6 @@ public class FtpSync implements Runnable {
             password = properties.getPassword("password");
             storageDir = properties.getString("storageDir");
             logger.info("{} {}", username, storageDir);
-            ftpClient = FtpClientProvider.provider().createFtpClient();
             ftpClient.setConnectTimeout((int) properties.getMillis("connectTimeout"));
             ftpClient.setReadTimeout((int) properties.getMillis("readTimeout"));
         }
