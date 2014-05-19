@@ -147,6 +147,7 @@ public class ArticleTask implements Runnable {
     public void run() {
         if (currentThread != null) {
             logger.error("currentThread: " + currentThread.getName());
+            return;
         }
         currentThread = Thread.currentThread();
         retry = false;
@@ -175,11 +176,14 @@ public class ArticleTask implements Runnable {
             tx.error(e);
         } catch (Exception e) {
             tx.error(e);
+        } catch (Throwable t) {
+            logger.error("throwable", t);
+            tx.error(t);
         } finally {
             tx.fin();
+            currentThread = null;
         }
         exception = tx.getException();
-        currentThread = null;
     }
 
     private void parseRelatedArticles() throws Exception {

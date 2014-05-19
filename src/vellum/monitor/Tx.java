@@ -161,8 +161,8 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         if (duration == 0) {
             if (warnings != null) {
                 setDuration();
-            } else {
-                logger.error("fin {} {}", buildLabel(), error);
+            } else if (error == null) {
+                logger.error("fin {}", buildLabel());
             }
         }
     }
