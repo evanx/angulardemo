@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static storage.ContentStorage.buildJsonp;
 import sun.net.ftp.FtpClient;
 import sun.net.ftp.FtpClientProvider;
 import sun.net.ftp.FtpDirEntry;
@@ -126,22 +127,19 @@ public class FtpSync implements Runnable {
             }
             tx.ok();
         } catch (Exception e) {
-            tx.error(e);            
+            tx.error(e);
         } finally {
             tx.fin();
             close();
         }
     }
 
-    StorageItem buildJsonp(StorageItem item) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("jsonp_callback('%s', ", item.path));
-        builder.append(new String(item.content));
-        builder.append(");");
-        byte[] bytes = builder.toString().getBytes();
-        return new StorageItem(item.path + "p", bytes);
+    static StorageItem buildJsonp(StorageItem item) {
+        byte[] content = ContentStorage.buildJsonp(item.path, item.content);
+        return new StorageItem(item.path + "p", content);
     }
 
+    
     void close() {
         try {
             ftpClient.close();        

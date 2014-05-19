@@ -1,4 +1,15 @@
 
+var jsonpCallbacks = {};
+
+function jsonpCallback(path, data) {
+   console.log("jsonpCallback", path, data);
+   jsonpCallbacks[path](data);   
+};
+
+function json_callback(path, data) {
+   jsonpCallback(path, data);
+};
+
 var appData = {
    servers: {
       def: ["chronica.co", "za.chronica.co"],
@@ -160,12 +171,12 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
             });
          },
          getJsonp: function(jsonPath, successHandler) {
-            var url = "http://" + geo.server + "/" + jsonPath + "p";
+            var url = "http://" + geo.server + "/" + jsonPath + "p?time=" + new Date().getTime();
             console.log("load", url);
-            $http.jsonp(url).success(successHandler).error(function() {
-               console.warn("load error", url);
-               service.changeServer();
-            });
+            jsonpCallbacks[jsonPath] = successHandler;
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = url;
          },
          load: function(jsonPath, successHandler) {
             console.log("load", geo.serverType, jsonPath);

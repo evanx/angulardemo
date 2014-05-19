@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+import vellum.exception.ParseException;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
@@ -58,7 +59,7 @@ public class ContentStorage {
     FtpSync ftpSync;
     TimestampedMonitor monitor;
     
-    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException {
+    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
         this.monitor = monitor;
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
@@ -175,14 +176,9 @@ public class ContentStorage {
     public void putContent(String path, byte[] content) throws IOException {
         logger.info("putContent {} {}", path, content.length);
         put(path, content);
-        File file = new File(storageDir, path);
-        file.getParentFile().mkdirs();
-        if (file.exists() && file.length() == content.length) {
-            logger.info("unchanged {}", path);
-        } else {
-            Streams.write(content, file);
-        }
+        writeContent(path, content);
         if (path.endsWith(".json")) {
+            writeContent(path + "p", buildJsonp(path, content));
             if (deque != null) {
                 deque.add(new StorageItem(path, content));
                 logger.info("Ftp deque {}", deque.size());
@@ -192,6 +188,16 @@ public class ContentStorage {
         }
     }
 
+    void writeContent(String path, byte[] content) throws IOException {
+        File file = new File(storageDir, path);
+        file.getParentFile().mkdirs();
+        if (file.exists() && file.length() == content.length) {
+            logger.info("unchanged {}", path);
+        } else {
+            Streams.write(content, file);
+        }        
+    }
+    
     public boolean containsKey(String path) {
         return map.containsKey(path);
     }
@@ -207,4 +213,14 @@ public class ContentStorage {
         content = Streams.readContent(localImageUrl);
         logger.info("imageUrl {} {}", content.length, localImageUrl);
     }
+    
+    static byte[] buildJsonp(String path, byte[] content) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("jsonpCallback('%s', ", path));
+        builder.append(new String(content));
+        builder.append(");");
+        return builder.toString().getBytes();
+    }
+
+    
 }

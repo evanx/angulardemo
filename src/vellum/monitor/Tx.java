@@ -1,5 +1,6 @@
 package vellum.monitor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -85,7 +86,9 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
     public void error(Object error) {
         this.error = error;
         setDuration();
-        if (error instanceof Exception) {
+        if (error instanceof IOException) {
+            logger.error(toString());
+        } else if (error instanceof Exception) {
             exception = (Exception) error;
             logger.error(toString(), exception);
         } else {
