@@ -14,8 +14,8 @@ var appData = {
    servers: {
       def: ["chronica.co", "za.chronica.co"],
       za: ["za.chronica.co", "chronica.co"],
-      cors: [ "chronica.co"],
-      jsonp: [ "za.chronica.co"]
+      cors: [ "chronica.co" ],
+      jsonp: [ "za.chronica.co" ]
    },
    sectionList: [
       {
@@ -86,7 +86,7 @@ app.config(['$httpProvider', function($httpProvider) {
 
 app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
       console.log("location", location);
-      var geo = { city: "jhb", country: 'za', servers: appData.servers };
+      var geo = { enabled: false, city: "jhb", country: 'za', servers: appData.servers };
       var sectionList = appData.sectionList;
       var articleMap = {};
       var sectionArticleList = {};
@@ -172,15 +172,16 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
          },
          getJsonp: function(jsonPath, successHandler) {
             var url = "http://" + geo.server + "/" + jsonPath + "p?time=" + new Date().getTime();
-            console.log("load", url);
+            console.log("getJsonp", url);
             jsonpCallbacks[jsonPath] = successHandler;
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            script.src = url;
+            var scriptElement = document.createElement("script");
+            scriptElement.type = "text/javascript";
+            scriptElement.src = url;
+            document.head.appendChild(scriptElement);
          },
          load: function(jsonPath, successHandler) {
             console.log("load", geo.serverType, jsonPath);
-            if (true) {
+            if (!geo.enabled) {
                service.getOrigin(jsonPath, successHandler);
             } else if (geo.serverType === 'jsonp') {
                service.getJsonp(jsonPath, successHandler);
@@ -221,6 +222,8 @@ app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
             });                       
          },
          init: function() {
+            geo.server = "chronica.co";
+            geo.serverType = "jsonp";               
             service.initData();
          },
          resetGeo: function() {
