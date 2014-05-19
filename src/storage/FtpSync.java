@@ -40,7 +40,8 @@ public class FtpSync implements Runnable {
     ScheduledFuture future;
     long initialDelay = Millis.fromSeconds(30);
     long delay = Millis.fromSeconds(15);
-    JMap properties;
+    long connectTimeout;
+    long readTimeout;
     int warningSize = 100;
     int port = 21;
     String hostname;
@@ -65,6 +66,8 @@ public class FtpSync implements Runnable {
             username = properties.getString("username");
             password = properties.getPassword("password");
             storageDir = properties.getString("storageDir");
+            connectTimeout = properties.getMillis("connectTimeout");
+            readTimeout = properties.getMillis("readTimeout");
             logger.info("{} {}", username, storageDir);
         }
     }
@@ -96,8 +99,8 @@ public class FtpSync implements Runnable {
             logger.warn("login: ftpClient not null");
         }
         ftpClient = FtpClientProvider.provider().createFtpClient();
-        ftpClient.setConnectTimeout((int) properties.getMillis("connectTimeout"));
-        ftpClient.setReadTimeout((int) properties.getMillis("readTimeout"));
+        ftpClient.setConnectTimeout((int) connectTimeout);
+        ftpClient.setReadTimeout((int) readTimeout);
         ftpClient.connect(new InetSocketAddress(hostname, port));
         ftpClient.login(username, password);
     }
