@@ -84,9 +84,10 @@ public class FtpSync implements Runnable {
         try {
             login();
             list();
-            ftpClient.close();
         } catch (Exception e) {
             logger.warn("initSchedule", e.getMessage());
+        } finally {
+            close();
         }
         logger.info("schedule {} {}", initialDelay, delay);
         future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
@@ -142,7 +143,11 @@ public class FtpSync implements Runnable {
     
     void close() {
         try {
-            ftpClient.close();        
+            if (ftpClient == null) {
+                logger.warn("close: ftpClient is null");                
+            } else {
+                ftpClient.close();        
+            }
         } catch (IOException e) {
             logger.warn("close", e);
         }
