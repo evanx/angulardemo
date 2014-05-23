@@ -13,7 +13,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static storage.ContentStorage.buildJsonp;
 import sun.net.ftp.FtpClient;
 import sun.net.ftp.FtpClientProvider;
 import sun.net.ftp.FtpDirEntry;
@@ -21,7 +20,6 @@ import sun.net.ftp.FtpProtocolException;
 import vellum.data.Millis;
 import vellum.exception.ParseException;
 import vellum.jx.JConsoleMap;
-import vellum.jx.JMap;
 import vellum.jx.JMapException;
 import vellum.monitor.TimestampedMonitor;
 import vellum.monitor.Tx;
@@ -55,6 +53,7 @@ public class FtpSync implements Runnable {
     Set<String> articleIdSet = new HashSet();
     Set<String> existingDirs = new HashSet();
     TimestampedMonitor monitor; 
+    Tx tx;
     
     public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException, ParseException {
         this.monitor = monitor;
@@ -106,12 +105,15 @@ public class FtpSync implements Runnable {
     }
 
     @Override
-    public synchronized void run() {        
+    public void run() {        
         if (deque.isEmpty()) {
             logger.info("empty");
             return;
         }
-        Tx tx = monitor.begin("FtpSync");
+        if (tx != null) {
+            logger.error("still running");
+        }
+        tx = monitor.begin("FtpSync");
         if (deque.size() > warningSize) {
             tx.warnf("size %d", deque.size());
         }
@@ -137,6 +139,7 @@ public class FtpSync implements Runnable {
             tx.error(e);
         } finally {
             tx.fin();
+            tx = null;
             close();
         }
     }
