@@ -3,9 +3,14 @@ var jsonpCallbacks = {};
 
 function jsonpCallback(path, data) {
    var callback = jsonpCallbacks[path];
-   console.log("jsonpCallback", path, data, typeof (callback));
-   if (typeof (callback) !== 'function') {
-      console.warn("jsonpCallback", path, typeof (callback));
+   console.log("jsonpCallback", path, typeof(data), typeof (callback));
+   if (callback) {
+      delete jsonpCallbacks[path];
+   }
+   if (!callback) {
+      console.warn("jsonpCallback missing", path);      
+   } else if (typeof (callback) !== 'function') {
+      console.warn("jsonpCallback type", path, typeof (callback));
    } else {
       callback(data);
    }
@@ -91,6 +96,8 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
               when("/sections", {
                  templateUrl: "sections.html",
                  controller: "sectionsController"}).
+              when("/country/:country", {
+                 controller: "countryController"}).
               when("/section/:section", {
                  templateUrl: "section.html",
                  controller: "sectionController",
@@ -118,13 +125,18 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       serverType: 'origin',
       city: "jhb",
       country: 'za',
-      servers: appData.servers
+      servers: appData.servers,
+      path: $location.path(),
+      host: $location.host()
    };
-   geo.query = $location.search();
-   if (location.search === "?country=de/") {
-      geo.query.country = 'de';
+   geo.host = $location.host();
+   if (geo.host === "chronica.co") {
+      geo.enabled = false;
    }
-   console.log("location", geo.query, location);
+   if (geo.host === "localhost") {
+      geo.enabled = true;
+   }
+   console.log("geo init", geo);
    var sectionList = appData.sectionList;
    var articleMap = {};
    var sectionArticleList = {};
@@ -209,7 +221,9 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          scriptElement.src = url;
          document.head.appendChild(scriptElement);
          $timeout(function() {
-            errorHandler();
+            if (jsonpCallbacks[jsonPath]) {
+               errorHandler();
+            }
          }, 2000);
       },
       loadType: function(jsonPath, successHandler, errorHandler) {
@@ -228,15 +242,16 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       },
       load: function(jsonPath, successHandler, errorHandler) {
          service.loadType(jsonPath, successHandler, function() {
+            console.warn("load: geo", jsonPath, geo.enabled, geo.server, geo.serverType);
             if (geo.enabled) {
                if (geo.server === 'origin') {
-                  service.presetGeo();
                   service.setGeo();
                } else {
                   service.changeServer();
                }
             }
             service.loadType(jsonPath, successHandler, function() {
+               console.warn("load: geo", jsonPath, geo.enabled, geo.server, geo.serverType);
                if (geo.enabled) {
                   service.changeServer();
                }
@@ -244,27 +259,33 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             });
          });
       },
-      loadSection: function(section, sectionHandler) {
+      loadSection: function(section) {
+         var deferred = $q.defer();
          var jsonPath = section + "/articles.json";
          service.load(jsonPath, function(data) {
             console.log("loadSection", section, typeof(data), data.length);
-            sectionHandler(section, data);
+            deferred.resolve({section: section, data: data});
          }, function() {
             console.warn("loadSection", section);
+            deferred.reject(section);
          });
+         return deferred.promise;
       },
       initData: function() {
          var firstSection = sectionList[0].name.toLowerCase();
-         service.loadSection(firstSection, function(section, data) {
-            console.log("firstSection", firstSection, section);
-            service.putSectionArticles(section, data);
+         service.loadSection(firstSection).then(function(result) {
+            service.putSectionArticles(firstSection, result.data);
             for (var i = 1; i < sectionList.length; i++) {
-               section = sectionList[i].name.toLowerCase();
-               service.loadSection(section, function(section, data) {
-                  service.putSectionArticles(section, data);
+               var section = sectionList[i].name.toLowerCase();
+               service.loadSection(section).then(function(result) {
+                  console.log("initData", result);
+                  service.putSectionArticles(result.section, result.data);
                });
             }
          });
+      },
+      setCountry: function(country) {
+         geo.country = country;
       },
       setGeo: function() {
          geo.serverIndex = 0;
@@ -291,14 +312,6 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          }
          service.setServer();
       },
-      presetGeo: function() {
-         if (geo.query.country) {
-            geo.country = geo.query.country;
-         }
-         if (geo.query.city) {
-            geo.city = geo.query.city;
-         }
-      },
       initGeo: function() {
          $http.get("http://ipinfo.io/json").success(function(data) {
             geo.ipinfo = data;
@@ -308,15 +321,14 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             if (data.country) {
                geo.country = data.country.toLowerCase();
             }
-            service.presetGeo();
             service.setGeo();
-            console.log("geo", geo);
+            console.log("initGeo", geo);
          }).error(function() {
-            service.initData();
+            console.warn("initGeo");            
          });
       },
       init: function() {
-         if (geo.enabled) {
+         if (geo.enabled && geo.path.indexOf("/country/") !== 0) {
             service.initGeo();
          }
       }
@@ -355,15 +367,22 @@ app.controller("appController", function($scope, $location, $timeout, appService
    }
 });
 
-app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
-   function($scope, $location, $window, appService) {
-      $scope.state.title = "My Independent";
-      $scope.sections = appService.getSectionList();
-      $scope.selected = function(section) {
-         console.log("selected", section);
-         $location.path("section/" + section);
-      };
-   }]);
+app.controller("countryController", function(
+        $scope, $location, $routeParams, $location, appService) {
+   console.log("countryController", $routeParams.country);
+   appService.setCountry($routeParams.country);
+   $location.path("section/Top");
+});
+
+app.controller("sectionsController", function(
+        $scope, $location, $window, appService) {
+   $scope.state.title = "My Independent";
+   $scope.sections = appService.getSectionList();
+   $scope.selected = function(section) {
+      console.log("selected", section);
+      $location.path("section/" + section);
+   };
+});
 
 var sectionController = app.controller("sectionController", function(
         $scope, $location, $routeParams, $window, $timeout, appService) {
@@ -374,10 +393,10 @@ var sectionController = app.controller("sectionController", function(
    console.log("sectionController", $scope.section);
    $scope.state.title = appService.getSectionLabel($routeParams.section);
    var jsonPath = $scope.section + "/articles.json";
-   $scope.resultHandler = function(section, data) {
+   $scope.resultHandler = function(result) {
       $scope.statusMessage = "Loaded";
-      console.log('section apply result', section, $scope.section, data);
-      $scope.articles = appService.putSectionArticles($scope.section, data);
+      console.log('section apply result', result);
+      $scope.articles = appService.putSectionArticles(result.section, result.data);
    };
    $scope.errorHandler = function() {
       $scope.statusMessage = "Failed";
@@ -386,7 +405,7 @@ var sectionController = app.controller("sectionController", function(
       $scope.articles = appService.getSectionArticles($scope.section);
    } else {
       $scope.statusMessage = "Loading " + jsonPath;
-      appService.loadSection($scope.section, $scope.resultHandler, $scope.errorHandler);
+      appService.loadSection($scope.section).then($scope.resultHandler, $scope.errorHandler);
    }
    $scope.selected = function(article) {
       console.log("selected", article.articleId);
