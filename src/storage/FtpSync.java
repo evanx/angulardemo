@@ -43,6 +43,7 @@ public class FtpSync implements Runnable {
     long readTimeout;
     int warningSize = 100;
     int port = 21;
+    String id;
     String hostname;
     String username;
     char[] password;
@@ -59,16 +60,18 @@ public class FtpSync implements Runnable {
     public FtpSync(FtpSyncManager manager, JConsoleMap properties) throws JMapException, ParseException {
         this.manager = manager;
         monitor = manager.monitor;
-        logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
             port = properties.getInt("port", port);
+            id = properties.getString("id");
             hostname = properties.getString("hostname");
             username = properties.getString("username");
             password = properties.getPassword("password");
             storageDir  = properties.getString("storageDir");
             connectTimeout = properties.getMillis("connectTimeout");
             readTimeout = properties.getMillis("readTimeout");
+            logger = LoggerFactory.getLogger("FtpSync:" + id);
+            logger.info("properties {}", properties);
             logger.info("{} {}", username, hostname);
         }
     }
@@ -115,7 +118,7 @@ public class FtpSync implements Runnable {
         if (tx != null) {
             logger.error("still running");
         }
-        tx = monitor.begin("FtpSync", hostname);
+        tx = monitor.begin("FtpSync", id);
         if (deque.size() > warningSize) {
             tx.warnf("size %d", deque.size());
         }
@@ -207,7 +210,7 @@ public class FtpSync implements Runnable {
     
     private void sync(StorageItem item) {
         String path = storageDir + "/" + item.path;
-        Tx sub = monitor.begin("sync", item.path);
+        Tx sub = monitor.begin("sync", id, item.path);
         try {
             long size = ftpClient.getSize(path);
             if (size != item.content.length) {
@@ -232,7 +235,7 @@ public class FtpSync implements Runnable {
 
     private void upload(StorageItem item) {
         String path = storageDir + "/" + item.path;
-        Tx tx = monitor.begin("upload", item.path);
+        Tx tx = monitor.begin("upload", id, item.path);
         try {
             ensureDirectoryPath(path);
             ftpClient.putFile(path, new ByteArrayInputStream(item.content));

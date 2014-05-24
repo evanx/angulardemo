@@ -2,17 +2,36 @@
 var jsonpCallbacks = {};
 
 function jsonpCallback(path, data) {
-   var callback = jsonpCallbacks[path];
-   console.log("jsonpCallback", path, typeof(data), typeof (callback));
-   if (callback) {
-      delete jsonpCallbacks[path];
-   }
-   if (!callback) {
-      console.warn("jsonpCallback missing", path);      
-   } else if (typeof (callback) !== 'function') {
-      console.warn("jsonpCallback type", path, typeof (callback));
+   var callbackInfo = jsonpCallbacks[path];
+   if (!callbackInfo) {
+      console.error("jsonp info missing", path);
    } else {
-      callback(data);
+      var callbackFunction = jsonpCallbacks[path].callback;
+      if (!callbackFunction) {
+         console.error("jsonp function missing", path);
+      } else if (typeof (callbackFunction) !== 'function') {
+         console.warn("jsonp not function", path, typeof (callbackFunction));
+      } else {
+         console.log("jsonp", path, typeof (data), data.length);
+         var currentTime = new Date().getTime();
+         if (callbackInfo.duration) {
+            console.error("jsonp has duration", path, callbackInfo.duration);
+         }
+         callbackInfo.duration = currentTime - callbackInfo.timestamp;
+         if (callbackInfo.timedOut) {
+            console.log("jsonp timed out", path, callbackInfo.duration);
+         } else {
+            if (currentTime >= callbackInfo.timestamp + callbackInfo.timeout + 1000) {
+               console.error("jsonp expired", callbackInfo);
+            } else {
+               console.info("jsonp ok", path, callbackInfo.duration);
+            }
+         }
+         callbackFunction(data);
+         if (callbackInfo.alsoCallback) {
+            callbackInfo.alsoCallback(data);
+         }
+      }
    }
 }
 
@@ -21,15 +40,6 @@ function json_callback(path, data) {
 }
 
 var appData = {
-   servers: {
-      other: ["cf.chronica.co", "chronica.co"],
-      de: ["de.chronica.co", "chronica.co"],
-      us: ["us.chronica.co", "chronica.co"],
-      za: ["za.chronica.co", "chronica.co"],
-      local: ["localhost:8000", "localhost:8000"],
-      "de.chronica.co": {type: "jsonp"},
-      "za.chronica.co": {type: "jsonp"}
-   },
    sectionList: [
       {
          name: "Top",
@@ -79,7 +89,27 @@ var appData = {
          name: "Videos",
          label: "Videos"
       }
-   ]};
+   ],
+   hosts: {
+      "cf.chronica.co": {type: "cors"},
+      "chronica.co": {type: "cors", geoDisabled: true},
+      "de.chronica.co": {type: "jsonp"},
+      "do.chronica.co": {type: "cors"},
+      "lh": {type: "jsonp"},
+      "de.lh": {type: "cors"},
+      "za.lh": {type: "cors"},
+      "localhost": {type: "cors"},
+      "us.chronica.co": {type: "cors"},
+      "za.chronica.co": {type: "jsonp"}
+   },
+   servers: {
+      local: ["localhost:8888", "lh:8000"],
+      other: ["cf.chronica.co", "chronica.co"],
+      de: ["de.chronica.co", "chronica.co"],
+      us: ["us.chronica.co", "chronica.co"],
+      za: ["za.chronica.co", "chronica.co"]
+   }
+};
 
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
@@ -96,8 +126,6 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
               when("/sections", {
                  templateUrl: "sections.html",
                  controller: "sectionsController"}).
-              when("/country/:country", {
-                 controller: "countryController"}).
               when("/section/:section", {
                  templateUrl: "section.html",
                  controller: "sectionController",
@@ -121,20 +149,30 @@ app.config(['$httpProvider', function($httpProvider) {
 app.factory("appService", function($q, $http, $location, $timeout) {
    var geo = {
       enabled: true,
+      serverIndex: 0,
       server: 'origin',
       serverType: 'origin',
       city: "jhb",
       country: 'za',
       servers: appData.servers,
-      path: $location.path(),
-      host: $location.host()
+      hosts: appData.hosts,
+      location: {
+         path: $location.path(),
+         host: $location.host()
+      },
    };
-   geo.host = $location.host();
-   if (geo.host === "chronica.co") {
-      geo.enabled = false;
+   if (geo.location.host.indexOf("de.") === 0) {
+      geo.overrideCountry = "de";
+   } else if (geo.location.host.indexOf("za.") === 0) {
+      geo.overrideCountry = "za";
    }
-   if (geo.host === "localhost") {
-      geo.enabled = true;
+   geo.host = geo.hosts[geo.location.host];
+   if (!geo.host) {
+      console.warn("no host", geo.location.host);
+   } else if (geo.host.geoDisabled) {
+      geo.enabled = false;
+   } else {
+      console.warn("geo enabled");
    }
    console.log("geo init", geo);
    var sectionList = appData.sectionList;
@@ -159,7 +197,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          return articleMap[articleId];
       },
       putSectionArticles: function(section, articles) {
-         console.log("putSectionArticles", section, typeof(articles), articles.length);
+         console.log("putSectionArticles", section, typeof (articles), articles.length);
          if (!sectionArticleList[section]) {
             sectionArticleList[section] = [];
          }
@@ -212,99 +250,130 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          console.log("getCors", url);
          $http.get(url).success(successHandler).error(errorHandler);
       },
-      getJsonp: function(jsonPath, successHandler, errorHandler) {
+      getJsonp: function(jsonPath, successHandler, errorHandler, timeout) {
+         var server = geo.server;
          var url = "http://" + geo.server + "/" + jsonPath + "p?time=" + new Date().getTime();
          console.log("getJsonp", url);
-         jsonpCallbacks[jsonPath] = successHandler;
+         if (jsonpCallbacks[jsonPath]) {
+            if (!jsonpCallbacks[jsonPath].duration) {
+               if (!jsonpCallbacks[jsonPath].timedOut) {
+                  var duration = new Date().getTime() - jsonpCallbacks[jsonPath].timestamp;
+                  console.warn("getJsonp active", jsonPath, server, duration);
+                  errorHandler();
+                  return;
+               }
+            }
+         }
+         jsonpCallbacks[jsonPath] = {
+            timedOut: false,
+            callback: successHandler,
+            timestamp: new Date().getTime(),
+            timeout: timeout
+         };
          var scriptElement = document.createElement("script");
          scriptElement.type = "text/javascript";
          scriptElement.src = url;
          document.head.appendChild(scriptElement);
          $timeout(function() {
-            if (jsonpCallbacks[jsonPath]) {
+            if (!jsonpCallbacks[jsonPath].duration) {
+               jsonpCallbacks[jsonPath].timedOut = true;
+               console.warn("getJsonp timeout", jsonPath, server);
                errorHandler();
             }
-         }, 2000);
+         }, timeout);
       },
-      loadType: function(jsonPath, successHandler, errorHandler) {
-         console.log("loadType", geo.server, geo.serverType, jsonPath);
+      loadType: function(jsonPath, successHandler, errorHandler, timeout) {
+         console.log("loadType", jsonPath, geo.serverType, geo.server);
          if (!geo.enabled) {
             service.getOrigin(jsonPath, successHandler, errorHandler);
-         } else if (geo.server === 'origin') {
+         } else if (geo.serverType === 'origin') {
             service.getOrigin(jsonPath, successHandler, errorHandler);
          } else if (geo.serverType === 'jsonp') {
-            service.getJsonp(jsonPath, successHandler, errorHandler);
+            service.getJsonp(jsonPath, successHandler, errorHandler, timeout);
          } else if (geo.serverType === 'cors') {
             service.getCors(jsonPath, successHandler, errorHandler);
          } else {
             service.getOrigin(jsonPath, successHandler, errorHandler);
          }
       },
-      load: function(jsonPath, successHandler, errorHandler) {
+      load: function(jsonPath, successHandler, errorHandler, initialTimeout, timeout) {
          service.loadType(jsonPath, successHandler, function() {
-            console.warn("load: geo", jsonPath, geo.enabled, geo.server, geo.serverType);
+            console.warn("load", jsonPath, geo.serverType, geo.server);
             if (geo.enabled) {
-               if (geo.server === 'origin') {
-                  service.setGeo();
-               } else {
-                  service.changeServer();
-               }
+               service.changeServer();
             }
             service.loadType(jsonPath, successHandler, function() {
-               console.warn("load: geo", jsonPath, geo.enabled, geo.server, geo.serverType);
+               console.warn("load", jsonPath, geo.serverType, geo.server);
                if (geo.enabled) {
                   service.changeServer();
                }
-               service.loadType(jsonPath, successHandler, errorHandler);
-            });
-         });
+               service.loadType(jsonPath, successHandler, errorHandler, timeout);
+            }, timeout);
+         }, initialTimeout);
       },
-      loadSection: function(section) {
+      loadSection: function(section, initialTimeout, timeout) {
          var deferred = $q.defer();
          var jsonPath = section + "/articles.json";
          service.load(jsonPath, function(data) {
-            console.log("loadSection", section, typeof(data), data.length);
+            console.log("loadSection", section, typeof (data), data.length);
             deferred.resolve({section: section, data: data});
          }, function() {
             console.warn("loadSection", section);
             deferred.reject(section);
-         });
+         }, initialTimeout, timeout);
          return deferred.promise;
       },
       initData: function() {
+         var timeout = 4000;
+         console.log("initData", geo);
          var firstSection = sectionList[0].name.toLowerCase();
-         service.loadSection(firstSection).then(function(result) {
+         service.loadSection(firstSection, timeout, timeout).then(function(result) {
             service.putSectionArticles(firstSection, result.data);
             for (var i = 1; i < sectionList.length; i++) {
                var section = sectionList[i].name.toLowerCase();
-               service.loadSection(section).then(function(result) {
-                  console.log("initData", result);
+               service.loadSection(section, timeout + i * 500, timeout).then(function(result) {
+                  console.log("initData result", result);
                   service.putSectionArticles(result.section, result.data);
                });
             }
          });
       },
-      setCountry: function(country) {
-         geo.country = country;
-      },
-      setGeo: function() {
-         geo.serverIndex = 0;
-         if (!geo.servers[geo.country]) {
+      changeCountry: function(country) {
+         if (!geo.servers[country]) {
+            console.warn("changeCountry", country);
             geo.country = "other";
+         } else {
+            console.log("changeCountry", country);
+            geo.country = country;
          }
+         geo.serverIndex = 0;
          service.setServer();
       },
       setServer: function() {
+         console.log("setServer", geo.country, geo.serverIndex);
+         if (!geo.servers[geo.country]) {
+            console.warn("setServer country", geo.country);
+            geo.country = "other";
+         }
          geo.server = geo.servers[geo.country][geo.serverIndex];
-         console.log("setServer", geo.country, geo.server, geo.servers[geo.server]);
-         if (geo.servers[geo.server] && geo.servers[geo.server].type === "jsonp") {
+         if (!geo.server) {
+            console.error("setServer: no server");
+            geo.serverType = "origin";
+         } else if (!geo.hosts[geo.server]) {
+            console.error("setServer: no host", geo.server);
+            geo.serverType = "jsonp";
+         } else if (!geo.hosts[geo.server].type) {
+            console.error("setServer: no type", geo.hosts[geo.server]);
+            geo.serverType = "jsonp";
+         } else if (geo.hosts[geo.server].type === "jsonp") {
             geo.serverType = "jsonp";
          } else {
             geo.serverType = "cors";
          }
-         console.log("server", geo.server, geo.serverType);
+         console.log("setServer done", geo.country, geo.server, geo.serverType, geo.hosts[geo.server]);
       },
       changeServer: function() {
+         console.log("changeServer", geo.country, geo.server, geo.hosts[geo.server]);
          if (geo.serverIndex === 0) {
             geo.serverIndex = 1;
          } else {
@@ -321,15 +390,24 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             if (data.country) {
                geo.country = data.country.toLowerCase();
             }
-            service.setGeo();
+            if (!geo.servers[geo.country]) {
+               console.log("initGeo country", geo.country);
+               geo.country = "other";
+            }
             console.log("initGeo", geo);
+            service.setServer();
          }).error(function() {
-            console.warn("initGeo");            
+            console.warn("initGeo");
          });
       },
       init: function() {
-         if (geo.enabled && geo.path.indexOf("/country/") !== 0) {
-            service.initGeo();
+         if (geo.enabled) {
+            if (geo.overrideCountry) {
+               console.warn("overrideCountry", geo.overrideCountry);
+               service.changeCountry(geo.overrideCountry);
+            } else {
+               service.initGeo();
+            }
          }
       }
    };
@@ -367,13 +445,6 @@ app.controller("appController", function($scope, $location, $timeout, appService
    }
 });
 
-app.controller("countryController", function(
-        $scope, $location, $routeParams, $location, appService) {
-   console.log("countryController", $routeParams.country);
-   appService.setCountry($routeParams.country);
-   $location.path("section/Top");
-});
-
 app.controller("sectionsController", function(
         $scope, $location, $window, appService) {
    $scope.state.title = "My Independent";
@@ -405,7 +476,7 @@ var sectionController = app.controller("sectionController", function(
       $scope.articles = appService.getSectionArticles($scope.section);
    } else {
       $scope.statusMessage = "Loading " + jsonPath;
-      appService.loadSection($scope.section).then($scope.resultHandler, $scope.errorHandler);
+      appService.loadSection($scope.section, 4000, 4000).then($scope.resultHandler, $scope.errorHandler);
    }
    $scope.selected = function(article) {
       console.log("selected", article.articleId);
@@ -478,6 +549,6 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
          $scope.scheduleAddThis();
       } else {
          $scope.statusMessage = "Loading " + jsonPath;
-         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
+         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler, 4000, 4000);
       }
    }]);

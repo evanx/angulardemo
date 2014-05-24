@@ -45,7 +45,7 @@ public class GitteryHandler implements HttpHandler {
     HttpExchange he;
     String method;
     String path;
-    
+
     public GitteryHandler(GitteryContext context) {
         this.context = context;
     }
@@ -59,16 +59,18 @@ public class GitteryHandler implements HttpHandler {
             if (path.startsWith("/storage/")) {
                 path = path.substring(9);
             } else if (path.equals("/") || path.equals("/prefetch")) {
-                logger.info("app {}", context.storage.caching);
-                path = context.storage.defaultPath;
-                if (context.storage.caching && context.storage.prefetchContent != null) {
-                    if (requestHeaderMatches("Accept-Encoding", "gzip")
-                            && context.storage.prefetchGzippedContent != null) {
-                        writeGzipped(context.storage.prefetchGzippedContent);
-                    } else {
-                        write(context.storage.prefetchContent);
+                if (he.getRequestMethod().equals("GET")) {
+                    logger.info("app {}", context.storage.caching);
+                    path = context.storage.defaultPath;
+                    if (context.storage.caching && context.storage.prefetchContent != null) {
+                        if (requestHeaderMatches("Accept-Encoding", "gzip")
+                                && context.storage.prefetchGzippedContent != null) {
+                            writeGzipped(context.storage.prefetchGzippedContent);
+                        } else {
+                            write(context.storage.prefetchContent);
+                        }
+                        return;
                     }
-                    return;
                 }
             } else if (path.contains("undefined")) {
                 logger.warn("path {}", path);
@@ -78,7 +80,7 @@ public class GitteryHandler implements HttpHandler {
                 path = path.substring(1);
             }
             if (he.getRequestMethod().equals("OPTIONS")) {
-                logger.warn("OPTIONS");                
+                logger.warn("OPTIONS");
                 writeOptions();
             } else if (he.getRequestMethod().equals("POST")) {
                 logger.warn("POST");
@@ -86,7 +88,7 @@ public class GitteryHandler implements HttpHandler {
                 writeGzip(get());
             } else {
                 logger.warn("Accept-Encoding: {}", he.getRequestHeaders().get("Accept-Encoding"));
-                write(get());                
+                write(get());
             }
         } catch (Throwable e) {
             writeError();
@@ -95,13 +97,13 @@ public class GitteryHandler implements HttpHandler {
             he.close();
         }
     }
-    
+
     private boolean requestHeaderMatches(String header, String pattern) {
         List<String> values = he.getRequestHeaders().get(header);
         if (values != null && !values.isEmpty()) {
             return values.get(0).contains(pattern);
         }
-        return false;        
+        return false;
     }
 
     private void post() throws IOException {
@@ -158,14 +160,14 @@ public class GitteryHandler implements HttpHandler {
         logger.info("not found {}", path);
         he.sendResponseHeaders(404, 0);
     }
-    
+
     void write(byte[] content) throws IOException {
         logger.info("response {} {}", path, content.length);
         setContentType();
         he.sendResponseHeaders(200, content.length);
         he.getResponseBody().write(content);
     }
-    
+
     void writeGzip(byte[] content) throws IOException {
         logger.info("gzip response {} {}", path, content.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
@@ -174,8 +176,8 @@ public class GitteryHandler implements HttpHandler {
         try (OutputStream stream = new GZIPOutputStream(he.getResponseBody())) {
             stream.write(content);
         }
-    }        
-    
+    }
+
     void writeGzipped(byte[] gzippedContent) throws IOException {
         logger.info("gzipped response {} {}", path, gzippedContent.length);
         he.getResponseHeaders().set("Content-Encoding", "gzip");
@@ -183,7 +185,7 @@ public class GitteryHandler implements HttpHandler {
         he.sendResponseHeaders(200, 0);
         he.getResponseBody().write(gzippedContent);
         he.getResponseBody().close();
-    }        
+    }
 
     void writeOptions() throws IOException {
         logger.info("options {} {}", path);
@@ -192,15 +194,15 @@ public class GitteryHandler implements HttpHandler {
         if (file.exists()) {
             he.sendResponseHeaders(200, 0);
         } else {
-            he.sendResponseHeaders(404, 0);            
+            he.sendResponseHeaders(404, 0);
         }
         he.getResponseBody().close();
-    }        
-       
+    }
+
     final static long CACHE_MIRROR_MILLIS = Millis.fromDays(28);
     final static long CACHE_IMAGE_MILLIS = Millis.fromDays(3);
     final static long CACHE_ARTICLES_MILLIS = Millis.fromMinutes(3);
-    
+
     private void setContentType() {
         he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
         if (path.startsWith("mirror/")) {
@@ -212,8 +214,10 @@ public class GitteryHandler implements HttpHandler {
             he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         } else if (path.endsWith(".json")) {
+            he.getResponseHeaders().set("Access-Control-Allow-Headers", "if-modified-since");
+            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }
-    
+
 }

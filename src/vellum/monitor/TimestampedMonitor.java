@@ -56,8 +56,7 @@ public class TimestampedMonitor implements Runnable {
         return tx;
     }
 
-    public void finish(Tx tx) {
-        logger.info("finish {}", tx);
+    void finish(Tx tx) {
         completedDeque.add(tx);
         for (Tx sub : tx.subs) {
             if (!sub.isCompleted()) {
@@ -67,6 +66,7 @@ public class TimestampedMonitor implements Runnable {
         if (false) {
             tx.subs.clear();
         }
+        logger.info("finish {}", tx);
     }
     
     LongAggregateMap completedMap;

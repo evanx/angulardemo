@@ -63,6 +63,10 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         return error != null;
     }
 
+    boolean isCompleted() {
+        return duration > 0;
+    }
+
     public Exception getException() {
         return exception;
     }
@@ -100,10 +104,6 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         setDuration();
     }
 
-    boolean isCompleted() {
-        return duration > 0;
-    }
-
     void setDuration() {
         setDuration(System.currentTimeMillis() - timestamp);
     }
@@ -116,6 +116,7 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         if (monitor != null) {
             monitor.finish(this);
         }
+        logger.info("setDuration {}", toString());        
     }
 
     public String getType() {

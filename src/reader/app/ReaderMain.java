@@ -26,7 +26,7 @@ public class ReaderMain {
         try {
             org.apache.log4j.Logger.getRootLogger().getLoggerRepository().resetConfiguration();
             org.apache.log4j.Logger.getRootLogger().addAppender(new ConsoleAppender(
-                    new PatternLayout("%d{ISO8601} %p [%c{1}] %m%n")));
+                    new PatternLayout("%d{ISO8601} %p [%c] %m%n")));
             Logger logger = LoggerFactory.getLogger(ReaderMain.class);
             JsonObjectDelegate object = new JsonObjectDelegate(new File("config.json"));
             logger.info("storage {}", object.getMap("storage"));
