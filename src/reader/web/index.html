@@ -67,6 +67,7 @@
         min-height: 230px; 
         overflow: hidden; 
         position: relative;        
+        background-color: gray;
       }
       .section-first-text {
         display: inline-block; 
@@ -81,7 +82,7 @@
         font-weight: normal;
       }
       .section-first-text,
-      a.section-first-text:hover {
+      a.section-first-text {
         font-weight: bold; 
         color: white;
         text-decoration: none;
@@ -99,10 +100,18 @@
       .section-first-image-gallery img {
         float: right;
       }
+      .section-first-text:hover {
+        background: rgba(0, 0, 0, .4); 
+        z-index: 100;        
+      }
       @media screen and (min-width: 560px) {
+        .section-first {
+          width: 585px;
+        }
         .section-first-text {
           padding: .5em 1.5em;
           text-decoration: none;
+          width: 100%;
         }
         .section-first-image {
           margin: 0;
@@ -131,6 +140,7 @@
           font-size: 130%;
           padding: .5em 1em;
           text-decoration: none;
+          width: 100%;
         }
         .section-first-image {
           padding: 0;
