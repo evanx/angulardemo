@@ -22,6 +22,7 @@ import vellum.jx.JMap;
 import vellum.jx.JMapException;
 import vellum.jx.JMaps;
 import vellum.monitor.TimestampedMonitor;
+import vellum.system.NullConsole;
 import vellum.util.Streams;
 
 /**
@@ -56,7 +57,7 @@ public class ContentStorage {
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
     Deque<StorageItem> deque;
-    FtpSync ftpSync;
+    FtpSyncManager ftpSync;
     TimestampedMonitor monitor;
     
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
@@ -67,7 +68,7 @@ public class ContentStorage {
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
-        ftpSync = new FtpSync(monitor, JConsoleMap.map(properties, "ftpClient"));
+        ftpSync = new FtpSyncManager(monitor, properties.map("ftpSync"));
         if (ftpSync.isEnabled()) {
             deque = ftpSync.getDeque();
         }

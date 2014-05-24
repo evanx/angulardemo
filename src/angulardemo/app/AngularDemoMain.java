@@ -29,13 +29,13 @@ public class AngularDemoMain {
             BasicConfigurator.configure();
             JMap properties = JMaps.map(System.getProperties());
             TaskManager taskManager = new TaskManager();
-            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
-            ContentStorage storage = new ContentStorage(monitor, properties.getMap("storage"));
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.map("monitor"));
+            ContentStorage storage = new ContentStorage(monitor, properties.map("storage"));
             new GitteryServer().start(new GitteryContext(storage,
                     "angulardemo/web", "index.html",
                     "https://raw.githubusercontent.com/evanx/angulardemo/master/angulardemo/web"));
             new FeedsTask().start(new FeedsContext(monitor, taskManager, storage,
-                    properties.getMap("feeds")));
+                    properties.map("feeds")));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

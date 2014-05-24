@@ -77,8 +77,11 @@ public class GitteryHandler implements HttpHandler {
             } else if (path.startsWith("/")) {
                 path = path.substring(1);
             }
-            if (he.getRequestMethod().equals("POST")) {
-                logger.warn("post");
+            if (he.getRequestMethod().equals("OPTIONS")) {
+                logger.warn("OPTIONS");                
+                writeOptions();
+            } else if (he.getRequestMethod().equals("POST")) {
+                logger.warn("POST");
             } else if (requestHeaderMatches("Accept-Encoding", "gzip")) {
                 writeGzip(get());
             } else {
@@ -182,6 +185,18 @@ public class GitteryHandler implements HttpHandler {
         he.getResponseBody().close();
     }        
 
+    void writeOptions() throws IOException {
+        logger.info("options {} {}", path);
+        setContentType();
+        File file = new File(context.storage.storageDir, path);
+        if (file.exists()) {
+            he.sendResponseHeaders(200, 0);
+        } else {
+            he.sendResponseHeaders(404, 0);            
+        }
+        he.getResponseBody().close();
+    }        
+       
     final static long CACHE_MIRROR_MILLIS = Millis.fromDays(28);
     final static long CACHE_IMAGE_MILLIS = Millis.fromDays(3);
     final static long CACHE_ARTICLES_MILLIS = Millis.fromMinutes(3);
@@ -193,6 +208,7 @@ public class GitteryHandler implements HttpHandler {
         } else if (Streams.getContentType(path).startsWith("image/")) {
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
         } else if (path.endsWith("/articles.json")) {
+            he.getResponseHeaders().set("Access-Control-Allow-Headers", "if-modified-since");
             he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         } else if (path.endsWith(".json")) {

@@ -33,16 +33,16 @@ public class ReaderMain {
             logger.info("feeds {}", object.getMap("feeds"));
             logger.info("webServer {}", object.getMap("webServer"));            
             JMap properties = object.getMap();
-            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.map("monitor"));
             VellumProvider.provider.put(monitor);
-            ContentStorage contentStorage = new ContentStorage(monitor, properties.getMap("storage"));
+            ContentStorage contentStorage = new ContentStorage(monitor, properties.map("storage"));
             VellumProvider.provider.put(contentStorage);
             GitteryContext gitteryContext = new GitteryContext(contentStorage, "reader/web", "index.html", null);
             VellumProvider.provider.put(gitteryContext);
             new GitteryServer().start(gitteryContext);
             TaskManager taskManager = new TaskManager();
             FeedsContext feedsContext = new FeedsContext(monitor, taskManager, contentStorage, 
-                properties.getMap("feeds"));
+                properties.map("feeds"));
             VellumProvider.provider.put(feedsContext);
             if (feedsContext.start()) {
                 contentStorage.start();

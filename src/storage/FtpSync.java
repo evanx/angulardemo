@@ -33,6 +33,7 @@ public class FtpSync implements Runnable {
 
     Logger logger = LoggerFactory.getLogger(FtpSync.class);
 
+    FtpSyncManager manager;
     Deque<String> pathDeque = new ArrayDeque();
     ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     ScheduledFuture future;
@@ -45,9 +46,9 @@ public class FtpSync implements Runnable {
     String hostname;
     String username;
     char[] password;
+    String storageDir;
     Deque<StorageItem> deque = new ArrayDeque();
     boolean cancelled = false;
-    String storageDir;
     FtpClient ftpClient;
     boolean enabled;
     Set<String> articleIdSet = new HashSet();
@@ -55,8 +56,9 @@ public class FtpSync implements Runnable {
     TimestampedMonitor monitor; 
     Tx tx;
     
-    public FtpSync(TimestampedMonitor monitor, JConsoleMap properties) throws JMapException, ParseException {
-        this.monitor = monitor;
+    public FtpSync(FtpSyncManager manager, JConsoleMap properties) throws JMapException, ParseException {
+        this.manager = manager;
+        monitor = manager.monitor;
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
@@ -64,10 +66,10 @@ public class FtpSync implements Runnable {
             hostname = properties.getString("hostname");
             username = properties.getString("username");
             password = properties.getPassword("password");
-            storageDir = properties.getString("storageDir");
+            storageDir  = properties.getString("storageDir");
             connectTimeout = properties.getMillis("connectTimeout");
             readTimeout = properties.getMillis("readTimeout");
-            logger.info("{} {}", username, storageDir);
+            logger.info("{} {}", username, hostname);
         }
     }
 
@@ -113,7 +115,7 @@ public class FtpSync implements Runnable {
         if (tx != null) {
             logger.error("still running");
         }
-        tx = monitor.begin("FtpSync");
+        tx = monitor.begin("FtpSync", hostname);
         if (deque.size() > warningSize) {
             tx.warnf("size %d", deque.size());
         }
@@ -205,7 +207,7 @@ public class FtpSync implements Runnable {
     
     private void sync(StorageItem item) {
         String path = storageDir + "/" + item.path;
-        Tx tx = monitor.begin("sync", item.path);
+        Tx sub = monitor.begin("sync", item.path);
         try {
             long size = ftpClient.getSize(path);
             if (size != item.content.length) {
@@ -214,17 +216,17 @@ public class FtpSync implements Runnable {
             } else {
                 logger.info("sync unchanged {} {}", item, size);
             }
-            tx.ok();
+            sub.ok();
         } catch (IOException | FtpProtocolException e) {
             try {
                 ensureDirectoryPath(path);
                 ftpClient.putFile(path, new ByteArrayInputStream(item.content));
-                tx.ok();
+                sub.ok();
             } catch (IOException | FtpProtocolException ex) {
-                tx.error(ex);
+                sub.error(ex);
             }
         } finally {
-            tx.fin();
+            sub.fin();
         }
     }
 
