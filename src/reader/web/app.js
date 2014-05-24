@@ -2,20 +2,29 @@
 var jsonpCallbacks = {};
 
 function jsonpCallback(path, data) {
-   console.log("jsonpCallback", path, data);
-   jsonpCallbacks[path](data);   
-};
+   var callback = jsonpCallbacks[path];
+   console.log("jsonpCallback", path, data, typeof(callback));
+   if (typeof(callback) !== 'function') {
+      console.warn("jsonpCallback", path, typeof(callback));
+   } else {
+      callback(data);
+   }
+}
+;
 
 function json_callback(path, data) {
    jsonpCallback(path, data);
-};
+}
+;
 
 var appData = {
    servers: {
-      def: ["chronica.co", "za.chronica.co"],
-      za: ["za.chronica.co", "chronica.co"],
-      cors: [ "chronica.co" ],
-      jsonp: [ "za.chronica.co" ]
+      other: ["cf.chronica.co", "us.chronica.co"],
+      de: ["de.chronica.co", "cf.chronica.co"],
+      us: ["us.chronica.co", "cf.chronica.co"],
+      za: ["za.chronica.co", "cf.chronica.co"],
+      "de.chronica.co": {type: "jsonp"},
+      "za.chronica.co": {type: "jsonp"}
    },
    sectionList: [
       {
@@ -78,183 +87,218 @@ app.filter('sliceFrom', function() {
 });
 
 app.config(['$httpProvider', function($httpProvider) {
-    if (!$httpProvider.defaults.headers.get) {
-        $httpProvider.defaults.headers.get = {};    
-    }
-    $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
-}]);
+      if (!$httpProvider.defaults.headers.get) {
+         $httpProvider.defaults.headers.get = {};
+      }
+      $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
+   }]);
 
-app.factory("appService", ["$q", "$http", "$location", function($q, $http) {
-      console.log("location", location);
-      var geo = { enabled: false, city: "jhb", country: 'za', servers: appData.servers };
-      var sectionList = appData.sectionList;
-      var articleMap = {};
-      var sectionArticleList = {};
-      var service = {
-         getSectionList: function() {
-            return sectionList;
-         },
-         putArticle: function(article) {
-            articleMap[article.articleId] = article;
-         },
-         putArticles: function(articles) {
+app.factory("appService", function($q, $http, $location, $timeout) {
+   var geo = {
+      enabled: true,
+      server: 'origin',
+      serverType: 'origin',
+      city: "jhb",
+      country: 'za',
+      servers: appData.servers
+   };
+   geo.query = $location.search();
+   if (location.search === "?country=de/") {
+      geo.query.country = 'de';
+   }
+   console.log("location", geo.query);
+   var sectionList = appData.sectionList;
+   var articleMap = {};
+   var sectionArticleList = {};
+   var service = {
+      getSectionList: function() {
+         return sectionList;
+      },
+      putArticle: function(article) {
+         articleMap[article.articleId] = article;
+      },
+      putArticles: function(articles) {
+         for (var i = 0; i < articles.length; i++) {
+            service.putArticle(articles[i]);
+         }
+      },
+      isArticle: function(articleId) {
+         return articleMap[articleId] !== undefined;
+      },
+      getArticle: function(articleId) {
+         return articleMap[articleId];
+      },
+      putSectionArticles: function(section, articles) {
+         console.log("putSectionArticles", section, articles);
+         if (!sectionArticleList[section]) {
+            sectionArticleList[section] = [];
+         }
+         if (!articles || articles.length === 0) {
+            console.warn("empty articles", section);
+         } else if (section === 'multimedia') {
+            sectionArticleList[section] = [];
             for (var i = 0; i < articles.length; i++) {
-               service.putArticle(articles[i]);
-            }
-         },
-         isArticle: function(articleId) {
-            return articleMap[articleId] !== undefined;
-         },
-         getArticle: function(articleId) {
-            return articleMap[articleId];
-         },
-         putSectionArticles: function(section, articles) {
-            console.log("putSectionArticles", section, articles);
-            if (!sectionArticleList[section]) {
-               sectionArticleList[section] = [];
-            }
-            if (!articles || articles.length === 0) {
-               console.warn("empty articles", section);
-            } else if (section === 'multimedia') {
-               sectionArticleList[section] = [];
-               for (var i = 0; i < articles.length; i++) {
-                  if (articles[i].imageList && articles[i].imageList.length > 0) {
-                     sectionArticleList[section].push(articles[i]);
-                     service.putArticle(articles[i]);
-                  }
+               if (articles[i].imageList && articles[i].imageList.length > 0) {
+                  sectionArticleList[section].push(articles[i]);
+                  service.putArticle(articles[i]);
                }
-            } else if (section === 'videos') {
-               sectionArticleList[section] = [];
-               for (var i = 0; i < articles.length; i++) {
-                  if (articles[i].youtubeList && articles[i].youtubeList.length > 0) {
-                     sectionArticleList[section].push(articles[i]);
-                     service.putArticle(articles[i]);
-                  }
+            }
+         } else if (section === 'videos') {
+            sectionArticleList[section] = [];
+            for (var i = 0; i < articles.length; i++) {
+               if (articles[i].youtubeList && articles[i].youtubeList.length > 0) {
+                  sectionArticleList[section].push(articles[i]);
+                  service.putArticle(articles[i]);
                }
+            }
+         } else {
+            sectionArticleList[section] = articles;
+            service.putArticles(articles);
+         }
+         return sectionArticleList[section];
+      },
+      isSectionArticles: function(section) {
+         return sectionArticleList[section] && sectionArticleList[section].length;
+      },
+      getSectionArticles: function(section) {
+         if (!sectionArticleList[section]) {
+            sectionArticleList[section] = [];
+         }
+         return sectionArticleList[section];
+      },
+      getSectionLabel: function(name) {
+         for (var i = 0; i < sectionList.length; i++) {
+            if (sectionList[i].name === name) {
+               return sectionList[i].label;
+            }
+            return name;
+         }
+      },
+      getOrigin: function(jsonPath, successHandler, errorHandler) {
+         $http.get(jsonPath).success(successHandler).error(errorHandler);
+      },
+      getCors: function(jsonPath, successHandler, errorHandler) {
+         var url = "http://" + geo.server + "/" + jsonPath;
+         console.log("getCors", url);
+         $http.get(url).success(successHandler).error(errorHandler);
+      },
+      getJsonp: function(jsonPath, successHandler, errorHandler) {
+         var url = "http://" + geo.server + "/" + jsonPath + "p?time=" + new Date().getTime();
+         console.log("getJsonp", url);
+         jsonpCallbacks[jsonPath] = successHandler;
+         var scriptElement = document.createElement("script");
+         scriptElement.type = "text/javascript";
+         scriptElement.src = url;
+         document.head.appendChild(scriptElement);
+         $timeout(function() { 
+            errorHandler();
+         }, 2000); 
+      },
+      loadType: function(jsonPath, successHandler, errorHandler) {
+         console.log("loadType", geo.server, geo.serverType, jsonPath);
+         if (!geo.enabled) {
+            service.getOrigin(jsonPath, successHandler, errorHandler);
+         } else if (geo.server === 'origin') {
+            service.getOrigin(jsonPath, successHandler, errorHandler);
+         } else if (geo.serverType === 'jsonp') {
+            service.getJsonp(jsonPath, successHandler, errorHandler);
+         } else if (geo.serverType === 'cors') {
+            service.getCors(jsonPath, successHandler, errorHandler);
+         } else {
+            service.getOrigin(jsonPath, successHandler, errorHandler);
+         }
+      },
+      load: function(jsonPath, successHandler, errorHandler) {
+         service.loadType(jsonPath, successHandler, function() {
+            if (geo.server === 'origin') {
+               service.overrideGeo();
+               service.setGeo();
             } else {
-               sectionArticleList[section] = articles;
-               service.putArticles(articles);
-            }
-            return sectionArticleList[section];
-         },
-         isSectionArticles: function(section) {
-            return sectionArticleList[section] && sectionArticleList[section].length;
-         },
-         getSectionArticles: function(section) {
-            if (!sectionArticleList[section]) {
-               sectionArticleList[section] = [];
-            }
-            return sectionArticleList[section];
-         },
-         getSectionLabel: function(name) {
-            for (var i = 0; i < sectionList.length; i++) {
-               if (sectionList[i].name === name) {
-                  return sectionList[i].label;
-               }
-               return name;
-            }
-         },
-         getOrigin: function(jsonPath, successHandler) {
-            var url = jsonPath;
-            console.log("load", url);
-            $http.get(url).success(successHandler).error(function() {
-               console.warn("load error", url);
                service.changeServer();
-            });
-         },
-         getCors: function(jsonPath, successHandler) {
-            var url = "http://" + geo.server + "/" + jsonPath;
-            console.log("load", url);
-            $http.get(url).success(successHandler).error(function() {
-               console.warn("load error", url);
-               service.changeServer();
-            });
-         },
-         getJsonp: function(jsonPath, successHandler) {
-            var url = "http://" + geo.server + "/" + jsonPath + "p?time=" + new Date().getTime();
-            console.log("getJsonp", url);
-            jsonpCallbacks[jsonPath] = successHandler;
-            var scriptElement = document.createElement("script");
-            scriptElement.type = "text/javascript";
-            scriptElement.src = url;
-            document.head.appendChild(scriptElement);
-         },
-         load: function(jsonPath, successHandler) {
-            console.log("load", geo.serverType, jsonPath);
-            if (!geo.enabled) {
-               service.getOrigin(jsonPath, successHandler);
-            } else if (geo.serverType === 'jsonp') {
-               service.getJsonp(jsonPath, successHandler);
-            } else if (geo.serverType === 'cors') {
-               service.getCors(jsonPath, successHandler);
-            } else {
-               service.getOrigin(jsonPath, successHandler);
             }
-         },
-         loadSection: function(section, sectionHandler) {
-            var jsonPath = section + "/articles.json";
-            service.load(jsonPath, function(data) {
-               sectionHandler(section, data);
+            service.loadType(jsonPath, successHandler, function() {
+               service.changeServer();
+               service.loadType(jsonPath, successHandler, errorHandler);
             });
-         },
-         initData: function() {
-            for (var i = 0; i < sectionList.length; i++) {
-               var section = sectionList[i].name.toLowerCase();
+         });
+      },
+      loadSection: function(section, sectionHandler) {
+         var jsonPath = section + "/articles.json";
+         service.load(jsonPath, function(data) {
+            console.log("loadSection", section, data);
+            sectionHandler(section, data);
+         }, function() {
+            console.warn("loadSection", section);
+         });
+      },
+      initData: function() {
+         var firstSection = sectionList[0].name.toLowerCase();
+         service.loadSection(firstSection, function(section, data) {
+            console.log("firstSection", firstSection, section);
+            service.putSectionArticles(section, data);
+            for (var i = 1; i < sectionList.length; i++) {
+               section = sectionList[i].name.toLowerCase();
                service.loadSection(section, function(section, data) {
                   service.putSectionArticles(section, data);
                });
             }
-         },
-         initGeo: function() {
-            $http.get("http://ipinfo.io/json").success(function(data) {
-               geo.ipinfo = data;
-               if (data.city === "Cape Town") {
-                  geo.city = "cpt";
-               }
-               if (data.country) {
-                  geo.country = data.country.toLowerCase();
-               }
-               console.log("geo", geo);
-               service.resetGeo();
-               service.initData();
-            }).error(function() {
-               service.initData();               
-            });                       
-         },
-         init: function() {
-            geo.server = "chronica.co";
-            geo.serverType = "jsonp";               
-            service.initData();
-         },
-         resetGeo: function() {
+         });
+      },
+      setGeo: function() {
+         geo.serverIndex = 0;
+         if (!geo.servers[geo.country]) {
+            geo.country = "other";
+         }
+         service.setServer();
+      },
+      setServer: function() {
+         geo.server = geo.servers[geo.country][geo.serverIndex];
+         console.log("setServer", geo.country, geo.server, geo.servers[geo.server]);
+         if (geo.servers[geo.server] && geo.servers[geo.server].type === "jsonp") {
+            geo.serverType = "jsonp";
+         } else {
+            geo.serverType = "cors";
+         }
+         console.log("server", geo.server, geo.serverType);
+      },
+      changeServer: function() {
+         if (geo.serverIndex === 0) {
+            geo.serverIndex = 1;
+         } else {
             geo.serverIndex = 0;
-            geo.serverKey = "def";
-            if (geo.servers[geo.country]) {
-               geo.serverKey = geo.country;
+         }
+         service.setServer();
+      },
+      overrideGeo: function() {
+         if (geo.query.country) {
+            geo.country = geo.query.country;
+         }
+         if (geo.query.city) {
+            geo.city = geo.query.city;
+         }
+      },
+      initGeo: function() {
+         $http.get("http://ipinfo.io/json").success(function(data) {
+            geo.ipinfo = data;
+            if (data.city === "Cape Town") {
+               geo.city = "cpt";
             }
-            service.setServer();
-         },
-         setServer: function() {
-            geo.server = geo.servers[geo.serverKey][geo.serverIndex];
-            if (geo.server === "za.chronica.co") {
-               geo.serverType = "jsonp";               
-            } else {
-               geo.serverType = "cors";
+            if (data.country) {
+               geo.country = data.country.toLowerCase();
             }
-            console.log("server", geo.server, geo.serverType);
-         },
-         changeServer: function() {
-            if (geo.serverIndex === 0) {
-               geo.serverIndex = 1;
-            } else {
-               geo.serverIndex = 0;
-            }
-            service.setServer();
-         }         
-      };
-      service.resetGeo();
-      return service;
-   }]);
+            service.overrideGeo();
+            service.setGeo();
+            console.log("geo", geo);
+         }).error(function() {
+            service.initData();
+         });
+      },
+      init: function() {
+         service.initGeo();
+      }
+   };
+   return service;
+});
 
 app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
       $sceDelegateProvider.resourceUrlWhitelist([
@@ -263,29 +307,29 @@ app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
       ]);
    }]);
 
-app.controller("appController", ["$scope", "$location", "appService",
-   function($scope, $location, appService) {
-      console.log("appController");
-      $scope.isCollapsed = true;
-      $scope.state = {};
-      $scope.userEmail = null;
-      $scope.state.title = "My Independent";
-      $scope.isActive = function(route) {
-         return route === $location.path();
-      };
-      $scope.personalize = function() {
-         //console.log("personalize", $location.path());
-         if ($location.path().indexOf("/section/") === 0) {
-            return $location.path().substring(1);
-         }
-         return null;
-      };
-      if (true) {
-         setTimeout(function() {
-            appService.init();
-         }, 2000);
+app.controller("appController", function($scope, $location, $timeout, appService) {
+   console.log("appController");
+   $scope.isCollapsed = true;
+   $scope.state = {};
+   $scope.userEmail = null;
+   $scope.state.title = "My Independent";
+   $scope.isActive = function(route) {
+      return route === $location.path();
+   };
+   $scope.personalize = function() {
+      //console.log("personalize", $location.path());
+      if ($location.path().indexOf("/section/") === 0) {
+         return $location.path().substring(1);
       }
-   }]);
+      return null;
+   };
+   appService.init();
+   if (true) {
+      $timeout(function() {
+         //appService.initData();
+      });
+   }
+});
 
 app.controller("sectionsController", ["$scope", "$location", "$window", "appService",
    function($scope, $location, $window, appService) {
@@ -307,9 +351,12 @@ var sectionController = app.controller("sectionController", [
       console.log("sectionController", $scope.section);
       $scope.state.title = appService.getSectionLabel($routeParams.section);
       var jsonPath = $scope.section + "/articles.json";
-      $scope.resultHandler = function(data) {
+      $scope.resultHandler = function(section, data) {
          $scope.statusMessage = "Loaded";
-         $scope.articles = appService.putSectionArticles($scope.section, data);
+         $scope.$apply(function() {
+            console.log('section apply result', section, $scope.section, data);
+            $scope.articles = appService.putSectionArticles($scope.section, data);
+         });
       };
       $scope.errorHandler = function() {
          $scope.statusMessage = "Failed";
@@ -318,7 +365,7 @@ var sectionController = app.controller("sectionController", [
          $scope.articles = appService.getSectionArticles($scope.section);
       } else {
          $scope.statusMessage = "Loading " + jsonPath;
-         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler);
+         appService.loadSection($scope.section, $scope.resultHandler, $scope.errorHandler);
       }
       $scope.selected = function(article) {
          console.log("selected", article.articleId);

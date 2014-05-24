@@ -43,6 +43,7 @@ public class GitteryHandler implements HttpHandler {
 
     GitteryContext context;
     HttpExchange he;
+    String method;
     String path;
     
     public GitteryHandler(GitteryContext context) {
@@ -53,7 +54,7 @@ public class GitteryHandler implements HttpHandler {
     public void handle(HttpExchange he) throws IOException {
         this.he = he;
         path = he.getRequestURI().getPath();
-        logger.info("path [{}]", path);
+        logger.info("handle {} {}", he.getRequestMethod(), path);
         try {
             if (path.startsWith("/storage/")) {
                 path = path.substring(9);

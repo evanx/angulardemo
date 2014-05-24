@@ -44,7 +44,7 @@ public class ReaderMain {
             FeedsContext feedsContext = new FeedsContext(monitor, taskManager, contentStorage, 
                 properties.getMap("feeds"));
             VellumProvider.provider.put(feedsContext);
-            if (feedsContext.start()) {
+            if (feedsContext.isEnabled() && feedsContext.start()) {
                 contentStorage.start();
                 monitor.start();
                 new FeedsTask().start(feedsContext);

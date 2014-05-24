@@ -33,6 +33,7 @@ public final class FeedsContext {
     int feedTaskThreadPoolSize = 4;
     int articleTaskThreadPoolSize = 4;
     final int retryCount = 4;
+    boolean enabled;
     final boolean once = false;
     final int articleCount = 99;
     final Map<String, String> feedMap = new HashMap();
@@ -47,17 +48,28 @@ public final class FeedsContext {
         this.monitor = monitor;
         this.properties = properties;
         this.taskManager = taskManager;
-        maxDepth = properties.getInt("maxDepth", maxDepth);
-        initialDelay = properties.getMillis("initialDelay", initialDelay);
-        topInitialDelay = properties.getMillis("topInitialDelay", topInitialDelay);
-        topPeriod = properties.getMillis("topPeriod", topPeriod);
-        period = properties.getMillis("period", period);
-        articleTaskTimeout = properties.getMillis("articleTaskTimeout", articleTaskTimeout);
-        articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);        
-        putFeed();
+        enabled = properties.getBoolean("enabled", true);
+        if (enabled) {
+            maxDepth = properties.getInt("maxDepth", maxDepth);
+            initialDelay = properties.getMillis("initialDelay", initialDelay);
+            topInitialDelay = properties.getMillis("topInitialDelay", topInitialDelay);
+            topPeriod = properties.getMillis("topPeriod", topPeriod);
+            period = properties.getMillis("period", period);
+            articleTaskTimeout = properties.getMillis("articleTaskTimeout", articleTaskTimeout);
+            articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);        
+            putFeed();
+        }
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
     public boolean start() throws Exception {
+        if (!enabled) {
+            logger.warn("start: disabled");
+            return false;
+        }
         String first = properties.getString("first", null);        
         if (first != null && !first.isEmpty() && !first.equals("none")) {
             logger.info("first", first);
