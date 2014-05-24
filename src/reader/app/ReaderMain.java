@@ -13,8 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.json.JsonObjectDelegate;
 import vellum.jx.JMap;
+import vellum.jx.JMaps;
 import vellum.monitor.TimestampedMonitor;
 import vellum.provider.VellumProvider;
+import vellum.util.Streams;
 
 /**
  *
@@ -28,11 +30,10 @@ public class ReaderMain {
             org.apache.log4j.Logger.getRootLogger().addAppender(new ConsoleAppender(
                     new PatternLayout("%d{ISO8601} %p [%c] %m%n")));
             Logger logger = LoggerFactory.getLogger(ReaderMain.class);
-            JsonObjectDelegate object = new JsonObjectDelegate(new File("config.json"));
-            logger.info("storage {}", object.getMap("storage"));
-            logger.info("feeds {}", object.getMap("feeds"));
-            logger.info("webServer {}", object.getMap("webServer"));            
-            JMap properties = object.getMap();
+            JMap properties = JMaps.parse(Streams.readString(new File("config.json")));
+            logger.info("storage {}", properties.map("storage"));
+            logger.info("feeds {}", properties.map("feeds"));
+            logger.info("webServer {}", properties.map("webServer"));            
             TimestampedMonitor monitor = new TimestampedMonitor(properties.map("monitor"));
             VellumProvider.provider.put(monitor);
             ContentStorage contentStorage = new ContentStorage(monitor, properties.map("storage"));

@@ -17,12 +17,10 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import vellum.exception.ParseException;
-import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
 import vellum.jx.JMapException;
 import vellum.jx.JMaps;
 import vellum.monitor.TimestampedMonitor;
-import vellum.system.NullConsole;
 import vellum.util.Streams;
 
 /**
@@ -82,17 +80,12 @@ public class ContentStorage {
             deque = ftpSync.getDeque();
         }
         prefetchFile.delete();
-        try {
-            for (String section : sections) {
-                String path = String.format("%s/articles.json", section);
-                logger.info("section {} {}", section, path);
-                loadJson(path);
-                if (false) {
-                    linkSet.add(path);
-                }
+        for (String section : sections) {
+            try {
+                loadSection(section);
+            } catch (Exception e) {
+                logger.error("loadJson " + section, e);
             }
-        } catch (Exception e) {
-            logger.error("loadJson", e);
         }
         buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {
@@ -110,17 +103,21 @@ public class ContentStorage {
         }
     }
             
-    private void loadJson(String path) {
+    private void loadSection(String section) {
+        String path = String.format("%s/articles.json", section);
+        logger.info("section {} {}", section, path);        
         File file = new File(storageDir, path);
         if (file.exists()) {
             try {
                 byte[] bytes = Streams.readBytes(file);
                 map.put(path, bytes);
-                jsonMap.put(path, JMaps.parse(new String(bytes)));
+                for (JMap articleMap : JMaps.listMap(new String(bytes))) {
+                    logger.info("loadSection {} {}", section, articleMap.get("articleId"));
+                }
             } catch (JsonSyntaxException | IOException | IllegalStateException e) {
                 String errorMessage = e.getMessage();
-                if (errorMessage.length() > 80) {
-                    errorMessage = errorMessage.substring(0, 80);
+                if (errorMessage.length() > 99) {
+                    errorMessage = errorMessage.substring(0, 99);
                 }
                 logger.warn("loadJson {} {}", path, errorMessage);
             }

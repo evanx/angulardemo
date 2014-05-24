@@ -101,10 +101,14 @@ public class FtpSyncManager implements Runnable {
                 }
             }
             tx.ok();
+        } catch (RuntimeException e) {
+            tx.error(e);
         } catch (Exception e) {
             tx.error(e);
+        } catch (Error e) {
+            tx.error(e);
         } catch (Throwable e) {
-            e.printStackTrace(System.err);
+            tx.error(e);
         } finally {
             tx.fin();
             tx = null;
