@@ -3,26 +3,25 @@ var jsonpCallbacks = {};
 
 function jsonpCallback(path, data) {
    var callback = jsonpCallbacks[path];
-   console.log("jsonpCallback", path, data, typeof(callback));
-   if (typeof(callback) !== 'function') {
-      console.warn("jsonpCallback", path, typeof(callback));
+   console.log("jsonpCallback", path, data, typeof (callback));
+   if (typeof (callback) !== 'function') {
+      console.warn("jsonpCallback", path, typeof (callback));
    } else {
       callback(data);
    }
 }
-;
 
 function json_callback(path, data) {
    jsonpCallback(path, data);
 }
-;
 
 var appData = {
    servers: {
-      other: ["cf.chronica.co", "us.chronica.co"],
-      de: ["de.chronica.co", "cf.chronica.co"],
-      us: ["us.chronica.co", "cf.chronica.co"],
-      za: ["za.chronica.co", "cf.chronica.co"],
+      other: ["cf.chronica.co", "chronica.co"],
+      de: ["de.chronica.co", "chronica.co"],
+      us: ["us.chronica.co", "chronica.co"],
+      za: ["za.chronica.co", "chronica.co"],
+      local: ["localhost:8000", "localhost:8000"],
       "de.chronica.co": {type: "jsonp"},
       "za.chronica.co": {type: "jsonp"}
    },
@@ -86,6 +85,25 @@ app.filter('sliceFrom', function() {
    };
 });
 
+app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
+      $locationProvider.html5Mode(false);
+      $routeProvider.
+              when("/sections", {
+                 templateUrl: "sections.html",
+                 controller: "sectionsController"}).
+              when("/section/:section", {
+                 templateUrl: "section.html",
+                 controller: "sectionController",
+                 resolve: sectionController.resolve}).
+              when(":date/article/:articleId", {
+                 templateUrl: "article.html",
+                 controller: "articleController"}).
+              when("/article/:articleId", {
+                 templateUrl: "article.html",
+                 controller: "articleController"}).
+              otherwise({redirectTo: "/section/Top"});
+   }]);
+
 app.config(['$httpProvider', function($httpProvider) {
       if (!$httpProvider.defaults.headers.get) {
          $httpProvider.defaults.headers.get = {};
@@ -106,7 +124,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
    if (location.search === "?country=de/") {
       geo.query.country = 'de';
    }
-   console.log("location", geo.query);
+   console.log("location", geo.query, location);
    var sectionList = appData.sectionList;
    var articleMap = {};
    var sectionArticleList = {};
@@ -129,7 +147,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          return articleMap[articleId];
       },
       putSectionArticles: function(section, articles) {
-         console.log("putSectionArticles", section, articles);
+         console.log("putSectionArticles", section, typeof(articles), articles.length);
          if (!sectionArticleList[section]) {
             sectionArticleList[section] = [];
          }
@@ -190,9 +208,9 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          scriptElement.type = "text/javascript";
          scriptElement.src = url;
          document.head.appendChild(scriptElement);
-         $timeout(function() { 
+         $timeout(function() {
             errorHandler();
-         }, 2000); 
+         }, 2000);
       },
       loadType: function(jsonPath, successHandler, errorHandler) {
          console.log("loadType", geo.server, geo.serverType, jsonPath);
@@ -210,14 +228,18 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       },
       load: function(jsonPath, successHandler, errorHandler) {
          service.loadType(jsonPath, successHandler, function() {
-            if (geo.server === 'origin') {
-               service.overrideGeo();
-               service.setGeo();
-            } else {
-               service.changeServer();
+            if (geo.enabled) {
+               if (geo.server === 'origin') {
+                  service.presetGeo();
+                  service.setGeo();
+               } else {
+                  service.changeServer();
+               }
             }
             service.loadType(jsonPath, successHandler, function() {
-               service.changeServer();
+               if (geo.enabled) {
+                  service.changeServer();
+               }
                service.loadType(jsonPath, successHandler, errorHandler);
             });
          });
@@ -225,7 +247,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       loadSection: function(section, sectionHandler) {
          var jsonPath = section + "/articles.json";
          service.load(jsonPath, function(data) {
-            console.log("loadSection", section, data);
+            console.log("loadSection", section, typeof(data), data.length);
             sectionHandler(section, data);
          }, function() {
             console.warn("loadSection", section);
@@ -269,7 +291,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          }
          service.setServer();
       },
-      overrideGeo: function() {
+      presetGeo: function() {
          if (geo.query.country) {
             geo.country = geo.query.country;
          }
@@ -286,7 +308,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             if (data.country) {
                geo.country = data.country.toLowerCase();
             }
-            service.overrideGeo();
+            service.presetGeo();
             service.setGeo();
             console.log("geo", geo);
          }).error(function() {
@@ -294,7 +316,9 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          });
       },
       init: function() {
-         service.initGeo();
+         if (geo.enabled) {
+            service.initGeo();
+         }
       }
    };
    return service;
@@ -326,8 +350,8 @@ app.controller("appController", function($scope, $location, $timeout, appService
    appService.init();
    if (true) {
       $timeout(function() {
-         //appService.initData();
-      });
+         appService.initData();
+      }, 1000);
    }
 });
 
@@ -341,62 +365,40 @@ app.controller("sectionsController", ["$scope", "$location", "$window", "appServ
       };
    }]);
 
-var sectionController = app.controller("sectionController", [
-   "$scope", "$location", "$routeParams", "$window", "appService",
-   function($scope, $location, $routeParams, $window, appService) {
-      $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
-      $scope.section = $routeParams.section.toLowerCase();
-      $scope.state.section = $scope.section;
-      $scope.state.mobile = ($window.innerWidth < 560);
-      console.log("sectionController", $scope.section);
-      $scope.state.title = appService.getSectionLabel($routeParams.section);
-      var jsonPath = $scope.section + "/articles.json";
-      $scope.resultHandler = function(section, data) {
-         $scope.statusMessage = "Loaded";
-         $scope.$apply(function() {
-            console.log('section apply result', section, $scope.section, data);
-            $scope.articles = appService.putSectionArticles($scope.section, data);
-         });
-      };
-      $scope.errorHandler = function() {
-         $scope.statusMessage = "Failed";
-      };
-      if (appService.isSectionArticles($scope.section)) {
-         $scope.articles = appService.getSectionArticles($scope.section);
-      } else {
-         $scope.statusMessage = "Loading " + jsonPath;
-         appService.loadSection($scope.section, $scope.resultHandler, $scope.errorHandler);
-      }
-      $scope.selected = function(article) {
-         console.log("selected", article.articleId);
-         $location.path("article/" + article.articleId);
-      };
-   }]);
+var sectionController = app.controller("sectionController", function(
+        $scope, $location, $routeParams, $window, $timeout, appService) {
+   $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
+   $scope.section = $routeParams.section.toLowerCase();
+   $scope.state.section = $scope.section;
+   $scope.state.mobile = ($window.innerWidth < 560);
+   console.log("sectionController", $scope.section);
+   $scope.state.title = appService.getSectionLabel($routeParams.section);
+   var jsonPath = $scope.section + "/articles.json";
+   $scope.resultHandler = function(section, data) {
+      $scope.statusMessage = "Loaded";
+      console.log('section apply result', section, $scope.section, data);
+      $scope.articles = appService.putSectionArticles($scope.section, data);
+   };
+   $scope.errorHandler = function() {
+      $scope.statusMessage = "Failed";
+   };
+   if (appService.isSectionArticles($scope.section)) {
+      $scope.articles = appService.getSectionArticles($scope.section);
+   } else {
+      $scope.statusMessage = "Loading " + jsonPath;
+      appService.loadSection($scope.section, $scope.resultHandler, $scope.errorHandler);
+   }
+   $scope.selected = function(article) {
+      console.log("selected", article.articleId);
+      $location.path("article/" + article.articleId);
+   };
+});
 
 sectionController.resolve = [
    '$routeParams', 'appService',
    function($routeParams, appService) {
       console.log("resolve", $routeParams.section);
    }];
-
-app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
-      $locationProvider.html5Mode(false);
-      $routeProvider.
-              when("/sections", {
-                 templateUrl: "sections.html",
-                 controller: "sectionsController"}).
-              when("/section/:section", {
-                 templateUrl: "section.html",
-                 controller: "sectionController",
-                 resolve: sectionController.resolve}).
-              when(":date/article/:articleId", {
-                 templateUrl: "article.html",
-                 controller: "articleController"}).
-              when("/article/:articleId", {
-                 templateUrl: "article.html",
-                 controller: "articleController"}).
-              otherwise({redirectTo: "/section/Top"});
-   }]);
 
 app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
