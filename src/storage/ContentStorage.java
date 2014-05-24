@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +59,7 @@ public class ContentStorage {
     Deque<StorageItem> deque;
     FtpSyncManager ftpSync;
     TimestampedMonitor monitor;
+    Map<String, SectionItem> sectionItemMap = new HashMap();
     
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
         this.monitor = monitor;
@@ -66,7 +69,7 @@ public class ContentStorage {
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
-        ftpSync = new FtpSyncManager(monitor, properties.map("ftpSync"));
+        ftpSync = new FtpSyncManager(monitor, properties.getMap("ftpSync"));
         if (ftpSync.isEnabled()) {
             deque = ftpSync.getDeque();
         }
@@ -103,16 +106,25 @@ public class ContentStorage {
         }
     }
             
-    private void loadSection(String section) {
-        String path = String.format("%s/articles.json", section);
-        logger.info("section {} {}", section, path);        
+    private void loadSection(String sectionName) {
+        String path = String.format("%s/articles.json", sectionName);
+        logger.info("section {} {}", sectionName, path);        
         File file = new File(storageDir, path);
         if (file.exists()) {
             try {
                 byte[] bytes = Streams.readBytes(file);
                 map.put(path, bytes);
-                for (JMap articleMap : JMaps.listMap(new String(bytes))) {
-                    logger.info("loadSection {} {}", section, articleMap.get("articleId"));
+                String json = new String(bytes);                
+                SectionItem sectionItem = sectionItemMap.get(sectionName);
+                if (json.startsWith("[")) {
+                    sectionItem.addAll(JMaps.listMap(json));
+                } else if (json.startsWith("{")) {
+                    sectionItem.addAll(JMaps.parse(json).getList("articles"));
+                }                        
+                List<JMap> articleList = JMaps.listMap(json);
+                logger.info("loadSection {} {}", sectionName, articleList.size());
+                for (JMap articleMap : sectionItem.articleList) {
+                    logger.info("loadSection {} {}", sectionName, articleMap.get("articleId"));
                 }
             } catch (JsonSyntaxException | IOException | IllegalStateException e) {
                 String errorMessage = e.getMessage();
@@ -227,5 +239,23 @@ public class ContentStorage {
         return builder.toString().getBytes();
     }
 
+    public void putSection(String section, List<JMap> articleList) throws IOException {
+        String path = String.format("%s/articles.json", section);
+        SectionItem sectionItem = getSectionItem(section);
+        if (articleList.isEmpty()) {
+            logger.error("putSection empty", section);
+        } else {
+            sectionItem.addAll(articleList);
+            putJson(path, sectionItem.map());
+        }
+    }    
     
+    private SectionItem getSectionItem(String section) {
+        SectionItem sectionItem = sectionItemMap.get(section);
+        if (sectionItem == null) {
+            sectionItem = new SectionItem(section);
+            sectionItemMap.put(section, sectionItem);
+        }
+        return sectionItem;
+    }
 }

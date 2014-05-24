@@ -325,12 +325,13 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       loadSection: function(section, initialTimeout, timeout) {
          var deferred = $q.defer();
          var jsonPath = section + "/articles.json";
+         var timestamp = new Date().getTime();
          service.load(jsonPath, function(data) {
             console.log("loadSection", section, typeof (data), data.length);
-            deferred.resolve({section: section, data: data});
+            deferred.resolve({section: section, data: data, timestamp: timestamp});
          }, function() {
             console.warn("loadSection", section);
-            deferred.reject(section);
+            deferred.reject({section: section, timestamp: timestamp});
          }, initialTimeout, timeout);
          return deferred.promise;
       },
@@ -480,8 +481,17 @@ var sectionController = app.controller("sectionController", function(
    var jsonPath = $scope.section + "/articles.json";
    $scope.resultHandler = function(result) {
       $scope.statusMessage = "Loaded";
-      console.log('section apply result', result);
-      $scope.articles = appService.putSectionArticles(result.section, result.data);
+      var duration = new Date().getTime() - result.timestamp;
+      var articles = [];
+      if (result.data instanceof Array) {
+         articles = result.data;
+         console.warn("array result", articles.length);
+      } else if (result.data.articles) {
+         articles = result.data.articles;
+         console.warn("object result", articles.length);
+      }
+      console.log('section result', typeof(articles), result.section, articles.length, duration);
+      $scope.articles = appService.putSectionArticles(result.section, articles);
    };
    $scope.errorHandler = function() {
       $scope.statusMessage = "Failed";

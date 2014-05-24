@@ -47,7 +47,7 @@ public class FtpSyncManager implements Runnable {
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
-            for (JMap clientProperties : properties.listMap("clients")) {
+            for (JMap clientProperties : properties.getListMap("clients")) {
                 logger.info("client {}", properties);
                 FtpSync client = new FtpSync(this, new JConsoleMap(new NullConsole(), clientProperties));
                 if (client.isEnabled()) {
@@ -87,19 +87,7 @@ public class FtpSyncManager implements Runnable {
             tx.warnf("size %d", deque.size());
         }
         try {
-            while (!deque.isEmpty()) {
-                StorageItem item = deque.peek();
-                if (item == null) {
-                    logger.warn("queue inconsistency");
-                } else {
-                    for (FtpSync client : clients) {
-                        if (client.isEnabled()) {
-                            client.getDeque().add(item);
-                        }
-                    }
-                    deque.remove(item);
-                }
-            }
+            handle();
             tx.ok();
         } catch (RuntimeException e) {
             tx.error(e);
@@ -112,6 +100,22 @@ public class FtpSyncManager implements Runnable {
         } finally {
             tx.fin();
             tx = null;
+        }
+    }
+    
+    private void handle() throws Exception {
+        while (!deque.isEmpty()) {
+            StorageItem item = deque.peek();
+            if (item == null) {
+                logger.warn("queue inconsistency");
+            } else {
+                for (FtpSync client : clients) {
+                    if (client.isEnabled()) {
+                        client.getDeque().add(item);
+                    }
+                }
+                deque.remove(item);
+            }
         }
     }
 }

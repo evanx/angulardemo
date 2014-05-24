@@ -16,11 +16,11 @@ public class FeedsMain {
         try {
             BasicConfigurator.configure();
             JMap properties = JMaps.map(System.getProperties());
-            TimestampedMonitor monitor = new TimestampedMonitor(properties.map("monitor"));
+            TimestampedMonitor monitor = new TimestampedMonitor(properties.getMap("monitor"));
             TaskManager taskManager = new TaskManager();
-            ContentStorage storage = new ContentStorage(monitor, properties.map("storage"));
+            ContentStorage storage = new ContentStorage(monitor, properties.getMap("storage"));
             new FeedsTask().start(new FeedsContext(monitor, taskManager, storage,
-                    properties.map("feeds")));
+                    properties.getMap("feeds")));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

@@ -1,5 +1,6 @@
 package storage;
 
+import iolfeed.FeedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -124,17 +125,15 @@ public class FtpSync implements Runnable {
         }
         try {
             login();
-            while (!deque.isEmpty()) {
-                StorageItem item = deque.peek();
-                if (item == null) {
-                    logger.warn("queue inconsistency");
-                } else {
-                    handle(item);
-                    deque.remove(item);
-                }
-            }
+            handle();
             tx.ok();
+        } catch (RuntimeException e) {
+            tx.error(e);
         } catch (Exception e) {
+            tx.error(e);
+        } catch (Error e) {
+            tx.error(e);
+        } catch (Throwable e) {
             tx.error(e);
         } finally {
             tx.fin();
@@ -143,6 +142,18 @@ public class FtpSync implements Runnable {
         }
     }
 
+    void handle() throws Exception {
+        while (!deque.isEmpty()) {
+            StorageItem item = deque.peek();
+            if (item == null) {
+                throw new FeedException("queue inconsistency");
+            } else {
+                handle(item);
+                deque.remove(item);
+            }
+        }
+    }
+    
     void handle(StorageItem item) {
         handle0(item);
         if (!item.path.startsWith("storage/")) {

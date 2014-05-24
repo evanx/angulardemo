@@ -140,7 +140,7 @@ public class FeedTask implements Runnable {
         }
     }
     
-    private boolean write() throws IOException {
+    private boolean write() {
         boolean completed = true;
         List<JMap> completedArticleList = new ArrayList();
         for (ArticleTask articleTask : articleTaskList) {
@@ -159,11 +159,9 @@ public class FeedTask implements Runnable {
             return false;
         }
         try {
-            context.storage.putJson(String.format("%s/articles.json", section), 
-                    new Gson().toJson(completedArticleList));
-            context.storage.buildPrefetchContent();
+            context.storage.putSection(section, completedArticleList);
             return completed;
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             logger.error("write", e);
             return false;            
         }
