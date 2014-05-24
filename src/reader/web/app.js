@@ -102,10 +102,8 @@ var appData = {
       "za.chronica.co": {hostType: "jsonp"}
    },
    preferredHosts: {
-      local: ["localhost:8888", "lh:8000"],
-      other: ["do.chronica.co", "cf.chronica.co"],
+      other: ["cf.chronica.co", "do.chronica.co"],
       de: ["de.chronica.co", "cf.chronica.co"],
-      us: ["do.chronica.co", "cf.chronica.co"],
       za: ["za.chronica.co", "do.chronica.co"]
    }
 };
@@ -170,6 +168,9 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             console.warn("initHost not defined", geo.location.host);
          } else if (geo.initialHost.geoDisabled) {
             geo.enabled = false;
+         }
+         if (geo.location.host.indexOf("de.") === 0) {
+            geo.overrideCountry = "de";
          }
          if (geo.location.host.indexOf("au.") === 0) {
             geo.overrideCountry = "au";
