@@ -171,6 +171,9 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          } else if (geo.initialHost.geoDisabled) {
             geo.enabled = false;
          }
+         if (geo.location.host.indexOf("au.") === 0) {
+            geo.overrideCountry = "au";
+         }
          console.log("initHost", geo.location.host, geo);
          if (geo.enabled) {
             console.warn("geo enabled");
@@ -240,12 +243,22 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          }
       },
       getOrigin: function(jsonPath, successHandler, errorHandler) {
-         $http.get("storage/" + jsonPath).success(successHandler).error(errorHandler);
+         var timestamp = new Date().getTime();
+         $http.get("storage/" + jsonPath).success(function(data) {
+            var duration = new Date().getTime() - timestamp;
+            console.log("getOrigin", jsonPath, duration);
+            successHandler(data);
+         }).error(errorHandler);
       },
       getCors: function(jsonPath, successHandler, errorHandler) {
          var url = "http://" + geo.hostName + "/storage/" + jsonPath;
          console.log("getCors", url);
-         $http.get(url).success(successHandler).error(errorHandler);
+         var timestamp = new Date().getTime();
+         $http.get(url).success(function(data) {
+            var duration = new Date().getTime() - timestamp;
+            console.log("getCors", jsonPath, duration);
+            successHandler(data);
+         }).error(errorHandler);
       },
       getJsonp: function(jsonPath, successHandler, errorHandler, timeout) {
          var hostName = geo.hostName.toLowerCase();
