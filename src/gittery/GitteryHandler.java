@@ -45,7 +45,7 @@ public class GitteryHandler implements HttpHandler {
     HttpExchange he;
     String method;
     String path;
-
+    
     public GitteryHandler(GitteryContext context) {
         this.context = context;
     }
@@ -57,7 +57,9 @@ public class GitteryHandler implements HttpHandler {
         logger.info("handle {} {}", he.getRequestMethod(), path);
         try {
             if (path.startsWith("/storage/")) {
-                path = path.substring(9);
+                if (!new File(context.storage.appDir, path).exists()) {
+                    path = path.substring(9);
+                }
             } else if (path.equals("/") || path.equals("/prefetch")) {
                 if (he.getRequestMethod().equals("GET")) {
                     logger.info("app {}", context.storage.caching);
@@ -190,6 +192,7 @@ public class GitteryHandler implements HttpHandler {
     void writeOptions() throws IOException {
         logger.info("options {} {}", path);
         setContentType();
+        he.getResponseHeaders().set("Content-length", "0");
         File file = new File(context.storage.storageDir, path);
         if (file.exists()) {
             he.sendResponseHeaders(200, 0);
@@ -204,19 +207,19 @@ public class GitteryHandler implements HttpHandler {
     final static long CACHE_ARTICLES_MILLIS = Millis.fromMinutes(3);
 
     private void setContentType() {
-        he.getResponseHeaders().set("Content-Type", Streams.getContentType(path));
+        he.getResponseHeaders().set("Content-type", Streams.getContentType(path));
         if (path.startsWith("mirror/")) {
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_MIRROR_MILLIS));
+            he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_MIRROR_MILLIS));
         } else if (Streams.getContentType(path).startsWith("image/")) {
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
+            he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
         } else if (path.endsWith("/articles.json")) {
-            he.getResponseHeaders().set("Access-Control-Allow-Headers", "if-modified-since");
-            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
+            he.getResponseHeaders().set("Access-control-allow-headers", "if-modified-since");
+            he.getResponseHeaders().set("Access-control-allow-origin", "*");
+            he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         } else if (path.endsWith(".json")) {
-            he.getResponseHeaders().set("Access-Control-Allow-Headers", "if-modified-since");
-            he.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-            he.getResponseHeaders().set("Cache-Control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
+            he.getResponseHeaders().set("Access-control-allow-headers", "if-modified-since");
+            he.getResponseHeaders().set("Access-control-allow-origin", "*");
+            he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_ARTICLES_MILLIS));
         }
     }
 

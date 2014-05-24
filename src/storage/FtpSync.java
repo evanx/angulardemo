@@ -129,13 +129,7 @@ public class FtpSync implements Runnable {
                 if (item == null) {
                     logger.warn("queue inconsistency");
                 } else {
-                    if (item.path.endsWith("/articles.json")) {
-                        upload(item);
-                        upload(buildJsonp(item));
-                    } else {
-                        sync(item);                        
-                        sync(buildJsonp(item));
-                    }
+                    handle(item);
                     deque.remove(item);
                 }
             }
@@ -149,6 +143,24 @@ public class FtpSync implements Runnable {
         }
     }
 
+    void handle(StorageItem item) {
+        handle0(item);
+        if (!item.path.startsWith("storage/")) {
+            handle0(new StorageItem("storage/" + item.path, item.content));
+        }
+    }
+    
+    void handle0(StorageItem item) {
+        logger.info("handle {}", item);
+        if (item.path.endsWith("/articles.json")) {
+            upload(item);
+            upload(buildJsonp(item));
+        } else {
+            sync(item);
+            sync(buildJsonp(item));
+        }
+    }
+    
     static StorageItem buildJsonp(StorageItem item) {
         byte[] content = ContentStorage.buildJsonp(item.path, item.content);
         return new StorageItem(item.path + "p", content);

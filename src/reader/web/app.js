@@ -246,7 +246,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          $http.get(jsonPath).success(successHandler).error(errorHandler);
       },
       getCors: function(jsonPath, successHandler, errorHandler) {
-         var url = "http://" + geo.server + "/" + jsonPath;
+         var url = "http://" + geo.server + "/storage/" + jsonPath;
          console.log("getCors", url);
          $http.get(url).success(successHandler).error(errorHandler);
       },
