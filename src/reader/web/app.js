@@ -338,7 +338,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          var jsonPath = section + "/articles.json";
          var timestamp = new Date().getTime();
          service.load(jsonPath, function(data) {
-            console.log("loadSection", section, typeof (data), data.length);
+            console.log("loadSection", section);
             deferred.resolve({section: section, data: data, timestamp: timestamp});
          }, function() {
             console.warn("loadSection", section);

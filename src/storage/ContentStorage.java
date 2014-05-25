@@ -78,10 +78,6 @@ public class ContentStorage {
     }
 
     public void start() throws Exception {
-        if (ftpSync.isEnabled()) {
-            ftpSync.start();
-            deque = ftpSync.getDeque();
-        }
         prefetchFile.delete();
         for (String section : sections) {
             try {
@@ -89,6 +85,10 @@ public class ContentStorage {
             } catch (Exception e) {
                 logger.error("loadJson " + section, e);
             }
+        }
+        if (ftpSync.isEnabled()) {
+            ftpSync.start();
+            deque = ftpSync.getDeque();
         }
         buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {
@@ -117,12 +117,12 @@ public class ContentStorage {
                 String json = new String(bytes);                
                 SectionEntity sectionItem = getSection(sectionName);
                 if (json.startsWith("[")) {
-                    sectionItem.addAll(JMaps.listMap(json));
+                    sectionItem.addAll(JMaps.listMap(json), 0);
                 } else if (json.startsWith("{")) {
-                    sectionItem.addAll(JMaps.parse(json).getList("articles"));
+                    sectionItem.addAll(JMaps.parse(json).getList("articles"), 0);
                 }                        
                 logger.info("loadSection {}", sectionItem);
-                for (JMap articleMap : sectionItem.articleList) {
+                for (JMap articleMap : sectionItem.articleDeque) {
                     logger.info("loadSection {} {}", sectionName, articleMap.get("articleId"));
                 }
             } catch (JsonSyntaxException | IOException | IllegalStateException | JMapException e) {
@@ -239,14 +239,18 @@ public class ContentStorage {
         return builder.toString().getBytes();
     }
 
-    public void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapException {
+    public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapException {
         String path = String.format("%s/articles.json", sectionName);
-        SectionEntity section = getSection(sectionName);
         if (articleList.isEmpty()) {
             logger.error("putSection empty", sectionName);
+        } else if (sectionName.equals("top")) {
+            SectionEntity section = new SectionEntity(sectionName, articleList, 30);
+            sectionItemMap.put(sectionName, section);
+            putJson(path, section.map(30));
         } else {
-            section.addAll(articleList);
-            putJson(path, section.map());
+            SectionEntity section = getSection(sectionName);
+            section.addAll(articleList, 99);
+            putJson(path, section.map(99));
         }
     }    
     
