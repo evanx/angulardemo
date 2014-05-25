@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -49,23 +51,21 @@ public class ContentStorage {
     public boolean prefetching = false;
     public String defaultHtml;
     public final String storagePath = "storage";
-    public final String defaultPath = "index.html";
-    public final String prefetchPath = "prefetch.html";
-    public byte[] prefetchContent;
-    public byte[] prefetchGzippedContent;
-    File prefetchFile;
+    public String defaultPath;
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
     Deque<StorageItem> deque;
     FtpSyncManager ftpSync;
     TimestampedMonitor monitor;
     Map<String, SectionEntity> sectionItemMap = new HashMap();
-    
+    DateFormat minuteTimestampFormat = new SimpleDateFormat("");
+            
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
         this.monitor = monitor;
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
         storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
+        defaultPath = "index.html";
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
@@ -74,11 +74,9 @@ public class ContentStorage {
             deque = ftpSync.getDeque();
         }
         defaultHtml = Streams.readString(new File(appDir, defaultPath));
-        prefetchFile = new File(storageDir, prefetchPath);
     }
 
     public void start() throws Exception {
-        prefetchFile.delete();
         for (String section : sections) {
             try {
                 loadSection(section);
@@ -90,7 +88,6 @@ public class ContentStorage {
             ftpSync.start();
             deque = ftpSync.getDeque();
         }
-        buildPrefetchContent();
         Signal.handle(new Signal("HUP"), new SignalHandler() {
             @Override
             public void handle(Signal signal) {
@@ -152,20 +149,6 @@ public class ContentStorage {
             return map.get(key);
         }
         return null;
-    }
-
-    public synchronized void buildPrefetchContent() throws IOException {
-        logger.info("buildPrefetchContent {}", linkSet.size());
-        if (prefetching) {
-            defaultHtml = Streams.readString(new File(appDir, defaultPath));
-            prefetchContent = new PrefetchBuilder().build(this);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (OutputStream stream = new GZIPOutputStream(baos)) {
-                stream.write(prefetchContent);
-            }
-            prefetchGzippedContent = baos.toByteArray();
-            Streams.write(prefetchContent, prefetchFile);
-        }
     }
 
     public void addLink(String section, String path) {

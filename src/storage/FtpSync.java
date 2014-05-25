@@ -24,7 +24,9 @@ import vellum.jx.JConsoleMap;
 import vellum.jx.JMapException;
 import vellum.monitor.TimestampedMonitor;
 import vellum.monitor.Tx;
+import vellum.util.Args;
 import vellum.util.Lists;
+import vellum.util.MimeTypes;
 
 /**
  *
@@ -88,7 +90,7 @@ public class FtpSync implements Runnable {
     public void start() throws Exception {
         try {
             login();
-            list();
+            listApp();
         } catch (Exception e) {
             logger.warn("initSchedule", e.getMessage());
         } finally {
@@ -269,10 +271,12 @@ public class FtpSync implements Runnable {
         }
     }
 
-    void list() throws Exception {
+    void listApp() throws Exception {
         logger.info("list {} {}", username, storageDir);
         for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
-            logger.info("entry {}", entry);
+            if (MimeTypes.getContentType(entry.getName(), null) != null) {
+                logger.info("entry {}", Args.format(entry.getName(), entry.getSize(), entry.getLastModified()));
+            }
         }
     }
 }

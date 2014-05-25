@@ -98,6 +98,7 @@ var appData = {
       "lh": {hostType: "jsonp"},
       "de.lh": {hostType: "cors"},
       "za.lh": {hostType: "cors"},
+      "au.lh": {hostType: "cors"},
       "localhost": {hostType: "cors"},
       "za.chronica.co": {hostType: "jsonp"}
    },
@@ -268,7 +269,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          var timestamp = new Date().getTime();
          $http.get(url).success(function(data) {
             var duration = new Date().getTime() - timestamp;
-            console.log("getCors", jsonPath, duration);
+            console.log("getCors", jsonPath, geo.hostName, duration);
             successHandler(data);
          }).error(errorHandler);
       },

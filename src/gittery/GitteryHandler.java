@@ -31,6 +31,7 @@ import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
+import vellum.util.MimeTypes;
 import vellum.util.Streams;
 
 /**
@@ -59,20 +60,6 @@ public class GitteryHandler implements HttpHandler {
             if (path.startsWith("/storage/")) {
                 if (!new File(context.storage.appDir, path).exists()) {
                     path = path.substring(9);
-                }
-            } else if (path.equals("/") || path.equals("/prefetch")) {
-                if (he.getRequestMethod().equals("GET")) {
-                    logger.info("app {}", context.storage.caching);
-                    path = context.storage.defaultPath;
-                    if (context.storage.caching && context.storage.prefetchContent != null) {
-                        if (requestHeaderMatches("Accept-Encoding", "gzip")
-                                && context.storage.prefetchGzippedContent != null) {
-                            writeGzipped(context.storage.prefetchGzippedContent);
-                        } else {
-                            write(context.storage.prefetchContent);
-                        }
-                        return;
-                    }
                 }
             } else if (path.contains("undefined")) {
                 logger.warn("path {}", path);
@@ -117,10 +104,6 @@ public class GitteryHandler implements HttpHandler {
     }
 
     private byte[] get() throws Exception {
-        if (path.equals("prefetch") && context.storage.prefetchContent != null) {
-            logger.info("prefetch: {}", path);
-            return context.storage.prefetchContent;
-        }
         byte[] content = context.storage.get(path);
         if (content != null) {
             logger.info("memory: {}", path);
@@ -207,10 +190,10 @@ public class GitteryHandler implements HttpHandler {
     final static long CACHE_ARTICLES_MILLIS = Millis.fromMinutes(3);
 
     private void setContentType() {
-        he.getResponseHeaders().set("Content-type", Streams.getContentType(path));
+        he.getResponseHeaders().set("Content-type", MimeTypes.getContentType(path, "text/html"));
         if (path.startsWith("mirror/")) {
             he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_MIRROR_MILLIS));
-        } else if (Streams.getContentType(path).startsWith("image/")) {
+        } else if (MimeTypes.getContentType(path, "").startsWith("image/")) {
             he.getResponseHeaders().set("Cache-control", "max-age=" + Millis.toSeconds(CACHE_IMAGE_MILLIS));
         } else if (path.endsWith("/articles.json")) {
             he.getResponseHeaders().set("Access-control-allow-headers", "if-modified-since");

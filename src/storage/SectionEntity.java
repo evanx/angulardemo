@@ -1,6 +1,7 @@
 package storage;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +45,15 @@ public class SectionEntity {
     public JMap map(int count) {
         JMap sectionMap = new JMap();
         sectionMap.put("section", section);
+        sectionMap.put("timestamp", System.currentTimeMillis());
         sectionMap.put("previous", previousPath);
         sectionMap.put("articles", Lists.list(articleDeque.iterator(), count));
         return sectionMap;
+    }
+
+    public List<StorageItem> produce() {
+        List<StorageItem> itemList = new ArrayList();
+        return itemList;
     }
     
     @Override
