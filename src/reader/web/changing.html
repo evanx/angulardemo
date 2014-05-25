@@ -11,81 +11,122 @@
     <style>
       body {
         background-color: lightskyblue; 
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 16pt;
+      }
+      span#heading {
+        font-size: 18pt; 
+        font-weight: bold;
       }
       div#main {
-        max-width: 300px;
+        position: relative;
+        max-width: 480px;
+        min-height: 640px;
         overflow: hidden;
       }
       @media screen and (min-width: 560px) {
+        body {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          font-size: 12pt;
+        }
+        span#heading {
+          font-size: 14pt; 
+        }
         div#main {
           margin-left: 200px;
         }
       }
       div#text {
-        position: absolute; 
-        top: 2em;
+        position: relative; 
+        top: 1em;
         margin: 1em;
-        z-index: 3;
-      }
-      div#background {
-        position: absolute; 
-        opacity: .1;
         z-index: 1;
-        top: 150px;
       }
-      div#background:hover {
+      div#logo {
+        position: relative; 
+        margin: 2em 2em;        
+      }
+      div#background-do {
+        position: absolute; 
+        top: 0em;
         opacity: .1;
+        z-index: 0;
       }
       div#background-map {
         position: absolute; 
         display: none;
+        top: 1em;
         opacity: .3;
-        z-index: 2;
+      }
+      div#background-cf {
+        position: absolute; 
+        display: none;
+        top: 1em;
+        opacity: .2;
+      }
+      div#background-af {
+        position: absolute; 
+        display: none;
+        top: 1em;
+        opacity: .2;
       }
     </style>      
     <script>
       var cityTimestamp = new Date().getTime();
       function doMouseOver() {
-        cityMouseOut0();
+        document.getElementById("background-do").style.display = 'block';
+        document.getElementById("background-cf").style.display = 'none';
+        document.getElementById("background-map").style.display = 'none';
+        document.getElementById("background-af").style.display = 'none';
+      }
+      function cfMouseOver() {
+        document.getElementById("background-do").style.display = 'none';
+        document.getElementById("background-cf").style.display = 'block';
+        document.getElementById("background-map").style.display = 'none';
+        document.getElementById("background-af").style.display = 'none';
+      }
+      function afMouseOver() {
+        document.getElementById("background-do").style.display = 'none';
+        document.getElementById("background-cf").style.display = 'none';
+        document.getElementById("background-map").style.display = 'none';
+        document.getElementById("background-af").style.display = 'block';
       }
       function cityMouseOver() {
-        var duration = new Date().getTime() - cityTimestamp;
-        if (duration > 200) {
-          console.log("cityMouseOver");
-          document.getElementById("background").style.display = 'none';
-          document.getElementById("background-map").style.display = 'block';
-          cityTimestamp = new Date().getTime();
-        }
+        document.getElementById("background-do").style.display = 'none';
+        document.getElementById("background-cf").style.display = 'none';
+        document.getElementById("background-map").style.display = 'block';
+        document.getElementById("background-af").style.display = 'none';
       }
       function cityMouseOut() {
-        var duration = new Date().getTime() - cityTimestamp;
-        if (duration > 5000) {
-          cityMouseOut0();
-        }
-      }
-      function cityMouseOut0() {
-        console.log("cityMouseOut");
-        document.getElementById("background").style.display = 'block';
-        document.getElementById("background-map").style.display = 'none';
-        cityTimestamp = new Date().getTime();
+        //document.getElementById("background-map").style.display = 'none';
       }
     </script>
   </head>
-  <body style="font-size: 14pt">
+  <body style="">
     <div id="main">
-      <div id="background">      
-        <img src='http://topnews.net.nz/data/DigitalOcean-Logo.png'>
-      </div>
-      <div id="background-map">      
-        <img src='http://maps.googleapis.com/maps/api/staticmap?center=-34.5,17.4&zoom=8&size=480x640&sensor=false'>
-      </div>
       <div id="text">
-        <p><span style="font-size: 16pt; font-weight: bold">Chronica.co is changing</span>
+        <p><span id="heading">Chronica.co is changing</span>
         </p>
-        <p id="do" onmouseover="doMouseOver()">Try my new server on DigitalOcean: <a href="http://do.chronica.co">http://do.chronica.co</a></p>
-        <p>Also try <a href="http://cf.chronica.co">http://cf.chronica.co</a> via CloudFlare CDN</p>
-        <p id="city" onmouseover="cityMouseOver(this)" onmouseout="cityMouseOut(this)"></p>
-        <p id="local"></p>
+        <p id="do" onmouseover="doMouseOver()">Try the server on DigitalOcean:
+           <a href="http://do.chronica.co">http://do.chronica.co</a></p>
+        <p id="cf" onmouseover="cfMouseOver()">Try via CloudFlare CDN:
+           <a href="http://cf.chronica.co">http://cf.chronica.co</a></p>
+        <p id="city" onmouseover="cityMouseOver()" onmouseout="cityMouseOut(this)"></p>
+        <p id="local" onmouseover="afMouseOver()"></p>
+      </div>
+        <div id="background-do">      
+          <img src='http://topnews.net.nz/data/DigitalOcean-Logo.png'>
+        </div>
+      <div id="logo">
+        <div id="background-cf">      
+          <img src='https://www.cloudflare.com/media/images/core/cloudflare-logo.png'>
+        </div>
+        <div id="background-map" style="max-height: 200px; overflow: hidden">      
+          <img src='http://maps.googleapis.com/maps/api/staticmap?center=-34.4,18.5&zoom=8&size=320x320&sensor=false'>
+        </div>
+        <div id="background-af">      
+          <img width="200" src='http://cdn.afrihost.com/images/nav/logo@2x.png'>
+        </div>
       </div>
     </div>
     <script>
@@ -101,7 +142,7 @@
           var ipinfoRes = JSON.parse(ipinfoReq.responseText);
           console.log("ipinfo", ipinfoRes);
           document.getElementById("city").innerHTML =
-                  "ipinfo.io query reports you are in: <a href='http://ipinfo.io'>" +
+                  "An <tt>ipinfo.io</tt> query reports you are in: <a href='http://ipinfo.io'>" +
                   ipinfoRes.city + "</a>";
           if (false && ipinfoRes.city === "Cape Town") {
             document.getElementById("map-cpt").style.display = "block";

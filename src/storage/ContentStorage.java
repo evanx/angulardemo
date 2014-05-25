@@ -1,10 +1,8 @@
 package storage;
 
 import com.google.gson.JsonSyntaxException;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
@@ -58,6 +55,9 @@ public class ContentStorage {
     TimestampedMonitor monitor;
     Map<String, SectionEntity> sectionItemMap = new HashMap();
     DateFormat minuteTimestampFormat = new SimpleDateFormat("");
+    int topCount = 30;
+    int articleCount = 99;
+    int thresholdCount = 50;
             
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
         this.monitor = monitor;
@@ -69,6 +69,9 @@ public class ContentStorage {
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
         ftpSync = new FtpSyncManager(monitor, properties.getMap("ftpSync"));
+        topCount = properties.getInt("topCount", topCount);
+        articleCount = properties.getInt("articleCount", articleCount);
+        thresholdCount = properties.getInt("thresholdCount", thresholdCount);
         if (ftpSync.isEnabled()) {
             deque = ftpSync.getDeque();
         }
