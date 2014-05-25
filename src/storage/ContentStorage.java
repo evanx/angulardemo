@@ -59,7 +59,7 @@ public class ContentStorage {
     Deque<StorageItem> deque;
     FtpSyncManager ftpSync;
     TimestampedMonitor monitor;
-    Map<String, SectionItem> sectionItemMap = new HashMap();
+    Map<String, SectionEntity> sectionItemMap = new HashMap();
     
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
         this.monitor = monitor;
@@ -115,23 +115,23 @@ public class ContentStorage {
                 byte[] bytes = Streams.readBytes(file);
                 map.put(path, bytes);
                 String json = new String(bytes);                
-                SectionItem sectionItem = sectionItemMap.get(sectionName);
+                SectionEntity sectionItem = getSection(sectionName);
                 if (json.startsWith("[")) {
                     sectionItem.addAll(JMaps.listMap(json));
                 } else if (json.startsWith("{")) {
                     sectionItem.addAll(JMaps.parse(json).getList("articles"));
                 }                        
-                List<JMap> articleList = JMaps.listMap(json);
-                logger.info("loadSection {} {}", sectionName, articleList.size());
+                logger.info("loadSection {}", sectionItem);
                 for (JMap articleMap : sectionItem.articleList) {
                     logger.info("loadSection {} {}", sectionName, articleMap.get("articleId"));
                 }
-            } catch (JsonSyntaxException | IOException | IllegalStateException e) {
+            } catch (JsonSyntaxException | IOException | IllegalStateException | JMapException e) {
+                e.printStackTrace(System.err);
                 String errorMessage = e.getMessage();
                 if (errorMessage.length() > 99) {
                     errorMessage = errorMessage.substring(0, 99);
                 }
-                logger.warn("loadJson {} {}", path, errorMessage);
+                logger.warn("loadSection {} {}", path, errorMessage);
             }
         }
     }
@@ -239,21 +239,21 @@ public class ContentStorage {
         return builder.toString().getBytes();
     }
 
-    public void putSection(String section, List<JMap> articleList) throws IOException {
-        String path = String.format("%s/articles.json", section);
-        SectionItem sectionItem = getSectionItem(section);
+    public void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapException {
+        String path = String.format("%s/articles.json", sectionName);
+        SectionEntity section = getSection(sectionName);
         if (articleList.isEmpty()) {
-            logger.error("putSection empty", section);
+            logger.error("putSection empty", sectionName);
         } else {
-            sectionItem.addAll(articleList);
-            putJson(path, sectionItem.map());
+            section.addAll(articleList);
+            putJson(path, section.map());
         }
     }    
     
-    private SectionItem getSectionItem(String section) {
-        SectionItem sectionItem = sectionItemMap.get(section);
+    private SectionEntity getSection(String section) {
+        SectionEntity sectionItem = sectionItemMap.get(section);
         if (sectionItem == null) {
-            sectionItem = new SectionItem(section);
+            sectionItem = new SectionEntity(section);
             sectionItemMap.put(section, sectionItem);
         }
         return sectionItem;

@@ -93,8 +93,8 @@ var appData = {
    definedHosts: {
       "cf.chronica.co": {hostType: "cors", geoDisabled: true},
       "chronica.co": {hostType: "cors", geoDisabled: true},
-      "de.chronica.co": {hostType: "jsonp", geoDisabled: true},
-      "do.chronica.co": {hostType: "cors"},
+      "de.chronica.co": {hostType: "jsonp"},
+      "do.chronica.co": {hostType: "cors", geoDisabled: true},
       "lh": {hostType: "jsonp"},
       "de.lh": {hostType: "cors"},
       "za.lh": {hostType: "cors"},
@@ -166,6 +166,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          geo.initialHost = geo.definedHosts[geo.location.host];
          if (!geo.initialHost) {
             console.warn("initHost not defined", geo.location.host);
+            geo.enabled = false;
          } else if (geo.initialHost.geoDisabled) {
             geo.enabled = false;
          }
@@ -197,11 +198,21 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       getArticle: function(articleId) {
          return articleMap[articleId];
       },
-      putSectionArticles: function(section, articles) {
-         console.log("putSectionArticles", section, typeof (articles), articles.length);
+      getArticles: function(data) {
+         if (data instanceof Array) {
+            return data;
+         } else if (data.articles) {
+            return data.articles;
+         } else {
+            return null;
+         }          
+      },
+      putSectionArticles: function(section, data) {
+         console.log("putSectionArticles", section, typeof (articles));
          if (!sectionArticleList[section]) {
             sectionArticleList[section] = [];
          }
+         var articles = service.getArticles(data);
          if (!articles || articles.length === 0) {
             console.warn("empty articles", section);
          } else if (section === 'multimedia') {
@@ -482,16 +493,8 @@ var sectionController = app.controller("sectionController", function(
    $scope.resultHandler = function(result) {
       $scope.statusMessage = "Loaded";
       var duration = new Date().getTime() - result.timestamp;
-      var articles = [];
-      if (result.data instanceof Array) {
-         articles = result.data;
-         console.warn("array result", articles.length);
-      } else if (result.data.articles) {
-         articles = result.data.articles;
-         console.warn("object result", articles.length);
-      }
-      console.log('section result', typeof(articles), result.section, articles.length, duration);
-      $scope.articles = appService.putSectionArticles(result.section, articles);
+      console.log('section result', result.section, duration);
+      $scope.articles = appService.putSectionArticles(result.section, result.data);
    };
    $scope.errorHandler = function() {
       $scope.statusMessage = "Failed";

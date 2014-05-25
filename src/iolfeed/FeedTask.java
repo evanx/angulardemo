@@ -1,6 +1,5 @@
 package iolfeed;
 
-import com.google.gson.Gson;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -18,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
+import vellum.jx.JMapException;
 import vellum.monitor.Tx;
 
 /**
@@ -161,7 +161,7 @@ public class FeedTask implements Runnable {
         try {
             context.storage.putSection(section, completedArticleList);
             return completed;
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException | RuntimeException | JMapException e) {
             logger.error("write", e);
             return false;            
         }

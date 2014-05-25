@@ -10,20 +10,23 @@ import vellum.jx.JMapException;
  *
  * @author evanx
  */
-public class SectionItem {
+public class SectionEntity {
     String section;
     List<JMap> articleList = new ArrayList();
     Map<String, JMap> articleMap;
 
-    SectionItem(String section) {
+    SectionEntity(String section) {
         this.section = section;
     }
     
-    SectionItem(String section, List<JMap> articles) throws JMapException {
+    SectionEntity(String section, List<JMap> articles) throws JMapException {
         this.section = section;
         this.articleList = articles;
         for (JMap article : articles) {
-            articleMap.put(article.getString("articleId"), article);
+            String articleId = article.getString("articleId");
+            if (!articleMap.containsKey(articleId)) {
+                articleMap.put(articleId, article);
+            }
         }
     }
 
@@ -39,7 +42,13 @@ public class SectionItem {
         return String.format("%s %d", section, articleList.size());
     }       
 
-    void addAll(List<JMap> articleList) {
-        articleList.addAll(articleList);
+    void addAll(List<JMap> articleList) throws JMapException {
+        for (JMap article : articleList) {
+            String articleId = article.getString("articleId");
+            if (!articleMap.containsKey(articleId)) {
+                articleMap.put(articleId, article);
+                this.articleList.add(article);
+            }
+        }
     }
 }

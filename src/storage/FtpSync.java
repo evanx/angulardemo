@@ -55,9 +55,9 @@ public class FtpSync implements Runnable {
     boolean enabled;
     Set<String> articleIdSet = new HashSet();
     Set<String> existingDirs = new HashSet();
-    TimestampedMonitor monitor; 
+    TimestampedMonitor monitor;
     Tx tx;
-    
+
     public FtpSync(FtpSyncManager manager, JConsoleMap properties) throws JMapException, ParseException {
         this.manager = manager;
         monitor = manager.monitor;
@@ -68,7 +68,7 @@ public class FtpSync implements Runnable {
             hostname = properties.getString("hostname");
             username = properties.getString("username");
             password = properties.getPassword("password");
-            storageDir  = properties.getString("storageDir");
+            storageDir = properties.getString("storageDir");
             connectTimeout = properties.getMillis("connectTimeout");
             readTimeout = properties.getMillis("readTimeout");
             logger = LoggerFactory.getLogger("FtpSync:" + id);
@@ -84,7 +84,7 @@ public class FtpSync implements Runnable {
     public Deque<StorageItem> getDeque() {
         return deque;
     }
-    
+
     public void start() throws Exception {
         try {
             login();
@@ -111,7 +111,7 @@ public class FtpSync implements Runnable {
     }
 
     @Override
-    public void run() {        
+    public void run() {
         if (deque.isEmpty()) {
             logger.info("empty");
             return;
@@ -153,14 +153,14 @@ public class FtpSync implements Runnable {
             }
         }
     }
-    
+
     void handle(StorageItem item) {
         handle0(item);
         if (!item.path.startsWith("storage/")) {
             handle0(new StorageItem("storage/" + item.path, item.content));
         }
     }
-    
+
     void handle0(StorageItem item) {
         logger.info("handle {}", item);
         if (item.path.endsWith("/articles.json")) {
@@ -171,26 +171,25 @@ public class FtpSync implements Runnable {
             sync(buildJsonp(item));
         }
     }
-    
+
     static StorageItem buildJsonp(StorageItem item) {
         byte[] content = ContentStorage.buildJsonp(item.path, item.content);
         return new StorageItem(item.path + "p", content);
     }
 
-    
     void close() {
         try {
             if (ftpClient == null) {
-                logger.warn("close: ftpClient is null");                
+                logger.warn("close: ftpClient is null");
             } else {
-                ftpClient.close();        
+                ftpClient.close();
                 ftpClient = null;
             }
         } catch (IOException e) {
-            logger.warn("close", e);
+            logger.warn("close", e.getMessage());
         }
     }
-    
+
     void ensureDirectory(final String path) throws IOException, FtpProtocolException {
         try {
             if (!existingDirs.contains(path)) {
@@ -208,7 +207,7 @@ public class FtpSync implements Runnable {
             }
         }
     }
-    
+
     void ensureDirectoryPath(final String path) throws IOException, FtpProtocolException {
         int index = path.lastIndexOf('/');
         if (!existingDirs.contains(path.substring(0, index))) {
@@ -230,7 +229,7 @@ public class FtpSync implements Runnable {
         ensureDirectoryPath(newPath);
         ftpClient.rename(item.path, newPath);
     }
-    
+
     private void sync(StorageItem item) {
         String path = storageDir + "/" + item.path;
         Tx sub = monitor.begin("sync", id, item.path);
@@ -269,11 +268,11 @@ public class FtpSync implements Runnable {
             tx.fin();
         }
     }
-    
+
     void list() throws Exception {
         logger.info("list {} {}", username, storageDir);
         for (FtpDirEntry entry : Lists.list(ftpClient.listFiles(storageDir))) {
             logger.info("entry {}", entry);
         }
-    }    
+    }
 }

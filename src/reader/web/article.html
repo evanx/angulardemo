@@ -11,7 +11,7 @@
     </div>
     <div class="carousel" ng-show="article.imageList.length > 1" ng-style="galleryStyle" 
          style="margin-bottom: .5em; float: left;">
-      <carousel interval="3000">
+      <carousel interval="2000">
         <slide ng-repeat="slide in article.imageList" active="slide.active">
           <img ng-src="{{slide.source}}" class="carousel">
           <div class="carousel-caption">
