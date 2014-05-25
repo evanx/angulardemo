@@ -17,7 +17,8 @@ public class SectionEntity {
     String section;
     Deque<JMap> articleDeque = new ArrayDeque();
     Map<String, JMap> articleMap = new HashMap();
-
+    String previousPath;
+    
     SectionEntity(String section) {
         this.section = section;
     }
@@ -43,7 +44,8 @@ public class SectionEntity {
     public JMap map(int count) {
         JMap sectionMap = new JMap();
         sectionMap.put("section", section);
-        sectionMap.put("articles", Lists.list(articleDeque.descendingIterator(), count));
+        sectionMap.put("previous", previousPath);
+        sectionMap.put("articles", Lists.list(articleDeque.iterator(), count));
         return sectionMap;
     }
     
@@ -53,7 +55,7 @@ public class SectionEntity {
     }       
 
     void addAll(List<JMap> articles, int count) throws JMapException {
-        for (JMap article : articles) {
+        for (JMap article : Lists.reverse(articles)) {
             String articleId = article.getString("articleId");
             if (!articleMap.containsKey(articleId)) {
                 articleMap.put(articleId, article);
