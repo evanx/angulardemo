@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
@@ -124,13 +125,12 @@ public class ContentStorage {
                 for (JMap articleMap : sectionItem.articleDeque) {
                     logger.info("loadSection {} {}", sectionName, articleMap.get("articleId"));
                 }
-            } catch (JsonSyntaxException | IOException | IllegalStateException | JMapException e) {
-                e.printStackTrace(System.err);
-                String errorMessage = e.getMessage();
-                if (errorMessage.length() > 99) {
-                    errorMessage = errorMessage.substring(0, 99);
-                }
-                logger.warn("loadSection {} {}", path, errorMessage);
+            } catch (JsonSyntaxException e) {
+                logger.warn("loadSection: " + sectionName, e);
+            } catch (IOException | JMapException e) {
+                logger.warn("loadSection: " + sectionName, e);
+            } catch (RuntimeException e) {
+                logger.error("loadSection: " + sectionName, e);
             }
         }
     }

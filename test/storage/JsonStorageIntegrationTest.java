@@ -2,6 +2,8 @@
 package storage;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
 import org.apache.log4j.BasicConfigurator;
@@ -50,8 +52,11 @@ public class JsonStorageIntegrationTest {
         if (file.exists()) {
             byte[] bytes = Streams.readBytes(file);
             String json = new String(bytes);
-            JsonArray array = new JsonParser().parse(json).getAsJsonArray();
-            Assert.assertTrue(array.size() == 5);
+            logger.info("json: {}", json);
+            JsonElement jsonElement = new JsonParser().parse(json);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonArray array = jsonObject.get("articles").getAsJsonArray();
+            Assert.assertTrue(array.size() >= 5);
         }
     }    
 }

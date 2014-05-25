@@ -186,6 +186,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          return sectionList;
       },
       putArticle: function(article) {
+         console.log("putArticle", article.articleId, article);
          articleMap[article.articleId] = article;
       },
       putArticles: function(articles) {
@@ -521,7 +522,6 @@ sectionController.resolve = [
 app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
       var jsonPath = "article/" + $routeParams.articleId + ".json";
-      //$sce.trustAsResourceUrl("http://www.youtube.com/embed/5VWDIlSMTMc");
       $scope.state.mobile = ($window.innerWidth < 560);
       $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
       console.log("article", $window);
@@ -573,6 +573,7 @@ app.controller("articleController", ["$scope", "$location", "$window", "$routePa
       console.log("articleController", $routeParams.articleId, jsonPath);
       if (appService.isArticle($routeParams.articleId)) {
          $scope.article = appService.getArticle($routeParams.articleId);
+         console.log("article cached", $scope.article);
          $scope.state.title = $scope.article.title;
          $scope.scheduleAddThis();
       } else {

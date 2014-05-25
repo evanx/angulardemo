@@ -3,6 +3,8 @@ package iolfeed;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -11,6 +13,7 @@ import java.util.Map;
 public class FeedsUtil {
 
     public static final Map<Character, String> unicodeHtmlMap = mapUnicodeHtml();
+    public static final Logger logger = LoggerFactory.getLogger(FeedsUtil.class);
 
     public static String cleanParagraph(String text) {
         text = text.trim();
@@ -59,6 +62,7 @@ public class FeedsUtil {
     }
 
     public static String cleanText(String text) {
+        String originalText = text;
         text = text.replaceAll("\u003c", "<");
         text = text.replaceAll("\u003e", ">");
         text = text.replaceAll("\u0027", "'");
@@ -74,31 +78,24 @@ public class FeedsUtil {
         text = text.replaceAll("&rsquo;", "'");
         text = text.replaceAll("&ndash;", "-");
         text = text.replaceAll("&mdash;", "-");
-        text = text.replaceAll("`", "'"); // backtick
-        text = text.replaceAll("‘", "'"); // left single quote
-        text = text.replaceAll("’", "'"); // right single quote
         text = text.replaceAll("&#8216;", "'");
         text = text.replaceAll("&#8217;", "'");
-        text = text.replaceAll("\u8216;", "'");
-        text = text.replaceAll("\u8217;", "'");
-        text = text.replaceAll("&#38;", "&");
-        text = text.replaceAll("&amp;", "&");
-        //text = text.replaceAll("\\u0026#8216;", "'");
-        //text = text.replaceAll("\\u0026#8217;", "'");
-        text = text.replaceAll("\u8220;", "\"");
-        text = text.replaceAll("\u8221;", "\"");
-        text = text.replaceAll("\u8220;", "...");
         text = text.replaceAll("&#8230;", "...");
         text = text.replaceAll("&#8221;", "\"");
         text = text.replaceAll("&#8211;", "-");
         text = text.replaceAll("&#8230;", "...");
-        //text = text.replaceAll("\\u0026#8220;", "\"");
-        //text = text.replaceAll("\\u0026#8221;", "\"");
-        if (false) {
-            text = text.replaceAll("\"", "&quot;");
-            text = text.replaceAll("'", "&#39;");
-            text = text.replaceAll("<", "&lt;");
-            text = text.replaceAll(">", "&gt;");
+        text = text.replaceAll("&#38;", "&");
+        text = text.replaceAll("&amp;", "&");
+        text = text.replaceAll("`", "'"); // backtick
+        text = text.replaceAll("‘", "'"); // left single quote
+        text = text.replaceAll("’", "'"); // right single quote
+        text = text.replaceAll("\u8216;", "'");
+        text = text.replaceAll("\u8217;", "'");
+        text = text.replaceAll("\u8220;", "\"");
+        text = text.replaceAll("\u8221;", "\"");
+        text = text.replaceAll("\u8230;", "...");
+        if (text.contains("\\\\\\")) {
+            logger.error("cleanText\n{}\n{}", originalText, text);
         }
         return accentHtmlToUnicode(text);
     }
