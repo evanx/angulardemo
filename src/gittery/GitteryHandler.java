@@ -47,7 +47,7 @@ public class GitteryHandler implements HttpHandler {
     String method;
     String path;
     String defaultPath;
-    
+
     public GitteryHandler(GitteryContext context) {
         this.context = context;
     }
@@ -65,6 +65,12 @@ public class GitteryHandler implements HttpHandler {
             } else if (path.contains("undefined")) {
                 logger.error("path {}", path);
             } else if (path.equals("/")) {
+                String host = he.getRequestHeaders().getFirst("Host");
+                logger.info("default path {}", host);
+                if (host != null && host.equals("cf.chronica.co")) {
+                    logger.warn("override default path for cloudflare", he.getRequestURI().getHost());
+                    path = "index.html";
+                }
                 path = context.storage.defaultPath;
             } else if (path.startsWith("/")) {
                 path = path.substring(1);
