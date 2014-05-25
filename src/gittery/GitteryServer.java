@@ -41,7 +41,7 @@ public class GitteryServer implements HttpHandler {
         
     public void start(GitteryContext context) throws Exception {
         this.context = context;
-        logger.debug("start {}", context);
+        logger.info("start {}", context);
         httpServer.start(new HttpServerProperties(context.port), this);
     }
 

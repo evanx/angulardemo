@@ -48,7 +48,6 @@ public class ContentStorage {
     public String appDir;
     public boolean caching;
     public boolean refresh;
-    public boolean prefetching = false;
     public String defaultHtml;
     public final String storagePath = "storage";
     public String defaultPath;
@@ -65,7 +64,7 @@ public class ContentStorage {
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
         storageDir = properties.getString("storageDir", "/home/evanx/angulardemo/storage");
-        defaultPath = "index.html";
+        defaultPath = properties.getString("defaultPath", "index.html");
         appDir = properties.getString("appDir", "/home/evanx/angulardemo/app");
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);

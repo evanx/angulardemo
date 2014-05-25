@@ -46,6 +46,7 @@ public class GitteryHandler implements HttpHandler {
     HttpExchange he;
     String method;
     String path;
+    String defaultPath;
     
     public GitteryHandler(GitteryContext context) {
         this.context = context;
@@ -62,7 +63,7 @@ public class GitteryHandler implements HttpHandler {
                     path = path.substring(9);
                 }
             } else if (path.contains("undefined")) {
-                logger.warn("path {}", path);
+                logger.error("path {}", path);
             } else if (path.equals("/")) {
                 path = context.storage.defaultPath;
             } else if (path.startsWith("/")) {

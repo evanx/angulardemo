@@ -29,6 +29,7 @@ public final class FeedsContext {
     long initialDelay = Millis.fromSeconds(15);
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
+    int feedLimit = 0;
     long articleTaskTimeout = Millis.fromMinutes(20);
     int feedTaskThreadPoolSize = 4;
     int articleTaskThreadPoolSize = 4;
@@ -57,6 +58,7 @@ public final class FeedsContext {
             period = properties.getMillis("period", period);
             articleTaskTimeout = properties.getMillis("articleTaskTimeout", articleTaskTimeout);
             articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);        
+            feedLimit = properties.getInt("feedLimit", feedLimit);
             putFeed();
         }
     }
@@ -123,9 +125,13 @@ public final class FeedsContext {
     }
 
     void putFeed(String id, String label, String url) {
-        FeedEntity feedEntity = new FeedEntity(id, label, url);
-        feedEntityList.add(feedEntity);
-        feedMap.put(id, url);
+        if (feedLimit > 0 && feedEntityList.size() == feedLimit) {
+            logger.warn("ignore {}", id);
+        } else {
+            FeedEntity feedEntity = new FeedEntity(id, label, url);
+            feedEntityList.add(feedEntity);
+            feedMap.put(id, url);
+        }
     }
 
     public TimestampedMonitor getMonitor() {
