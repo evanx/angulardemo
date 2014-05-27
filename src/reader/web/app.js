@@ -126,8 +126,10 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
                  controller: "sectionsController"}).
               when("/section/:section", {
                  templateUrl: "section.html",
-                 controller: "sectionController",
-                 resolve: sectionController.resolve}).
+                 controller: "sectionController"}).
+              when("/test/section/:section", {
+                 templateUrl: "test/section.html",
+                 controller: "sectionController"}).
               when(":date/article/:articleId", {
                  templateUrl: "article.html",
                  controller: "articleController"}).
@@ -449,13 +451,14 @@ app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
       ]);
    }]);
 
-app.controller("appController", function($scope, $location, $timeout, appService) {
-   console.log("appController");
+app.controller("appController", function($scope, $window, $location, $timeout, appService) {
    $scope.isCollapsed = true;
    $scope.state = {};
    $scope.userEmail = null;
    $scope.state.title = "My Independent";
-   $scope.isActive = function(route) {
+   $scope.state.mobile = ($window.innerWidth < 560);
+   console.log("appController", $scope.state.mobile);
+   $scope.isActive = function(route) {    
       return route === $location.path();
    };
    $scope.personalize = function() {
@@ -488,7 +491,6 @@ var sectionController = app.controller("sectionController", function(
    $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
    $scope.section = $routeParams.section.toLowerCase();
    $scope.state.section = $scope.section;
-   $scope.state.mobile = ($window.innerWidth < 560);
    console.log("sectionController", $scope.section);
    $scope.state.title = appService.getSectionLabel($routeParams.section);
    var jsonPath = $scope.section + "/articles.json";
@@ -513,16 +515,9 @@ var sectionController = app.controller("sectionController", function(
    };
 });
 
-sectionController.resolve = [
-   '$routeParams', 'appService',
-   function($routeParams, appService) {
-      console.log("resolve", $routeParams.section);
-   }];
-
 app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
       var jsonPath = "article/" + $routeParams.articleId + ".json";
-      $scope.state.mobile = ($window.innerWidth < 560);
       $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
       console.log("article", $window);
       $scope.addThisVisible = false;
