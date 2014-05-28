@@ -14,6 +14,7 @@ body {
         font-family: "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 }
+
 @media screen and (max-width: 560px) {
     body {
     padding-top: 50px;
