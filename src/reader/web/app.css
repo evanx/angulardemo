@@ -3,7 +3,7 @@ body {
     overflow-x: hidden;
 }
 body {
-    padding-top: 70px;
+    padding-top: 50px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .navbar {
@@ -11,12 +11,14 @@ body {
 }
 @media screen and (min-width: 560px) {
     body {
+        padding-top: 70px;
         font-family: "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 }
+@media screen and (max-height: 480px) {
+}
 @media screen and (max-width: 560px) {
     body {
-    padding-top: 50px;
     }
     .navbar {
     }
@@ -47,8 +49,8 @@ footer {
 .section-heading {
     display: inline-table;
     color: gray;
-    margin-top: .5em;
-    margin-bottom: .5em;
+    margin-top: .25em;
+    margin-bottom: .15em;
 }
 .section-link {
     font-size: 16pt;
@@ -84,7 +86,8 @@ footer {
     text-decoration: none;
 }
 .section-first-text-heading {
-    font-size: 18pt;
+    padding-top: 0em;
+    font-size: 16pt;
 }
 .section-first-image,
 .section-first-image-gallery {        
@@ -126,11 +129,11 @@ footer {
         width: 100%;
     }
     .section-first-text-heading {
-        font-size: 130%;
+        font-size: 120%;
     }
     .section-first-text {
-        font-size: 130%;
-        padding: .5em 1em;
+        font-size: 120%;
+        padding: .25em 1em;
         text-decoration: none;
         width: 100%;
     }

@@ -161,6 +161,8 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          host: $location.host()
       },
    };
+   console.off = function() {      
+   };
    var sectionList = appData.sectionList;
    var articleMap = {};
    var sectionArticleList = {};
@@ -188,7 +190,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          return sectionList;
       },
       putArticle: function(article) {
-         console.log("putArticle", article.articleId, article);
+         console.off("putArticle", article.articleId, article);
          articleMap[article.articleId] = article;
       },
       putArticles: function(articles) {
@@ -468,11 +470,15 @@ app.controller("appController", function($scope, $window, $location, $timeout, a
       }
       return null;
    };
-   appService.init();
-   if (true) {
-      $timeout(function() {
-         appService.initData();
-      }, 1000);
+   if ($location.host() === "localhost") {
+      console.warn("localhost");
+   } else {
+      appService.init();
+      if (true) {
+         $timeout(function() {
+            appService.initData();
+         }, 1000);
+      }
    }
 });
 
