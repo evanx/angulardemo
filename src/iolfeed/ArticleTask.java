@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.monitor.Tx;
 import vellum.util.Streams;
 
@@ -91,7 +91,7 @@ public class ArticleTask implements Runnable {
     Thread currentThread;
     boolean byline;
 
-    ArticleTask(FeedsContext context, JMap map) throws FeedException, JMapException {
+    ArticleTask(FeedsContext context, JMap map) throws FeedException, JMapsException {
         this.context = context;
         this.map = map;
         sourceArticleUrl = map.getString("link");
@@ -101,12 +101,12 @@ public class ArticleTask implements Runnable {
     }
 
     ArticleTask(FeedsContext context, RelatedArticleItem storyItem, int depth) 
-            throws FeedException, JMapException {
+            throws FeedException, JMapsException {
         this(context, storyItem.map());
         this.depth = depth;
     }
 
-    public void init() throws JMapException, FeedException {
+    public void init() throws JMapsException, FeedException {
         this.context = context;
         this.storage = context.storage;
     }

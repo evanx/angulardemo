@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.util.Lists;
 
 /**
@@ -24,7 +24,7 @@ public class SectionEntity {
         this.section = section;
     }
 
-    SectionEntity(String section, List<JMap> articles, int count) throws JMapException {
+    SectionEntity(String section, List<JMap> articles, int count) throws JMapsException {
         this.section = section;
         for (JMap article : articles) {
             String articleId = article.getString("articleId");
@@ -38,7 +38,7 @@ public class SectionEntity {
         }
     }
     
-    SectionEntity(String section, List<JMap> articles) throws JMapException {
+    SectionEntity(String section, List<JMap> articles) throws JMapsException {
         this(section, articles, 0);
     }
     
@@ -61,7 +61,7 @@ public class SectionEntity {
         return String.format("%s %d", section, articleDeque.size());
     }       
 
-    void addAll(List<JMap> articles, int count) throws JMapException {
+    void addAll(List<JMap> articles, int count) throws JMapsException {
         for (JMap article : Lists.reverse(articles)) {
             String articleId = article.getString("articleId");
             if (!articleMap.containsKey(articleId)) {

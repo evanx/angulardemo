@@ -15,7 +15,7 @@ import vellum.data.Millis;
 import vellum.exception.ParseException;
 import vellum.jx.JConsoleMap;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.monitor.TimestampedMonitor;
 import vellum.monitor.Tx;
 import vellum.system.NullConsole;
@@ -42,7 +42,7 @@ public class FtpSyncManager implements Runnable {
     Tx tx;
     List<FtpSync> clients = new ArrayList();
     
-    public FtpSyncManager(TimestampedMonitor monitor, JMap properties) throws JMapException, ParseException {
+    public FtpSyncManager(TimestampedMonitor monitor, JMap properties) throws JMapsException, ParseException {
         this.monitor = monitor;
         logger.info("properties {}", properties);
         enabled = properties.getBoolean("enabled", true);

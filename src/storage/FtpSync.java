@@ -21,7 +21,7 @@ import sun.net.ftp.FtpProtocolException;
 import vellum.data.Millis;
 import vellum.exception.ParseException;
 import vellum.jx.JConsoleMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.monitor.TimestampedMonitor;
 import vellum.monitor.Tx;
 import vellum.util.Args;
@@ -60,7 +60,7 @@ public class FtpSync implements Runnable {
     TimestampedMonitor monitor;
     Tx tx;
 
-    public FtpSync(FtpSyncManager manager, JConsoleMap properties) throws JMapException, ParseException {
+    public FtpSync(FtpSyncManager manager, JConsoleMap properties) throws JMapsException, ParseException {
         this.manager = manager;
         monitor = manager.monitor;
         enabled = properties.getBoolean("enabled", true);

@@ -20,7 +20,7 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import vellum.exception.ParseException;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.jx.JMaps;
 import vellum.monitor.TimestampedMonitor;
 import vellum.util.Streams;
@@ -60,7 +60,7 @@ public class ContentStorage {
     int articleCount = 99;
     int thresholdCount = 50;
             
-    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapException, IOException, ParseException {
+    public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapsException, IOException, ParseException {
         this.monitor = monitor;
         logger.info("properties: " + properties);
         contentUrl = properties.getString("contentUrl", "http://chronica.co");
@@ -127,7 +127,7 @@ public class ContentStorage {
                 }
             } catch (JsonSyntaxException e) {
                 logger.warn("loadSection: " + sectionName, e);
-            } catch (IOException | JMapException e) {
+            } catch (IOException | JMapsException e) {
                 logger.warn("loadSection: " + sectionName, e);
             } catch (RuntimeException e) {
                 logger.error("loadSection: " + sectionName, e);
@@ -224,7 +224,7 @@ public class ContentStorage {
         return builder.toString().getBytes();
     }
 
-    public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapException {
+    public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapsException {
         String path = String.format("%s/articles.json", sectionName);
         if (articleList.isEmpty()) {
             logger.error("putSection empty", sectionName);

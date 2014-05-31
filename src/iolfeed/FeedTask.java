@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.monitor.Tx;
 
 /**
@@ -161,7 +161,7 @@ public class FeedTask implements Runnable {
         try {
             context.storage.putSection(section, completedArticleList);
             return completed;
-        } catch (IOException | RuntimeException | JMapException e) {
+        } catch (IOException | RuntimeException | JMapsException e) {
             logger.error("write", e);
             return false;            
         }

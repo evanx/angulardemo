@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.exception.ParseException;
 import vellum.jx.JMap;
-import vellum.jx.JMapException;
+import vellum.jx.JMapsException;
 import vellum.util.Lists;
 
 /**
@@ -26,7 +26,7 @@ public class TimestampedMonitor implements Runnable {
     private final long period;
     private ScheduledFuture future; 
     
-    public TimestampedMonitor(JMap properties) throws JMapException, ParseException {
+    public TimestampedMonitor(JMap properties) throws JMapsException, ParseException {
         this.limitDuration = properties.getMillis("limit");
         this.period = properties.getMillis("period", 0);
     }
