@@ -21,6 +21,7 @@ import vellum.jx.JMap;
 public class ArticleTaskIntegrationTest {
 
     Logger logger = LoggerFactory.getLogger(ArticleTaskIntegrationTest.class);
+    
     FeedsContext feedsContext = TestFeedContexts.newFeedContext();
 
     public ArticleTaskIntegrationTest() throws Exception {        
