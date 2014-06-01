@@ -1,5 +1,5 @@
 
-server=chronica.co
+server=ngena.com
 
 c0chronica() {
   server=chronica.co
