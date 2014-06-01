@@ -2,10 +2,12 @@ package storage;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import vellum.format.CalendarFormats;
 import vellum.jx.JMap;
 import vellum.jx.JMapsException;
 import vellum.util.Lists;
@@ -45,7 +47,7 @@ public class SectionEntity {
     public JMap map(int count) {
         JMap sectionMap = new JMap();
         sectionMap.put("section", section);
-        sectionMap.put("timestamp", System.currentTimeMillis());
+        sectionMap.put("timestamp", CalendarFormats.numericTimestampMinuteFormat.format(new Date()));
         sectionMap.put("previous", previousPath);
         sectionMap.put("articles", Lists.list(articleDeque.iterator(), count));
         return sectionMap;
