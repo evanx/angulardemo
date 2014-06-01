@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import vellum.jx.JMap;
+import vellum.jx.JMapFormatter;
 import vellum.jx.JMaps;
 
 /**
@@ -44,7 +45,7 @@ public class TimestampedMonitorTest {
     @Test
     public void testProperties() throws Exception {
         properties.put("limit", "2s");
-        properties = JMaps.parse(properties.toJson());
+        properties = JMaps.parse(JMaps.format(properties));
         Assert.assertEquals(2000, properties.getMillis("limit"));
     }
     

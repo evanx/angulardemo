@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
@@ -165,7 +164,7 @@ public class ContentStorage {
 
     public void putJson(String path, JMap map) throws IOException {
         jsonMap.put(path, map);
-        byte[] content = map.toJson().getBytes();
+        byte[] content = JMaps.format(map).getBytes();
         putContent(path, content);
     }
 
@@ -229,13 +228,13 @@ public class ContentStorage {
         if (articleList.isEmpty()) {
             logger.error("putSection empty", sectionName);
         } else if (sectionName.equals("top")) {
-            SectionEntity section = new SectionEntity(sectionName, articleList, 30);
-            sectionItemMap.put(sectionName, section);
-            putJson(path, section.map(30));
+            SectionEntity section = getSection(sectionName);
+            section.addAll(articleList, topCount);
+            putJson(path, section.map(topCount));
         } else {
             SectionEntity section = getSection(sectionName);
-            section.addAll(articleList, 99);
-            putJson(path, section.map(99));
+            section.addAll(articleList, articleCount);
+            putJson(path, section.map(articleCount));
         }
     }    
     
