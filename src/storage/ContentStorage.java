@@ -118,7 +118,7 @@ public class ContentStorage {
                 if (json.startsWith("[")) {
                     sectionItem.addAll(JMaps.listMap(json), 0);
                 } else if (json.startsWith("{")) {
-                    sectionItem.addAll(JMaps.parse(json).getList("articles"), 0);
+                    sectionItem.addAll(JMaps.parseMap(json).getList("articles"), 0);
                 }                        
                 logger.info("loadSection {}", sectionItem);
                 for (JMap articleMap : sectionItem.articleDeque) {
@@ -164,7 +164,7 @@ public class ContentStorage {
 
     public void putJson(String path, JMap map) throws IOException {
         jsonMap.put(path, map);
-        byte[] content = JMaps.format(map).getBytes();
+        byte[] content = map.toJson().getBytes();
         putContent(path, content);
     }
 

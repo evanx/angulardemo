@@ -46,6 +46,6 @@ public class JsonTest {
         JMap article = new JMap();
         article.put("articleId", "test-article-id");
         article.put("image", new ImageItem("image-source", "image-text"));
-        logger.info(JMaps.format(article));
+        logger.info("json {}", article.toJson());
     }
 }

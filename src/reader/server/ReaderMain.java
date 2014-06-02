@@ -29,7 +29,7 @@ public class ReaderMain {
             org.apache.log4j.Logger.getRootLogger().addAppender(new ConsoleAppender(
                     new PatternLayout("%d{ISO8601} %p [%c] %m%n")));
             Logger logger = LoggerFactory.getLogger(ReaderMain.class);
-            JMap properties = JMaps.parse(Streams.readString(new File("config.json")));
+            JMap properties = JMaps.parseMap(Streams.readString(new File("config.json")));
             logger.info("storage {}", properties.getMap("storage"));
             logger.info("feeds {}", properties.getMap("feeds"));
             logger.info("webServer {}", properties.getMap("webServer"));            

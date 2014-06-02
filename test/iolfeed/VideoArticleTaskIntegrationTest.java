@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.jx.JMap;
-import vellum.jx.JMapFormatter;
 import vellum.jx.JMaps;
 
 /**
@@ -114,7 +113,7 @@ public class VideoArticleTaskIntegrationTest {
         map.put("link", link);
         ArticleTask articleTask = new ArticleTask(feedsContext, map);
         articleTask.run();
-        System.out.println(JMaps.format(articleTask.map));
+        System.out.println(articleTask.map.toJson());
         Assert.assertTrue(articleTask.isCompleted());
         Assert.assertTrue(articleTask.youtubeList.size() == 1);
         Assert.assertEquals("DA leader Helen Zille and parliamentary member Lindiwe Mazibuko joined Free State provincial candidate Patricia Kopane at an election rally at Seeisoville stadium in Kroonstad on Monday.", 
@@ -134,7 +133,7 @@ public class VideoArticleTaskIntegrationTest {
         map.put("link", link);
         ArticleTask articleTask = new ArticleTask(feedsContext, map);
         articleTask.run();
-        System.out.println(JMapFormatter.formatMap(articleTask.map));
+        System.out.println(articleTask.map.toJson());
         return articleTask;
     }
     
