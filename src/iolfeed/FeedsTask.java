@@ -43,6 +43,7 @@ public class FeedsTask implements Runnable {
 
     @Override
     public void run() {
+        logger.info("run");
         for (FeedEntity entity : context.feedEntityList) {
             if (!entity.getId().equals("top")) {
                 submit(entity.getId());
@@ -60,11 +61,11 @@ public class FeedsTask implements Runnable {
     };
 
     private void submit(String section) {
-        logger.info("submit {}", section);
+        logger.info("submit: {}", section);
         Future future = futureMap.get(section);
         if (future != null) {
             if (!future.isDone()) {
-                logger.warn("not done {}", section);
+                logger.warn("not done: {}", section);
                 return;
             } else {
                 try {
@@ -79,5 +80,6 @@ public class FeedsTask implements Runnable {
         futureMap.put(section,
                 taskExecutorService.submit(
                         new FeedTask(context, section)));
+        logger.info("submitted: {}", section);
     }
 }
