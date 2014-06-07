@@ -106,9 +106,13 @@ public class ContentStorage {
     }
             
     private void loadSection(String sectionName) {
-        String path = String.format("%s/articles.json", sectionName);
-        logger.info("section {} {}", sectionName, path);        
+        logger.info("section {} {}", sectionName);
+        String path = String.format("%s/current.json", sectionName);
         File file = new File(storageDir, path);
+        if (!file.exists()) {
+            path = String.format("%s/articles.json", sectionName);
+            file = new File(storageDir, path);            
+        }
         if (file.exists()) {
             try {
                 byte[] bytes = Streams.readBytes(file);
@@ -132,6 +136,32 @@ public class ContentStorage {
         }
     }
 
+    public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapsException {
+        if (articleList.isEmpty()) {
+            logger.error("putSection empty", sectionName);
+        } else if (sectionName.equals("top")) {
+            putSection(sectionName, articleList, topLimit);
+        } else {
+            putSection(sectionName, articleList, sectionLimit);
+        }
+    }    
+
+    private void putSection(String sectionName, List<JMap> articleList, int limit) throws IOException, JMapsException {
+        SectionEntity section = getSection(sectionName);
+        section.addAll(articleList);
+        String path = String.format("%s/current.json", sectionName);
+        putJson(path, section.map(0));
+        if (section.size() > limit*2) {
+            String timestampString = CalendarFormats.numericTimestampMinuteFormat.formatNow();
+            path = String.format("%s/%s.json", sectionName, timestampString);
+            putJson(path, section.mapExcess(limit));
+            section.setPreviousPath(path);
+            section.trim(limit);
+        }
+        path = String.format("%s/articles.json", sectionName);
+        putJson(path, section.map(limit));
+    }
+    
     public synchronized void put(String key, byte[] value) {
         if (caching || key.endsWith(".json")) {
             map.put(key, value);
@@ -219,30 +249,6 @@ public class ContentStorage {
         builder.append(new String(content));
         builder.append(");");
         return builder.toString().getBytes();
-    }
-
-    public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapsException {
-        if (articleList.isEmpty()) {
-            logger.error("putSection empty", sectionName);
-        } else if (sectionName.equals("top")) {
-            putSection(sectionName, articleList, topLimit);
-        } else {
-            putSection(sectionName, articleList, sectionLimit);
-        }
-    }    
-
-    private void putSection(String sectionName, List<JMap> articleList, int limit) throws IOException, JMapsException {
-        SectionEntity section = getSection(sectionName);
-        section.addAll(articleList);
-        if (section.size() > limit*2) {
-            String timestampString = CalendarFormats.numericTimestampMinuteFormat.formatNow();
-            String path = String.format("%s/%s.json", sectionName, timestampString);
-            putJson(path, section.mapExcess(limit));
-            section.setPreviousPath(path);
-            section.trim(limit);
-        }
-        String path = String.format("%s/articles.json", sectionName);
-        putJson(path, section.map(limit));
     }
     
     private SectionEntity getSection(String section) {
