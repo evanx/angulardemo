@@ -2,7 +2,6 @@ package storage;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -43,16 +42,41 @@ public class SectionEntity {
     SectionEntity(String section, List<JMap> articles) throws JMapsException {
         this(section, articles, 0);
     }
+
+    public void setPreviousPath(String previousPath) {
+        this.previousPath = previousPath;
+    }
     
     public JMap map(int count) {
         JMap sectionMap = new JMap();
         sectionMap.put("section", section);
-        sectionMap.put("timestamp", CalendarFormats.numericTimestampMinuteFormat.format(new Date()));
+        sectionMap.put("timestamp", CalendarFormats.numericTimestampMinuteFormat.formatNow());
         sectionMap.put("previous", previousPath);
         sectionMap.put("articles", Lists.list(articleDeque.iterator(), count));
         return sectionMap;
     }
 
+    public JMap mapExcess(int count) {
+        JMap sectionMap = new JMap();
+        sectionMap.put("section", section);
+        sectionMap.put("timestamp", CalendarFormats.numericTimestampMinuteFormat.formatNow());
+        sectionMap.put("previous", previousPath);
+        sectionMap.put("articles", Lists.listExcess(articleDeque.iterator(), count));
+        return sectionMap;
+    }
+
+    int size() {
+        return articleDeque.size();
+    }
+    
+    void trim(int limit) throws JMapsException {
+        while (articleDeque.size() > limit) {
+            JMap article = articleDeque.removeLast();
+            String articleId = article.getString("articleId");
+            articleMap.remove(articleId);
+        }
+    }
+        
     public List<StorageItem> produce() {
         List<StorageItem> itemList = new ArrayList();
         return itemList;
@@ -63,7 +87,7 @@ public class SectionEntity {
         return String.format("%s %d", section, articleDeque.size());
     }       
 
-    void addAll(List<JMap> articles, int count) throws JMapsException {
+    void addAll(List<JMap> articles) throws JMapsException {
         for (JMap article : Lists.reverse(articles)) {
             String articleId = article.getString("articleId");
             if (!articleMap.containsKey(articleId)) {
@@ -71,12 +95,6 @@ public class SectionEntity {
                 articleDeque.addFirst(article);
             }
         }
-        if (count > 0) {
-            while (articleDeque.size() > count) {
-                JMap article = articleDeque.removeLast();
-                String articleId = article.getString("articleId");
-                articleMap.remove(articleId);
-            }
-        }
     }
+
 }

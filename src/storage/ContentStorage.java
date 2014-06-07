@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import vellum.exception.ParseException;
+import vellum.format.CalendarFormats;
 import vellum.jx.JMap;
 import vellum.jx.JMapsException;
 import vellum.jx.JMaps;
@@ -55,9 +57,8 @@ public class ContentStorage {
     TimestampedMonitor monitor;
     Map<String, SectionEntity> sectionItemMap = new HashMap();
     DateFormat minuteTimestampFormat = new SimpleDateFormat("");
-    int topCount = 30;
-    int articleCount = 99;
-    int thresholdCount = 50;
+    int topLimit = 15;
+    int sectionLimit = 50;
             
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapsException, IOException, ParseException {
         this.monitor = monitor;
@@ -69,9 +70,8 @@ public class ContentStorage {
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
         ftpSync = new FtpSyncManager(monitor, properties.getMap("ftpSync"));
-        topCount = properties.getInt("topCount", topCount);
-        articleCount = properties.getInt("articleCount", articleCount);
-        thresholdCount = properties.getInt("thresholdCount", thresholdCount);
+        topLimit = properties.getInt("topLimit", topLimit);
+        sectionLimit = properties.getInt("sectionLimit", sectionLimit);
         if (ftpSync.isEnabled()) {
             deque = ftpSync.getDeque();
         }
@@ -116,9 +116,9 @@ public class ContentStorage {
                 String json = new String(bytes);                
                 SectionEntity sectionItem = getSection(sectionName);
                 if (json.startsWith("[")) {
-                    sectionItem.addAll(JMaps.listMap(json), 0);
+                    sectionItem.addAll(JMaps.listMap(json));
                 } else if (json.startsWith("{")) {
-                    sectionItem.addAll(JMaps.parseMap(json).getList("articles"), 0);
+                    sectionItem.addAll(JMaps.parseMap(json).getList("articles"));
                 }                        
                 logger.info("loadSection {}", sectionItem);
                 for (JMap articleMap : sectionItem.articleDeque) {
@@ -128,8 +128,6 @@ public class ContentStorage {
                 logger.warn("loadSection: " + sectionName, e);
             } catch (IOException | JMapsException e) {
                 logger.warn("loadSection: " + sectionName, e);
-            } catch (RuntimeException e) {
-                logger.error("loadSection: " + sectionName, e);
             }
         }
     }
@@ -224,19 +222,28 @@ public class ContentStorage {
     }
 
     public synchronized void putSection(String sectionName, List<JMap> articleList) throws IOException, JMapsException {
-        String path = String.format("%s/articles.json", sectionName);
         if (articleList.isEmpty()) {
             logger.error("putSection empty", sectionName);
         } else if (sectionName.equals("top")) {
-            SectionEntity section = getSection(sectionName);
-            section.addAll(articleList, topCount);
-            putJson(path, section.map(topCount));
+            putSection(sectionName, articleList, topLimit);
         } else {
-            SectionEntity section = getSection(sectionName);
-            section.addAll(articleList, articleCount);
-            putJson(path, section.map(articleCount));
+            putSection(sectionName, articleList, sectionLimit);
         }
     }    
+
+    private void putSection(String sectionName, List<JMap> articleList, int limit) throws IOException, JMapsException {
+        SectionEntity section = getSection(sectionName);
+        section.addAll(articleList);
+        if (section.size() > limit*2) {
+            String timestampString = CalendarFormats.numericTimestampMinuteFormat.formatNow();
+            String path = String.format("%s/%s.json", sectionName, timestampString);
+            putJson(path, section.mapExcess(limit));
+            section.setPreviousPath(path);
+            section.trim(limit);
+        }
+        String path = String.format("%s/articles.json", sectionName);
+        putJson(path, section.map(limit));
+    }
     
     private SectionEntity getSection(String section) {
         SectionEntity sectionItem = sectionItemMap.get(section);
