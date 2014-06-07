@@ -27,9 +27,11 @@ public class FeedsTask implements Runnable {
     Map<String, Future> futureMap = new HashMap();
 
     public void start(FeedsContext context) throws Exception {
+        logger.info("start");
         this.context = context;
         taskExecutorService = Executors.newFixedThreadPool(context.feedTaskThreadPoolSize);
         if (context.once) {
+            logger.info("once");
             run();
         } else {
             elapsedExecutorService.scheduleAtFixedRate(topTask, context.topInitialDelay,
@@ -58,20 +60,24 @@ public class FeedsTask implements Runnable {
     };
 
     private void submit(String section) {
+        logger.info("submit {}", section);
         Future future = futureMap.get(section);
-        if (!future.isDone()) {
-            logger.warn("not done {}", section);
-        } else {
-            try {
-                future.get();
-            } catch (InterruptedException e) {
-                logger.warn("interrupted {}", section);
-            } catch (ExecutionException e) {
-                logger.error("exception {}", e.getCause());
+        if (future != null) {
+            if (!future.isDone()) {
+                logger.warn("not done {}", section);
+                return;
+            } else {
+                try {
+                    future.get();
+                } catch (InterruptedException e) {
+                    logger.warn("interrupted {}", section);
+                } catch (ExecutionException e) {
+                    logger.error("exception {}", e.getCause());
+                }
             }
-            futureMap.put(section,
-                    taskExecutorService.submit(
-                            new FeedTask(context, section)));
         }
+        futureMap.put(section,
+                taskExecutorService.submit(
+                        new FeedTask(context, section)));
     }
 }

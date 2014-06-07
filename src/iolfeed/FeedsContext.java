@@ -1,5 +1,6 @@
 package iolfeed;
 
+import static iolfeed.FeedsTask.logger;
 import vellum.monitor.TimestampedMonitor;
 import storage.ContentStorage;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public final class FeedsContext {
             return false;
         }
         String first = properties.getString("first", null);        
+        logger.info("start {}", first);
         if (first != null && !first.isEmpty() && !first.equals("none")) {
             logger.info("first", first);
             Tx tx = monitor.begin("first");
