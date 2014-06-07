@@ -1,4 +1,4 @@
-html,
+shtml,
 body {
     overflow-x: hidden;
 }
@@ -97,6 +97,7 @@ footer {
 .section-first-image img,
 .section-first-image-gallery img {
     float: right;
+    max-height: 220px; 
 }
 .section-first-text:hover {
     background: rgba(0, 0, 0, .4); 
