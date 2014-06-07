@@ -35,7 +35,7 @@ public class FeedTask implements Runnable {
     Exception exception;
     final List<ArticleTask> articleTaskList = new ArrayList();
     
-    public FeedTask(FeedsContext context, String section) throws Exception {
+    public FeedTask(FeedsContext context, String section) {
         logger = LoggerFactory.getLogger("FeedTask." + section);
         this.context = context;
         this.section = section;
