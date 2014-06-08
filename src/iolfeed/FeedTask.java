@@ -34,6 +34,7 @@ public class FeedTask implements Runnable {
     int articleCount;
     Exception exception;
     final List<ArticleTask> articleTaskList = new ArrayList();
+    Tx tx;
     
     public FeedTask(FeedsContext context, String section) {
         logger = LoggerFactory.getLogger("FeedTask." + section);
@@ -45,17 +46,25 @@ public class FeedTask implements Runnable {
     
     @Override
     public void run() {
-        Tx tx = context.monitor.begin("FeedTask", section);
+        if (tx != null) {
+            logger.warn("tx active");
+            return;
+        }
+        tx = context.monitor.begin("FeedTask", section);
         try {
             perform();
             tx.ok();
-            context.storage.sync();
+            if (false) {
+                context.storage.sync();
+            }
         } catch (RuntimeException e) {
-            this.exception = e;
             tx.error(e);
         } catch (Exception e) {
-            this.exception = e;
             tx.error(e);
+        } finally {
+            tx.fin();
+            exception = tx.getException();
+            tx = null;
         }
     }
     
@@ -105,7 +114,7 @@ public class FeedTask implements Runnable {
         if (articleTaskList.isEmpty()) {
             logger.warn("empty article list");
         } else {
-            while (!performTasks()) {
+            if (!performTasks()) {
                 logger.warn("performTasks incomplete");
             }
             for (int i = 0; !write() && i <= context.retryCount; i++) {
