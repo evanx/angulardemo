@@ -107,7 +107,6 @@ public class ArticleTask implements Runnable {
     }
 
     public void init() throws JMapsException, FeedException {
-        this.context = context;
         this.storage = context.storage;
     }
 
@@ -176,14 +175,17 @@ public class ArticleTask implements Runnable {
             tx.error(e);
         } catch (Exception e) {
             tx.error(e);
-        } catch (Throwable t) {
-            logger.error("throwable", t);
-            tx.error(t);
+        } catch (Throwable e) {
+            tx.error(e);
+            logger.error("throwable", e);
         } finally {
+            if (!completed && !tx.isError()) {
+                logger.error("finally");
+            }
             tx.fin();
+            exception = tx.getException();
             currentThread = null;
         }
-        exception = tx.getException();
     }
 
     private void parseRelatedArticles() throws Exception {
@@ -211,6 +213,8 @@ public class ArticleTask implements Runnable {
     private void parseArticle() throws Exception {
         URLConnection connection = new URL(sourceArticleUrl).openConnection();
         connection.setDoOutput(false);
+        connection.setConnectTimeout(context.connectTimeout);
+        connection.setReadTimeout(context.readTimeout);
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()))) {
             parseLink(connection.getURL().toString());           
@@ -496,12 +500,5 @@ public class ArticleTask implements Runnable {
             throw new IOException("invalid image size");
         }
         return image.path;
-    }
-
-    void postContent(String path, byte[] content) throws IOException {
-        String localImageUrl = String.format("%s/%s", context.storage.contentUrl, path);
-        Streams.postHttp(content, new URL(localImageUrl));
-        content = Streams.readContent(localImageUrl);
-        logger.info("imageUrl {} {}", content.length, localImageUrl);
     }
 }

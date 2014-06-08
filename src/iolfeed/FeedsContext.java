@@ -31,10 +31,12 @@ public final class FeedsContext {
     long period = Millis.fromMinutes(30);
     int maxDepth = 6;
     int feedLimit = 0;
-    long articleTaskTimeout = Millis.fromMinutes(20);
+    long articleTaskTimeout = Millis.fromMinutes(10);
     int feedTaskThreadPoolSize = 4;
     int articleTaskThreadPoolSize = 4;
     final int retryCount = 4;
+    int connectTimeout = 30000;
+    int readTimeout = 45000;
     boolean enabled;
     final boolean once = false;
     final int articleCount = 99;
