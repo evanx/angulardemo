@@ -1,4 +1,3 @@
-
 package storage;
 
 import com.google.gson.JsonArray;
@@ -15,6 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vellum.ssl.OpenTrustManager;
+import vellum.ssl.SSLContexts;
 import vellum.util.Streams;
 
 /**
@@ -22,30 +23,31 @@ import vellum.util.Streams;
  * @author evanx
  */
 public class JsonStorageIntegrationTest {
+
     Logger logger = LoggerFactory.getLogger(JsonStorageIntegrationTest.class);
     String storageDir = "/pri/angulardemo/storage";
-    
+
     public JsonStorageIntegrationTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
         BasicConfigurator.configure();
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
-    
-    @Test 
+
+    @Test
     public void loadJson() throws Exception {
         String path = "top/articles.json";
         File file = new File(storageDir, path);
@@ -58,7 +60,6 @@ public class JsonStorageIntegrationTest {
             JsonArray array = jsonObject.get("articles").getAsJsonArray();
             Assert.assertTrue(array.size() >= 5);
         }
-    }    
-    
-    
+    }
+
 }

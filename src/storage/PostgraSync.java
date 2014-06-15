@@ -42,8 +42,8 @@ public class PostgraSync implements Runnable {
     ScheduledFuture future;
     long initialDelay = Millis.fromSeconds(30);
     long delay = Millis.fromSeconds(15);
-    int connectTimeout;
-    int readTimeout;
+    int connectTimeout = 30000;
+    int readTimeout = 30000;
     boolean enabled;
     int warningSize = 100;
     int port = 21;
@@ -62,8 +62,8 @@ public class PostgraSync implements Runnable {
         if (enabled) {
             port = properties.getInt("port", port);
             hostname = properties.getString("hostname", "localhost:8443");
-            connectTimeout = (int) properties.getMillis("connectTimeout", 45000);
-            readTimeout = (int) properties.getMillis("readTimeout", 30000);
+            connectTimeout = (int) properties.getMillis("connectTimeout", connectTimeout);
+            readTimeout = (int) properties.getMillis("readTimeout", readTimeout);
             logger.info("properties {}", properties);
             logger.info("{}", hostname);
         }
