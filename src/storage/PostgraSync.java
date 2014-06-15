@@ -141,6 +141,7 @@ public class PostgraSync implements Runnable {
             connection.setReadTimeout(readTimeout);
             connection.setUseCaches(false);
             connection.setDoInput(true);
+            connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Content-Length", Integer.toString(bytes.length));
