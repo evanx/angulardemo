@@ -100,6 +100,10 @@ public class FtpSync implements Runnable {
         future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
     }
 
+    public void shutdown() throws Exception {
+        executorService.shutdown();
+    }
+    
     private void login() throws Exception {
         logger.info("login {} {}", username, storageDir);
         if (ftpClient != null) {
@@ -120,6 +124,7 @@ public class FtpSync implements Runnable {
         }
         if (tx != null) {
             logger.error("still running");
+            return;
         }
         tx = monitor.begin("FtpSync", id);
         if (deque.size() > warningSize) {
@@ -132,10 +137,6 @@ public class FtpSync implements Runnable {
         } catch (RuntimeException e) {
             tx.error(e);
         } catch (Exception e) {
-            tx.error(e);
-        } catch (Error e) {
-            tx.error(e);
-        } catch (Throwable e) {
             tx.error(e);
         } finally {
             tx.fin();

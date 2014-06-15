@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +51,10 @@ public class ContentStorage {
     public String defaultPath;
     Set<String> linkSet = new ConcurrentSkipListSet();
     boolean evict = false;
-    Deque<StorageItem> deque;
+    Deque<StorageItem> ftpSyncDeque;
+    Deque<StorageItem> postgraSyncDeque;
     FtpSyncManager ftpSync;
+    PostgraSync postgraSync;
     TimestampedMonitor monitor;
     Map<String, SectionEntity> sectionItemMap = new HashMap();
     DateFormat minuteTimestampFormat = new SimpleDateFormat("");
@@ -70,10 +71,11 @@ public class ContentStorage {
         caching = properties.getBoolean("caching", false);
         refresh = properties.getBoolean("refresh", false);
         ftpSync = new FtpSyncManager(monitor, properties.getMap("ftpSync"));
+        postgraSync = new PostgraSync(monitor, properties.getMap("postgraSync"));
         topLimit = properties.getInt("topLimit", topLimit);
         sectionLimit = properties.getInt("sectionLimit", sectionLimit);
         if (ftpSync.isEnabled()) {
-            deque = ftpSync.getDeque();
+            ftpSyncDeque = ftpSync.getDeque();
         }
         defaultHtml = Streams.readString(new File(appDir, defaultPath));
     }
@@ -88,7 +90,11 @@ public class ContentStorage {
         }
         if (ftpSync.isEnabled()) {
             ftpSync.start();
-            deque = ftpSync.getDeque();
+            ftpSyncDeque = ftpSync.getDeque();
+        }
+        if (postgraSync.isEnabled()) {
+            postgraSync.start();
+            postgraSyncDeque = postgraSync.getDeque();
         }
         Signal.handle(new Signal("HUP"), new SignalHandler() {
             @Override
@@ -207,11 +213,19 @@ public class ContentStorage {
         if (path.endsWith(".json")) {
             writeContent(path + "p", buildJsonp(path, content));
             if (ftpSync.isEnabled()) {
-                if (deque == null) {
-                    logger.warn("putContent: deque is null");
+                if (ftpSyncDeque == null) {
+                    logger.warn("putContent: ftp deque is null");
                 } else {
-                    deque.add(new StorageItem(path, content));
-                    logger.info("putContent: Ftp deque {}", deque.size());
+                    ftpSyncDeque.add(new StorageItem(path, content));
+                    logger.info("putContent: ftp deque {}", ftpSyncDeque.size());
+                }
+            }
+            if (postgraSync.isEnabled()) {
+                if (postgraSyncDeque == null) {
+                    logger.warn("putContent: postgra deque is null");
+                } else {
+                    postgraSyncDeque.add(new StorageItem(path, content));
+                    logger.info("putContent: postgra deque {}", postgraSyncDeque.size());
                 }
             }
         }

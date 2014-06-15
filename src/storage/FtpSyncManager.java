@@ -73,6 +73,10 @@ public class FtpSyncManager implements Runnable {
         }
     }
 
+    public void shutdown() throws Exception {
+        executorService.shutdown();
+    }
+    
     @Override
     public void run() {        
         if (deque.isEmpty()) {
@@ -81,6 +85,7 @@ public class FtpSyncManager implements Runnable {
         }
         if (tx != null) {
             logger.error("still running");
+            return;
         }
         tx = monitor.begin("FtpSyncManager");
         if (deque.size() > warningSize) {
