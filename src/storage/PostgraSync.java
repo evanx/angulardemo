@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.Executors;
@@ -26,6 +24,7 @@ import vellum.monitor.Tx;
 import vellum.ssl.OpenHostnameVerifier;
 import vellum.ssl.OpenTrustManager;
 import vellum.ssl.SSLContexts;
+import vellum.util.Args;
 import vellum.util.Streams;
 
 /**
@@ -55,7 +54,7 @@ public class PostgraSync implements Runnable {
     TimestampedMonitor monitor;
     Tx tx;
     SSLContext sslContext;
-        
+
     public PostgraSync(TimestampedMonitor monitor, JMap properties) throws JMapsException, ParseException {
         this.monitor = monitor;
         enabled = properties.getBoolean("enabled", true);
@@ -86,7 +85,7 @@ public class PostgraSync implements Runnable {
     public void shutdown() throws Exception {
         executorService.shutdown();
     }
-    
+
     @Override
     public void run() {
         if (deque.isEmpty()) {
@@ -130,7 +129,7 @@ public class PostgraSync implements Runnable {
         String url = "https://localhost:8443/api/content/" + item.path;
         post(url, item.content);
     }
-    
+
     public String post(String urlString, byte[] bytes) throws IOException {
         logger.trace("post {} {}", urlString, bytes.length);
         HttpsURLConnection connection = (HttpsURLConnection) new URL(urlString).openConnection();
@@ -149,15 +148,15 @@ public class PostgraSync implements Runnable {
             try (OutputStream outputStream = connection.getOutputStream()) {
                 outputStream.write(bytes);
             }
-            logger.info("responseCode {}", connection.getResponseCode());
+            logger.trace("responseCode {}", connection.getResponseCode());
             String response;
             try (InputStream inputStream = connection.getInputStream()) {
                 response = Streams.readString(inputStream);
             }
-            logger.info("response {}", response);
+            logger.info("response {}", Args.format(urlString, bytes.length, connection.getResponseCode(), response));
             return response.trim();
         } finally {
             connection.disconnect();
         }
-    }    
+    }
 }
