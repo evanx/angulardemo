@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.Executors;
@@ -12,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vellum.data.Millis;
@@ -21,6 +24,8 @@ import vellum.jx.JMapsException;
 import vellum.monitor.TimestampedMonitor;
 import vellum.monitor.Tx;
 import vellum.ssl.OpenHostnameVerifier;
+import vellum.ssl.OpenTrustManager;
+import vellum.ssl.SSLContexts;
 import vellum.util.Streams;
 
 /**
@@ -49,7 +54,8 @@ public class PostgraSync implements Runnable {
     boolean cancelled = false;
     TimestampedMonitor monitor;
     Tx tx;
-
+    SSLContext sslContext;
+        
     public PostgraSync(TimestampedMonitor monitor, JMap properties) throws JMapsException, ParseException {
         this.monitor = monitor;
         enabled = properties.getBoolean("enabled", true);
@@ -73,6 +79,7 @@ public class PostgraSync implements Runnable {
 
     public void start() throws Exception {
         logger.info("schedule {} {}", initialDelay, delay);
+        sslContext = SSLContexts.create(new OpenTrustManager());
         future = executorService.scheduleWithFixedDelay(this, initialDelay, delay, TimeUnit.MILLISECONDS);
     }
 
@@ -129,6 +136,7 @@ public class PostgraSync implements Runnable {
         HttpsURLConnection connection = (HttpsURLConnection) new URL(urlString).openConnection();
         try {
             connection.setHostnameVerifier(new OpenHostnameVerifier());
+            connection.setSSLSocketFactory(sslContext.getSocketFactory());
             connection.setConnectTimeout(connectTimeout);
             connection.setReadTimeout(readTimeout);
             connection.setUseCaches(false);
