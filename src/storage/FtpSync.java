@@ -160,7 +160,7 @@ public class FtpSync implements Runnable {
     void handle(StorageItem item) {
         handle0(item);
         if (!item.path.startsWith("storage/")) {
-            handle0(new StorageItem("storage/" + item.path, item.content));
+            handle0(new StorageItem("storage/" + item.path, item.content, item.cacheSeconds));
         }
     }
 
@@ -177,7 +177,7 @@ public class FtpSync implements Runnable {
 
     static StorageItem buildJsonp(StorageItem item) {
         byte[] content = ContentStorage.buildJsonp(item.path, item.content);
-        return new StorageItem(item.path + "p", content);
+        return new StorageItem(item.path + "p", content, item.cacheSeconds);
     }
 
     void close() {

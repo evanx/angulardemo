@@ -456,7 +456,7 @@ public class ArticleTask implements Runnable {
         if (topic != null) {
             map.put("topic", topic);
         }
-        context.storage.putJson(articlePath, map);
+        context.storage.putJsonArticle(articlePath, map);
     }
 
     private void loadImage() throws IOException {

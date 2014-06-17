@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+import vellum.data.Seconds;
 import vellum.exception.ParseException;
 import vellum.format.CalendarFormats;
 import vellum.jx.JMap;
@@ -60,7 +61,7 @@ public class ContentStorage {
     DateFormat minuteTimestampFormat = new SimpleDateFormat("");
     int topLimit = 15;
     int sectionLimit = 50;
-            
+    
     public ContentStorage(TimestampedMonitor monitor, JMap properties) throws JMapsException, IOException, ParseException {
         this.monitor = monitor;
         logger.info("properties: " + properties);
@@ -152,7 +153,8 @@ public class ContentStorage {
         }
     }    
 
-    private void putSection(String sectionName, List<JMap> articleList, int limit) throws IOException, JMapsException {
+    private void putSection(String sectionName, List<JMap> articleList, int limit) 
+            throws IOException, JMapsException {
         SectionEntity section = getSection(sectionName);
         section.addAll(articleList);
         String path = String.format("%s/current.json", sectionName);
@@ -196,13 +198,19 @@ public class ContentStorage {
         return jsonMap.get(path);
     }
 
+    public void putJsonArticle(String path, JMap map) throws IOException {
+        jsonMap.put(path, map);
+        byte[] content = map.toJson().getBytes();
+        putContent(path, content);
+    }
+    
     public void putJson(String path, JMap map) throws IOException {
         jsonMap.put(path, map);
         byte[] content = map.toJson().getBytes();
         putContent(path, content);
     }
 
-    public void putJson(String path, String json) throws IOException {
+    public void putJson(String path, String json, int cacheSeconds) throws IOException {
         putContent(path, json.getBytes());
     }
 
@@ -216,7 +224,7 @@ public class ContentStorage {
                 if (ftpSyncDeque == null) {
                     logger.warn("putContent: ftp deque is null");
                 } else {
-                    ftpSyncDeque.add(new StorageItem(path, content));
+                    ftpSyncDeque.add(new StorageItem(path, content, getCacheSeconds(path)));
                     logger.info("putContent: ftp deque {}", ftpSyncDeque.size());
                 }
             }
@@ -224,7 +232,7 @@ public class ContentStorage {
                 if (postgraSyncDeque == null) {
                     logger.warn("putContent: postgra deque is null");
                 } else {
-                    postgraSyncDeque.add(new StorageItem(path, content));
+                    postgraSyncDeque.add(new StorageItem(path, content, getCacheSeconds(path)));
                     logger.info("putContent: postgra deque {}", postgraSyncDeque.size());
                 }
             }
@@ -272,5 +280,12 @@ public class ContentStorage {
             sectionItemMap.put(section, sectionItem);
         }
         return sectionItem;
+    }
+
+    private long getCacheSeconds(String path) {
+        if (path.startsWith("article/")) return Seconds.fromDays(3);
+        else if (path.startsWith("image/")) return Seconds.fromDays(21);
+        else if (path.endsWith("articles.json")) return Seconds.fromMinutes(10);
+        else return Seconds.fromMinutes(10);
     }
 }

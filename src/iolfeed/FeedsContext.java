@@ -1,6 +1,5 @@
 package iolfeed;
 
-import static iolfeed.FeedsTask.logger;
 import vellum.monitor.TimestampedMonitor;
 import storage.ContentStorage;
 import java.util.ArrayList;
