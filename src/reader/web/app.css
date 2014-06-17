@@ -61,7 +61,7 @@ footer {
     min-height: 220px; 
     overflow: hidden; 
     position: relative;        
-    background-color: white;
+    background-color: gray;
 }
 .section-first-text {
     display: inline-block; 
@@ -97,7 +97,7 @@ footer {
 .section-first-image img,
 .section-first-image-gallery img {
     float: right;
-    max-height: 220px; 
+    //max-height: 220px;
 }
 .section-first-text:hover {
     background: rgba(0, 0, 0, .4); 
@@ -220,7 +220,7 @@ footer {
     background-color: gray;
 }
 .section-article-image img {
-    width: 150px;
+    width: 175px;
 }
 .section-article-image-youtube {
     position: absolute;
