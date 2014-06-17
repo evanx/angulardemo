@@ -41,22 +41,22 @@
               <a href="#/article/{{article.articleId}}">{{article.title}}</a>
             </div>
             <div class="article-link-image" ng-show="article.articleImage && article.articleImage.source">
-              <img width="125" ng-src="{{article.articleImage.source}}"/>
+              <img ng-src="{{article.articleImage.source}}"/>
             </div>
             <div class="article-link-image"
               ng-show="!article.articleImage && article.imageList && article.imageList.length > 0">
-              <img width="125" ng-src="{{article.imageList[0].source}}"/>
+              <img ng-src="{{article.imageList[0].source}}"/>
             </div>
             <div class="article-link-image-youtube" 
                  ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
-              <img width="125" ng-src="{{article.youtubeList[0].thumbnail}}"/>
+              <img ng-src="{{article.youtubeList[0].thumbnail}}"/>
             </div>
             <p class="article-lead">{{article.description}}</p>
           </td>
         </tr>
         <tr>
           <td class="section-ad-embed" ng-show="state.mobile">
-            <img src="http://aka-cdn-ns.adtech.de/images/341/Ad10398037St1Sz3055Sq105982172V0Id2.jpg"/>
+            <img src="http://aka-cdn-ns.adtech.de/images/451/Ad10398659St1Sz3055Sq105982189V0Id2.jpg"/>
           </td>
           <td class="section-ad-embed" ng-hide="state.mobile">
             <img src="http://aka-cdn-ns.adtech.de/images/387/Ad10409347St1Sz225Sq106007817V0Id6.gif"/>

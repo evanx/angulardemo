@@ -254,11 +254,11 @@ footer {
     font-weight: bold; 
 }
 .article-link-image {
-    margin-right: 1em; 
+    margin-right: .5em; 
     display: block; 
     float: left;
     width: 175px;
-    min-height: 90px;
+    min-height: 131px;
 }
 .article-link-image-youtube {
     margin-right: 1em; 
@@ -266,7 +266,11 @@ footer {
     float: left;
     width: 175px;                 
 }
+.article-link-image img {
+    width: 175px;
+}
 .article-link-image-youtube img {
+    width: 175px;
 }
 .article-lead {
 }
