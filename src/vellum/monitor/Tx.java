@@ -89,7 +89,6 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
 
     public void error(Object error) {
         this.error = error;
-        setDuration();
         if (error instanceof IOException) {
             logger.error(toString());
         } else if (error instanceof Exception) {
@@ -98,9 +97,11 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
         } else {
             logger.error(toString());
         }
+        setDuration();
     }
 
     public void ok() {
+        logger.info("ok {}", toString());        
         setDuration();
     }
 
@@ -110,13 +111,13 @@ public class Tx implements Timestamped, Thread.UncaughtExceptionHandler {
 
     void setDuration(long duration) {
         this.duration = duration;
+        logger.info("setDuration {}", toString());
         if (duration == 0) {
             duration = 1;
         }
         if (monitor != null) {
             monitor.finish(this);
         }
-        logger.info("setDuration {}", toString());        
     }
 
     public String getType() {

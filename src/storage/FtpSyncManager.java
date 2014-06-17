@@ -48,7 +48,7 @@ public class FtpSyncManager implements Runnable {
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
             for (JMap clientProperties : properties.getListMap("clients")) {
-                logger.info("client {}", properties);
+                logger.info("client {}", clientProperties);
                 FtpSync client = new FtpSync(this, new JConsoleMap(new NullConsole(), clientProperties));
                 if (client.isEnabled()) {
                     clients.add(client);
@@ -97,11 +97,6 @@ public class FtpSyncManager implements Runnable {
         } catch (RuntimeException e) {
             tx.error(e);
         } catch (Exception e) {
-            tx.error(e);
-        } catch (Error e) {
-            tx.error(e);
-        } catch (Throwable e) {
-            logger.error("throwable", e);
             tx.error(e);
         } finally {
             tx.fin();
