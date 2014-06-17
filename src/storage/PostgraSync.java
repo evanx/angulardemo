@@ -60,7 +60,7 @@ public class PostgraSync implements Runnable {
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
             port = properties.getInt("port", port);
-            hostname = properties.getString("hostname", "localhost:8443");
+            hostname = properties.getString("hostname", "localhost:8843");
             connectTimeout = (int) properties.getMillis("connectTimeout", connectTimeout);
             readTimeout = (int) properties.getMillis("readTimeout", readTimeout);
             logger.info("properties {}", properties);
