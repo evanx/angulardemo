@@ -46,7 +46,7 @@ public class PostgraSync implements Runnable {
     boolean enabled;
     int warningSize = 100;
     int port = 21;
-    String hostname;
+    String baseUrl;
     String username;
     String storageDir;
     Deque<StorageItem> deque = new ArrayDeque();
@@ -60,11 +60,11 @@ public class PostgraSync implements Runnable {
         enabled = properties.getBoolean("enabled", true);
         if (enabled) {
             port = properties.getInt("port", port);
-            hostname = properties.getString("hostname", "localhost:8843");
+            baseUrl = properties.getString("baseUrl", "https://localhost:8843/api/content/");
             connectTimeout = (int) properties.getMillis("connectTimeout", connectTimeout);
             readTimeout = (int) properties.getMillis("readTimeout", readTimeout);
             logger.info("properties {}", properties);
-            logger.info("{}", hostname);
+            logger.info("{}", baseUrl);
         }
     }
 
@@ -126,7 +126,7 @@ public class PostgraSync implements Runnable {
     }
 
     void handle(StorageItem item) throws IOException {
-        String url = "https://localhost:8443/api/content/" + item.path;
+        String url = baseUrl + item.path;
         post(url, item.content);
     }
 
