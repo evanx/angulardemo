@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="favicon.ico">
-    <title>My Independent</title>
-    <link rel="stylesheet" href="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <!--link href="mirror/netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"-->
-    <!--link href="lib/bootstrap.min.css" rel="stylesheet"-->
-    <!--link href="lib/offcanvas.css" rel="stylesheet"-->
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"-->
-    <link href="app.css" rel="stylesheet">
-    </head>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <link rel="shortcut icon" href="favicon.ico">
+      <title>Independent</title>
+      <link rel="stylesheet" href="/mirror/netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+      <!--link href="mirror/netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"-->
+      <!--link href="lib/bootstrap.min.css" rel="stylesheet"-->
+      <!--link href="lib/offcanvas.css" rel="stylesheet"-->
+      <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
+      <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"-->
+      <link rel="shortcut icon" href="favicon.png"> 
+      <link href="app.css" rel="stylesheet">
+      <style>
+         [ng\:cloak], [ng-cloak], .ng-cloak {
+            display: none !important;
+         }       
+      </style>
+   </head>
 
-    <body ng-controller="appController">
+   <body ng-controller="appController">
 
       <!--div id="fb-root"></div>
       <script>
@@ -32,90 +38,96 @@
             }(document, 'script', 'facebook-jssdk'));
       </script-->
 
-      <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#/sections"
-               style="white-space: nowrap; width: 100%">{{title}}</a>
-            <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button-->
-            <!--div class="navbar-text hidden" ng-show-="personalize()">
-              <a href="#/personalize/{{personalize()}}"><span class="glyphicon glyphicon-user"></span></a>
+      <div class="navbar navbar-fixed-top navbar-inverse ng-cloak" role="navigation">
+         <div class="container">
+            <div class="navbar-header">               
+              <img class="navbar-brand" style="" src="branding/32x32.png"/>
+            </div>
+            <!--div class="navbar-header">               
+              <img class="navbar-brand" style="" src="branding/INMLogo.png"/>
             </div-->
-          </div>
-          <div class="collapse navbar-collapse" ng-hide="true">
-            <ul class="nav navbar-nav">
-              <li><a href="#/sections" style="outline: 0">
-                  <span class="glyphicon glyphicon-chevron-down"></span></a>
-              </li>
-              <li ng-repeat="section in sectionList" ng-if="$index < 6" 
-                  ng-class="{active: isActive('/section/' + section.name)}"
-                  ><a href="#/section/{{section.name}}">{{section.label}}</a></li>
-              <!--
-              <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Frontpage</a></li>
-              <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
-              <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
-              <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
-              <li class="hidden-sm" ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">SciTech</a></li>
-              <li class="hidden-sm" ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
-              <li class="hidden-sm" ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
-              <li class="hidden" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
-              <li class="hidden" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
-              <li class="hidden" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
-              <li class="hidden-md" ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
-              <li class="hidden-md" ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
-              -->
-            </ul>
-          </div>
-        </div>
+            <div class="navbar-header">               
+              <a class="navbar-brand" href="#/sections"
+                 style="white-space: nowrap; width: 100%;"><span>{{title}}</span></a>
+               <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                 <span class="sr-only">Toggle navigation</span>
+                 <span class="icon-bar"></span>
+                 <span class="icon-bar"></span>
+                 <span class="icon-bar"></span>
+               </button-->
+               <!--div class="navbar-text hidden" ng-show-="personalize()">
+                 <a href="#/personalize/{{personalize()}}"><span class="glyphicon glyphicon-user"></span></a>
+               </div-->
+            </div>
+            <div class="collapse navbar-collapse" ng-hide="true">
+               <ul class="nav navbar-nav">
+                  <li><a href="#/sections" style="outline: 0"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                  </li>
+                  <li ng-repeat="section in sectionList" ng-if="$index < 6" 
+                      ng-class="{active: isActive('/section/' + section.name)}"
+                      ><a href="#/section/{{section.name}}">{{section.label}}</a></li>
+                  <!--
+                  <li ng-class="{active: isActive('/section/Top')}"><a href="#/section/Top">Frontpage</a></li>
+                  <li ng-class="{active: isActive('/section/News')}"><a href="#/section/News">News</a></li>
+                  <li ng-class="{active: isActive('/section/Sport')}"><a href="#/section/Sport">Sport</a></li>
+                  <li ng-class="{active: isActive('/section/Business')}"><a href="#/section/Business">Business</a></li>
+                  <li class="hidden-sm" ng-class="{active: isActive('/section/SciTech')}"><a href="#/section/SciTech">SciTech</a></li>
+                  <li class="hidden-sm" ng-class="{active: isActive('/section/Motoring')}"><a href="#/section/Motoring">Motoring</a></li>
+                  <li class="hidden-sm" ng-class="{active: isActive('/section/Lifestyle')}"><a href="#/section/Lifestyle">Lifestyle</a></li>
+                  <li class="hidden" ng-class="{active: isActive('/section/Tonight')}"><a href="#/section/Tonight">Tonight</a></li>
+                  <li class="hidden" ng-class="{active: isActive('/section/Travel')}"><a href="#/section/Travel">Travel</a></li>
+                  <li class="hidden" ng-class="{active: isActive('/section/Backpage')}"><a href="#/section/Backpage">Backpage</a></li>
+                  <li class="hidden-md" ng-class="{active: isActive('/section/Multimedia')}"><a href="#/section/Multimedia">Galleries</a></li>
+                  <li class="hidden-md" ng-class="{active: isActive('/section/Videos')}"><a href="#/section/Videos">Videos</a></li>
+                  -->
+               </ul>
+            </div>
+         </div>
       </div>
 
       <div class="container ng-cloak" ui-view="pagecontent" autoscroll="true" ng-view>
-        <div class="row visible-xs">
-          <div class="col-lg-10">                                   
-            <table class="table table-striped" style="width: 300px">
-              <tbody>
-                <tr ng-click="selected('top')">
-                  <td class="section-link"><a href="#/section/Top">Frontpage</a></td>
-                </tr>
-                <tr ng-click="selected('news')">
-                  <td class="section-link"><a href="#/section/News">News</a></td>
-                </tr>
-                <tr ng-click="selected('sport')">
-                  <td class="section-link"><a href="#/section/Sport">Sport</a></td>
-                </tr>
-                <tr ng-click="selected('business')">
-                  <td class="section-link"><a href="#/section/Business">Business</a></td>
-                </tr>
-                <tr ng-click="selected('scitech')">
-                  <td class="section-link"><a href="#/section/SciTech">SciTech</a></td>
-                </tr>
-                <tr ng-click="selected('motoring')">
-                  <td class="section-link"><a href="#/section/Motoring">Motoring</a></td>
-                </tr>
-                <tr ng-click="selected('lifestyle')">
-                  <td class="section-link"><a href="#/section/Lifestyle">Lifestyle</a></td>
-                </tr>
-                <tr ng-click="selected('tonight')">
-                  <td class="section-link"><a href="#/section/Tonight">Tonight</a></td>
-                </tr>
-                <tr ng-click="selected('travel')">
-                  <td class="section-link"><a href="#/section/Travel">Travel</a></td>
-                </tr>
-                <tr ng-click="selected('multimedia')">
-                  <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
-                </tr>
-                <tr ng-click="selected('videos')">
-                  <td class="section-link"><a href="#/section/Videos">Videos</a></td>
-                </tr>
-              </tbody>
-            </table>    
-          </div>
-        </div>
+         <h1>Loading...</h1>
+         <!--div class="row visible-xs">
+            <div class="col-lg-10">                                   
+               <table class="table table-striped" style="width: 300px">
+                  <tbody>
+                     <tr ng-click="selected('top')">
+                        <td class="section-link"><a href="#/section/Top">Frontpage</a></td>
+                     </tr>
+                     <tr ng-click="selected('news')">
+                        <td class="section-link"><a href="#/section/News">News</a></td>
+                     </tr>
+                     <tr ng-click="selected('sport')">
+                        <td class="section-link"><a href="#/section/Sport">Sport</a></td>
+                     </tr>
+                     <tr ng-click="selected('business')">
+                        <td class="section-link"><a href="#/section/Business">Business</a></td>
+                     </tr>
+                     <tr ng-click="selected('scitech')">
+                        <td class="section-link"><a href="#/section/SciTech">SciTech</a></td>
+                     </tr>
+                     <tr ng-click="selected('motoring')">
+                        <td class="section-link"><a href="#/section/Motoring">Motoring</a></td>
+                     </tr>
+                     <tr ng-click="selected('lifestyle')">
+                        <td class="section-link"><a href="#/section/Lifestyle">Lifestyle</a></td>
+                     </tr>
+                     <tr ng-click="selected('tonight')">
+                        <td class="section-link"><a href="#/section/Tonight">Tonight</a></td>
+                     </tr>
+                     <tr ng-click="selected('travel')">
+                        <td class="section-link"><a href="#/section/Travel">Travel</a></td>
+                     </tr>
+                     <tr ng-click="selected('multimedia')">
+                        <td class="section-link"><a href="#/section/Multimedia">Multimedia</a></td>
+                     </tr>
+                     <tr ng-click="selected('videos')">
+                        <td class="section-link"><a href="#/section/Videos">Videos</a></td>
+                     </tr>
+                  </tbody>
+               </table>    
+            </div>
+         </div-->
       </div>
 
       <!--div class="fb-like-box" data-href="https://www.facebook.com/IOLnews" data-width="300" data-colorscheme="light" data-show-faces="true" data-header="true" data-stream="false" data-show-border="true"></div-->
@@ -138,29 +150,29 @@
       -->
       <!--script src="/mirror/offcanvas.js"></script-->
       <script>
-                      var addthis_config = {
-                        "data_track_addressbar": false
-                      };
-                      var addthis_share = {
-                        url_transforms: {
-                          shorten: {
-                            twitter: 'bitly',
-                            facebook: 'bitly'
-                          }
-                        },
-                        shorteners: {
-                          bitly: {}
-                        }
-                      };
-                      if (false && typeof (navigator.geolocation)) {
-                        navigator.geolocation.getCurrentPosition(function(p) {
-                          console.log("geolocation success", p);
-                        }, function() {
-                          console.log("geolocation error", p);
-                        }, {enableHighAccuracy: true});
-                      } else {
-                        console.log("geolocation none");
-                      }
+                         var addthis_config = {
+                            "data_track_addressbar": false
+                         };
+                         var addthis_share = {
+                            url_transforms: {
+                               shorten: {
+                                  twitter: 'bitly',
+                                  facebook: 'bitly'
+                               }
+                            },
+                            shorteners: {
+                               bitly: {}
+                            }
+                         };
+                         if (false && typeof (navigator.geolocation)) {
+                            navigator.geolocation.getCurrentPosition(function(p) {
+                               console.log("geolocation success", p);
+                            }, function() {
+                               console.log("geolocation error", p);
+                            }, {enableHighAccuracy: true});
+                         } else {
+                            console.log("geolocation none");
+                         }
       </script>
       <!--script type="text/javascript" src="/mirror/s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5360d56a360acff5"></script--> 
       <script src="app.js"></script>    
@@ -178,5 +190,5 @@
       <link rel='prefetch' href='videos/articles.json'>
       -->
       <!--link-->
-    </body>
-  </html>
+   </body>
+</html>
