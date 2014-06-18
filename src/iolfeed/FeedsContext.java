@@ -62,6 +62,7 @@ public final class FeedsContext {
             articleTaskThreadPoolSize = properties.getInt("articleTaskThreadPoolSize", articleTaskThreadPoolSize);        
             feedLimit = properties.getInt("feedLimit", feedLimit);
             putFeed();
+            putFeedIsolezwe();
         }
     }
 
@@ -87,6 +88,15 @@ public final class FeedsContext {
         } else {
             return true;
         }
+    }
+    
+    private void putFeedIsolezwe() { 
+       putFeed("Izindaba", "Izindaba", "http://www.iol.co.za/cmlink/1.1116601"); 
+       putFeed("Ezokungcebeleka", "Ezokungcebeleka", "http://www.iol.co.za/cmlink/1.1118482"); 
+       putFeed("Ezemidlalo", "Ezemidlalo", "http://www.iol.co.za/cmlink/1.1118492"); 
+       putFeed("Intandokazi", "Intandokazi", "http://www.iol.co.za/cmlink/1.1118920"); 
+       putFeed("Ezemisakazo", "Ezemisakazo", "http://www.iol.co.za/cmlink/1.1118924"); 
+       putFeed("Ezezimoto", "Ezezimoto", "http://www.iol.co.za/cmlink/1.1118927"); 
     }
     
     private void putFeed() {
@@ -128,6 +138,7 @@ public final class FeedsContext {
     }
 
     void putFeed(String id, String label, String url) {
+       id = id.toLowerCase();
         if (feedLimit > 0 && feedEntityList.size() == feedLimit) {
             logger.warn("ignore {}", id);
         } else {

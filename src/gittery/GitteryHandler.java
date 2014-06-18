@@ -120,6 +120,10 @@ public class GitteryHandler implements HttpHandler {
         if (file.exists()) {
             return Streams.readBytes(file);
         }
+        file = new File(context.storage.appDir, path + ".html");
+        if (file.exists()) {
+            return Streams.readBytes(file);
+        }
         logger.info("not app file: " + file.getAbsolutePath());
         file = new File(context.storage.storageDir, path);
         if (file.exists()) {

@@ -40,66 +40,97 @@ function json_callback(path, data) {
 }
 
 var appData = {
-   sectionList: [
-      {
-         name: "Top",
-         label: "Frontpage"
-      },
-      {
-         name: "News",
-         label: "News"
-      },
-      {
-         name: "Sport",
-         label: "Sport"
-      },
-      {
-         name: "Business",
-         label: "Business"
-      },
-      {
-         name: "SciTech",
-         label: "Science & Technology"
-      },
-      {
-         name: "Motoring",
-         label: "Motoring"
-      },
-      {
-         name: "Lifestyle",
-         label: "Lifestyle"
-      },
-      {
-         name: "Tonight",
-         label: "Tonight"
-      },
-      {
-         name: "Travel",
-         label: "Travel"
-      },
-      {
-         name: "Backpage",
-         label: "Backpage"
-      },
-      {
-         name: "Multimedia",
-         label: "Galleries"
-      },
-      {
-         name: "Videos",
-         label: "Videos"
-      }
-   ],
+   "isolezwe": {
+      title: "Isolezwe",
+      sectionList: [
+         {
+            name: "Izindaba",
+            label: "Izindaba"
+         },
+         {
+            name: "Ezokungcebeleka",
+            label: "Ezokungcebeleka"
+         },
+         {
+            name: "Ezemidlalo",
+            label: "Ezemidlalo"
+         },
+         {
+            name: "Intandokazi",
+            label: "Intandokazi"
+         },
+         {
+            name: "Ezemisakazo",
+            label: "Ezemisakazo"
+         },
+         {
+            name: "Ezezimoto",
+            label: "Ezezimoto"
+         },
+      ]
+   },
+   "iol": {
+      title: "Independent",
+      sectionList: [
+         {
+            name: "Top",
+            label: "Frontpage"
+         },
+         {
+            name: "News",
+            label: "News"
+         },
+         {
+            name: "Sport",
+            label: "Sport"
+         },
+         {
+            name: "Business",
+            label: "Business"
+         },
+         {
+            name: "Motoring",
+            label: "Motoring"
+         },
+         {
+            name: "Lifestyle",
+            label: "Lifestyle"
+         },
+         {
+            name: "SciTech",
+            label: "Science & Technology"
+         },
+         {
+            name: "Tonight",
+            label: "Tonight"
+         },
+         {
+            name: "Travel",
+            label: "Travel"
+         },
+         {
+            name: "Backpage",
+            label: "Backpage"
+         },
+         {
+            name: "Multimedia", label: "Galleries"
+         },
+         {
+            name: "Videos",
+            label: "Videos"
+         }
+      ]
+   },
    definedHosts: {
       "cf.chronica.co": {hostType: "cors", geoDisabled: true},
       "chronica.co": {hostType: "cors", geoDisabled: true},
       "de.chronica.co": {hostType: "jsonp"},
       "do.chronica.co": {hostType: "cors", geoDisabled: true},
       "lh": {hostType: "jsonp"},
+      "ngena.local": {hostType: "cors", geoDisabled: true},
       "de.lh": {hostType: "cors"},
-      "za.lh": {hostType: "cors"},
-      "au.lh": {hostType: "cors"},
-      "localhost": {hostType: "cors"},
+      "za.lh": {hostType: "cors"}, "au.lh": {hostType: "cors"},
+      "localhost": {hostType: "cors", geoDisabled: true},
       "za.chronica.co": {hostType: "jsonp"}
    },
    preferredHosts: {
@@ -108,7 +139,6 @@ var appData = {
       za: ["za.chronica.co", "do.chronica.co"]
    }
 };
-
 var app = angular.module("app", ["ngTouch", "ngRoute", "ngSanitize", "ui.bootstrap"]);
 
 app.filter('sliceFrom', function() {
@@ -119,6 +149,12 @@ app.filter('sliceFrom', function() {
 });
 
 app.config(["$locationProvider", '$routeProvider', function($locationProvider, $routeProvider) {
+      appData.title = appData.iol;
+      if (window.location.host.indexOf("ngena") >= 0) {
+         appData.title = appData.isolezwe;
+      }
+      var defaultRoute = "/section/" + appData.title.sectionList[0].name;
+      console.log("location", window.location.host, defaultRoute);
       $locationProvider.html5Mode(false);
       $routeProvider.
               when("/sections", {
@@ -136,7 +172,7 @@ app.config(["$locationProvider", '$routeProvider', function($locationProvider, $
               when("/article/:articleId", {
                  templateUrl: "article.html",
                  controller: "articleController"}).
-              otherwise({redirectTo: "/section/Top"});
+              otherwise({redirectTo: defaultRoute});
    }]);
 
 app.config(['$httpProvider', function($httpProvider) {
@@ -161,12 +197,15 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          host: $location.host()
       },
    };
-   console.off = function() {      
+   console.off = function() {
    };
-   var sectionList = appData.sectionList;
+   var sectionList = appData.title.sectionList;
    var articleMap = {};
    var sectionArticleList = {};
    var service = {
+      getTitle: function() {
+         return appData.title.title;
+      },
       initHost: function() {
          geo.initialHost = geo.definedHosts[geo.location.host];
          if (!geo.initialHost) {
@@ -211,7 +250,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             return data.articles;
          } else {
             return null;
-         }          
+         }
       },
       putSectionArticles: function(section, data) {
          console.log("putSectionArticles", section, typeof (articles));
@@ -259,8 +298,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
             }
             return name;
          }
-      },
-      getOrigin: function(jsonPath, successHandler, errorHandler) {
+      }, getOrigin: function(jsonPath, successHandler, errorHandler) {
          var timestamp = new Date().getTime();
          $http.get("storage/" + jsonPath).success(function(data) {
             var duration = new Date().getTime() - timestamp;
@@ -294,8 +332,7 @@ app.factory("appService", function($q, $http, $location, $timeout) {
          }
          jsonpCallbacks[jsonPath] = {
             timedOut: false,
-            callback: successHandler,
-            timestamp: new Date().getTime(),
+            callback: successHandler, timestamp: new Date().getTime(),
             timeout: timeout
          };
          var scriptElement = document.createElement("script");
@@ -354,11 +391,13 @@ app.factory("appService", function($q, $http, $location, $timeout) {
       },
       initData: function() {
          var timeout = 4000;
-         console.log("initData", geo);
+         console.log("initData", sectionList, geo);
          var firstSection = sectionList[0].name.toLowerCase();
          service.loadSection(firstSection, timeout, timeout).then(function(result) {
             service.putSectionArticles(firstSection, result.data);
+            console.log("initData sectionList", sectionList);
             for (var i = 1; i < sectionList.length; i++) {
+               console.log("initData section", i, sectionList[i]);
                var section = sectionList[i].name.toLowerCase();
                service.loadSection(section, timeout + i * 500, timeout).then(function(result) {
                   console.log("initData result", result);
@@ -455,12 +494,14 @@ app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
 
 app.controller("appController", function($scope, $window, $location, $timeout, appService) {
    $scope.isCollapsed = true;
+   $scope.title = appData.title.title;
+   $scope.sectionList = appData.title.sectionList;
    $scope.state = {};
    $scope.userEmail = null;
-   $scope.state.title = "My Independent";
+   $scope.state.title = appData.title.title;
    $scope.state.mobile = ($window.innerWidth < 560);
-   console.log("appController", $scope.state.mobile);
-   $scope.isActive = function(route) {    
+   console.log("appController", $scope.state.mobile, $scope.title, $scope.sectionList);
+   $scope.isActive = function(route) {
       return route === $location.path();
    };
    $scope.personalize = function() {
@@ -482,9 +523,9 @@ app.controller("appController", function($scope, $window, $location, $timeout, a
    }
 });
 
-app.controller("sectionsController", function(
-        $scope, $location, $window, appService) {
-   $scope.state.title = "My Independent";
+app.controller("sectionsController", function($scope, $location, $window, appService) {
+   console.log("sectionsController location", $location.path());
+   $scope.state.title = appService.getTitle();
    $scope.sections = appService.getSectionList();
    $scope.selected = function(section) {
       console.log("selected", section);
@@ -492,8 +533,7 @@ app.controller("sectionsController", function(
    };
 });
 
-var sectionController = app.controller("sectionController", function(
-        $scope, $location, $routeParams, $window, $timeout, appService) {
+var sectionController = app.controller("sectionController", function($scope, $location, $routeParams, $window, $timeout, appService) {
    $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
    $scope.section = $routeParams.section.toLowerCase();
    $scope.state.section = $scope.section;
@@ -520,7 +560,6 @@ var sectionController = app.controller("sectionController", function(
       $location.path("article/" + article.articleId);
    };
 });
-
 app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
    function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
       var jsonPath = "article/" + $routeParams.articleId + ".json";
