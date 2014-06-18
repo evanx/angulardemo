@@ -1,74 +1,73 @@
 <div class="row" ng-show="articles.length > 0" style="margin-bottom: 0em;">  
-  <div class="col-lg-6 section-first" 
-       ng-hide="!articles[0].imagePath"
-       ng-hide="articles[0].imageList.length > 1"
-       ng-hide="article.youtubeList.length > 0"
-       >
-    <a class="section-first-image" href="#/article/{{articles[0].articleId}}"
-       ng-show="articles[0].articleImage"
-       ><img ng-src="{{articles[0].articleImage.source}}"></a>
-    <a class="section-first-image-gallery" href="#/article/{{articles[0].articleId}}"
-       ng-show="!articles[0].articleImage && articles[0].imageList && articles[0].imageList.length > 0"
-       ><img ng-src="{{articles[0].imageList[0].source}}"></a>
-    <a class="section-first-text" href="#/article/{{articles[0].articleId}}">
-      <h1 class="section-heading">{{sectionLabel}}</h1>
-      <h4 class="section-first-text-heading">{{articles[0].title}}</h4>
-      <p>{{articles[0].description}}</p>
-    </a>
-  </div>
+   <div class="col-lg-6 section-first" 
+        ng-hide="!articles[0].imagePath"
+        ng-hide="articles[0].imageList.length > 1"
+        ng-hide="article.youtubeList.length > 0"
+        >
+      <a class="section-first-image" href="#/article/{{articles[0].articleId}}"
+         ng-show="articles[0].articleImage"
+         ><img ng-src="{{articles[0].articleImage.source}}"></a>
+      <a class="section-first-image-gallery" href="#/article/{{articles[0].articleId}}"
+         ng-show="!articles[0].articleImage && articles[0].imageList && articles[0].imageList.length > 0"
+         ><img ng-src="{{articles[0].imageList[0].source}}"></a>
+      <a class="section-first-text" href="#/article/{{articles[0].articleId}}">
+         <h1 class="section-heading">{{sectionLabel}}</h1>
+         <h4 class="section-first-text-heading">{{articles[0].title}}</h4>
+         <p>{{articles[0].description}}</p>
+      </a>
+   </div>
 </div>
 <div class="row" ng-if="articles.length > 0" style="margin-bottom: 1em;">  
-  <div class="section-first-youtube" ng-show="articles[0].youtubeList.length > 0">
-    <div class="video-container">
-      <div ng-repeat="youtube in articles[0].youtubeList">
-        <iframe width="560" height="315"
-                ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+   <div class="section-first-youtube" ng-show="articles[0].youtubeList.length > 0">
+      <div class="video-container">
+         <div ng-repeat="youtube in articles[0].youtubeList">
+            <iframe width="560" height="315"
+                    ng-src="{{youtube.url}}" frameborder="0" allowfullscreen></iframe>   
+         </div>
+      </div>  
+      <h4><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
+      <div class="section-first-youtube-description" ng-show="articles[0].youtubeList.length > 0">
+         <p>{{articles[0].description}}</p>
       </div>
-    </div>  
-    <h4><a href="#/article/{{articles[0].articleId}}">{{articles[0].title}}</a></h4>
-    <div class="section-first-youtube-description" ng-show="articles[0].youtubeList.length > 0">
-      <p>{{articles[0].description}}</p>
-    </div>
-  </div>
+   </div>
 </div>
 <div class="row" ng-show="articles.length > 0" style="margin: 0; padding: 0;">  
-  <div class="col-lg-6" ng-show="articles.length > 1" style="margin: 0; padding: 0;">
-    <table class="table table-striped table-condensed section-table">
-      <tbody>
-        <tr ng-repeat="article in articles track by $index" ng-click="selected(article)" ng-if="$index > 0">
-          <td style="">
-            <div class="article-link">
-              <a href="#/article/{{article.articleId}}">{{article.title}}</a>
-            </div>
-            <div class="article-link-image" ng-show="article.articleImage && article.articleImage.source">
-              <img ng-src="{{article.articleImage.source}}"/>
-            </div>
-            <div class="article-link-image"
-              ng-show="!article.articleImage && article.imageList && article.imageList.length > 0">
-              <img ng-src="{{article.imageList[0].source}}"/>
-            </div>
-            <div class="article-link-image-youtube" 
-                 ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
-              <img ng-src="{{article.youtubeList[0].thumbnail}}"/>
-            </div>
-            <p class="article-lead">{{article.description}}</p>
-          </td>
-        </tr>
-        <tr>
-          <td class="section-ad-embed" ng-show="state.mobile">
-            <img src="http://aka-cdn-ns.adtech.de/images/451/Ad10398659St1Sz3055Sq105982189V0Id2.jpg"/>
-          </td>
-          <td class="section-ad-embed" ng-hide="state.mobile">
-            <img src="http://aka-cdn-ns.adtech.de/images/387/Ad10409347St1Sz225Sq106007817V0Id6.gif"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="view-footer" ng-show="section !== 'top'">
-      <span>More on <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a></span>
-    </div>
-    <div class="view-footer" ng-show="section == 'top'">
-      <span>More on <a href="http://www.iol.co.za">IOL.co.za</a></span>
-    </div>
-  </div>
+   <div class="col-lg-6" ng-show="articles.length > 1" style="margin: 0; padding: 0;">
+      <table class="table table-striped table-condensed section-table">
+         <tbody>
+            <tr ng-repeat="article in articles track by $index" ng-click="selected(article)" ng-if="$index > 0">
+               <td style="">
+                  <div class="article-link">
+                     <a href="#/article/{{article.articleId}}">{{article.title}}</a>
+                  </div>
+                  <div class="article-link-image" ng-show="article.articleImage && article.articleImage.source">
+                     <img ng-src="{{article.articleImage.source}}"/>
+                  </div>
+                  <div class="article-link-image"
+                       ng-show="!article.articleImage && article.imageList && article.imageList.length > 0">
+                     <img ng-src="{{article.imageList[0].source}}"/>
+                  </div>
+                  <div class="article-link-image-youtube" 
+                       ng-show="!article.imagePath && article.youtubeList[0].thumbnail">
+                     <img ng-src="{{article.youtubeList[0].thumbnail}}"/>
+                  </div>
+                  <p class="article-lead">{{article.description}}</p>
+               </td>
+            </tr>
+            <tr style="">
+               <td style="">
+                  <a href="http://core.adtech.de/adlink/3.0/567.1/0/0/-1/ADTECH;loc=300;alias=iol-home-1;random={{timestamp}}" 
+                     style="display: block;"><img 
+                        src="http://core.adtech.de/adserv/3.0/567.1/0/0/-1/ADTECH;loc=300;alias=iol-home-1;random={{timestamp}}" border="0"></a>                  
+               </td>
+            </tr>
+         </tbody>
+      </table>
+      <div class="view-footer" ng-show="section !== 'top'">
+         <span>More on <a href="http://www.iol.co.za/{{section}}">IOL.co.za/{{section}}</a></span>
+      </div>
+      <div class="view-footer" ng-show="section == 'top'">
+         <span>More on <a href="http://www.iol.co.za">IOL.co.za</a></span>
+      </div>
+   </div>
 </div>

@@ -493,6 +493,7 @@ app.config(['$sceDelegateProvider', function($sceDelegateProvider) {
    }]);
 
 app.controller("appController", function($scope, $window, $location, $timeout, appService) {
+   $scope.timestamp = new Date().getTime();
    $scope.isCollapsed = true;
    $scope.title = appData.title.title;
    $scope.sectionList = appData.title.sectionList;
@@ -525,6 +526,7 @@ app.controller("appController", function($scope, $window, $location, $timeout, a
 
 app.controller("sectionsController", function($scope, $location, $window, appService) {
    console.log("sectionsController location", $location.path());
+   $scope.timestamp = new Date().getTime();
    $scope.state.title = appService.getTitle();
    $scope.sections = appService.getSectionList();
    $scope.selected = function(section) {
@@ -534,6 +536,7 @@ app.controller("sectionsController", function($scope, $location, $window, appSer
 });
 
 var sectionController = app.controller("sectionController", function($scope, $location, $routeParams, $window, $timeout, appService) {
+   $scope.timestamp = new Date().getTime();
    $scope.sectionLabel = appService.getSectionLabel($routeParams.section);
    $scope.section = $routeParams.section.toLowerCase();
    $scope.state.section = $scope.section;
@@ -560,64 +563,65 @@ var sectionController = app.controller("sectionController", function($scope, $lo
       $location.path("article/" + article.articleId);
    };
 });
-app.controller("articleController", ["$scope", "$location", "$window", "$routeParams", "$window", "$sce", "$timeout", "appService",
-   function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
-      var jsonPath = "article/" + $routeParams.articleId + ".json";
-      $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
-      console.log("article", $window);
-      $scope.addThisVisible = false;
-      $scope.galleryStyle = "";
-      $scope.setStyle = function() {
-         $scope.galleryStyle = {};
-         if ($scope.article.maxHeight) {
-            var height = 2 + $scope.article.maxHeight;
-            if ($window.innerWidth < $scope.article.maxWidth) {
-               height = 2 + ($scope.article.maxHeight * $window.innerWidth / $scope.article.maxWidth);
-               $scope.galleryStyle["width"] = "100%";
-            } else {
-               $scope.galleryStyle["width"] = "" + $scope.article.maxWidth + "px";
-               $scope.galleryStyle["margin-left"] = "1em";
-            }
-            $scope.galleryStyle["min-height"] = "" + height + "px";
+
+app.controller("articleController", function($scope, $location, $window, $routeParams, $window, $sce, $timeout, appService) {
+   $scope.timestamp = new Date().getTime();
+   var jsonPath = "article/" + $routeParams.articleId + ".json";
+   $scope.develInfo = "" + $window.innerWidth + "x" + $window.innerHeight;
+   console.log("article", $window);
+   $scope.addThisVisible = false;
+   $scope.galleryStyle = "";
+   $scope.setStyle = function() {
+      $scope.galleryStyle = {};
+      if ($scope.article.maxHeight) {
+         var height = 2 + $scope.article.maxHeight;
+         if ($window.innerWidth < $scope.article.maxWidth) {
+            height = 2 + ($scope.article.maxHeight * $window.innerWidth / $scope.article.maxWidth);
+            $scope.galleryStyle["width"] = "100%";
+         } else {
+            $scope.galleryStyle["width"] = "" + $scope.article.maxWidth + "px";
+            $scope.galleryStyle["margin-left"] = "1em";
          }
-         console.log("galleryStyle", $scope.galleryStyle);
-      };
-      $scope.scheduleAddThis = function() {
-         if (typeof addthis !== 'undefined') {
-            $timeout(function() {
-               console.log("addthis", addthis);
-               addthis.toolbox(".addthis_toolbox");
-               $scope.addThisVisible = true;
-            }, 200);
-         }
-      };
-      $scope.processArticle = function(article) {
-         if (article.imageList) {
-            for (var i = 0; i < article.imageList.length; i++) {
-            }
-         }
-         return article;
-      };
-      $scope.resultHandler = function(data) {
-         console.log("articleResult", data);
-         $scope.statusMessage = "Loaded";
-         $scope.article = data;
-         $scope.setStyle();
-         $scope.state.title = $scope.article.title;
-         appService.putArticle($scope.article);
-         $scope.scheduleAddThis();
-      };
-      $scope.errorHandler = function() {
-         $scope.statusMessage = "Failed";
-      };
-      console.log("articleController", $routeParams.articleId, jsonPath);
-      if (appService.isArticle($routeParams.articleId)) {
-         $scope.article = appService.getArticle($routeParams.articleId);
-         console.log("article cached", $scope.article);
-         $scope.state.title = $scope.article.title;
-         $scope.scheduleAddThis();
-      } else {
-         $scope.statusMessage = "Loading " + jsonPath;
-         appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler, 4000, 4000);
+         $scope.galleryStyle["min-height"] = "" + height + "px";
       }
-   }]);
+      console.log("galleryStyle", $scope.galleryStyle);
+   };
+   $scope.scheduleAddThis = function() {
+      if (typeof addthis !== 'undefined') {
+         $timeout(function() {
+            console.log("addthis", addthis);
+            addthis.toolbox(".addthis_toolbox");
+            $scope.addThisVisible = true;
+         }, 200);
+      }
+   };
+   $scope.processArticle = function(article) {
+      if (article.imageList) {
+         for (var i = 0; i < article.imageList.length; i++) {
+         }
+      }
+      return article;
+   };
+   $scope.resultHandler = function(data) {
+      console.log("articleResult", data);
+      $scope.statusMessage = "Loaded";
+      $scope.article = data;
+      $scope.setStyle();
+      $scope.state.title = $scope.article.title;
+      appService.putArticle($scope.article);
+      $scope.scheduleAddThis();
+   };
+   $scope.errorHandler = function() {
+      $scope.statusMessage = "Failed";
+   };
+   console.log("articleController", $routeParams.articleId, jsonPath);
+   if (appService.isArticle($routeParams.articleId)) {
+      $scope.article = appService.getArticle($routeParams.articleId);
+      console.log("article cached", $scope.article);
+      $scope.state.title = $scope.article.title;
+      $scope.scheduleAddThis();
+   } else {
+      $scope.statusMessage = "Loading " + jsonPath;
+      appService.load(jsonPath, $scope.resultHandler, $scope.errorHandler, 4000, 4000);
+   }
+});

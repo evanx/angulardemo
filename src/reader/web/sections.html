@@ -1,13 +1,20 @@
 <div class="row">
-  <div class="col-lg-10 sections" ng-show="sections.length > 0">
-    <table class="table" style="width: 300px">
-      <tbody>
-        <tr ng-repeat="section in sections" ng-click="selected(section.name)">
-          <td class="section-link">
-            <a href="#/section/{{section.name}}">{{section.label}}</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>    
-  </div>
+   <div class="col-lg-10 sections" ng-show="sections.length > 0">
+      <table class="table" style="width: 300px; margin-bottom: 0em;">
+         <tbody>
+            <tr ng-repeat="section in sections" ng-click="selected(section.name)">
+               <td class="section-link">
+                  <a href="#/section/{{section.name}}">{{section.label}}</a>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <a href="http://core.adtech.de/adlink/3.0/567.1/0/0/-1/ADTECH;loc=300;alias=iol-home-1;random={{timestamp}}" 
+                     style=""><img 
+                        src="http://core.adtech.de/adserv/3.0/567.1/0/0/-1/ADTECH;loc=300;alias=iol-home-1;random={{timestamp}}" border="0"></a>                  
+               </td>
+            </tr>
+         </tbody>
+      </table>    
+   </div>
 </div>

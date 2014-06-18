@@ -269,6 +269,7 @@ footer {
 }
 .article-link-image img {
     width: 175px;
+    border: solid black 1px;
 }
 .article-link-image-youtube img {
     width: 175px;
